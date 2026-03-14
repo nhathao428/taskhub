@@ -2,3 +2,16 @@ node_modules
 __pycache__
 .env
 .DS_Store
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+*.log
