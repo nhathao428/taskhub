@@ -24,10 +24,13 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final CorsConfig corsConfig;
 
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider, @Lazy UserService userService) {
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider, @Lazy UserService userService,
+                          CorsConfig corsConfig) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.corsConfig = corsConfig;
     }
 
     @Bean
@@ -59,9 +62,15 @@ public class SecurityConfig {
             // JWT bearer tokens in the Authorization header, not cookies. CSRF attacks target
             // cookie-based authentication and are not applicable here.
             .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/swagger-ui/**", "/swagger-ui.html",
+                        "/api-docs/**", "/v3/api-docs/**",
+                        "/h2-console/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
