@@ -1,0 +1,205 @@
+import { useEffect, useState } from 'react'
+import { MdAdd } from 'react-icons/md'
+import api from '../api/axios'
+import Modal from '../components/Modal'
+
+const emptyForm = { employee: '', date: '', checkIn: '', checkOut: '' }
+
+export default function Attendance() {
+  const [records, setRecords] = useState([])
+  const [employees, setEmployees] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filterEmpId, setFilterEmpId] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const fetchRecords = async (empId) => {
+    setLoading(true)
+    try {
+      const url = empId ? `/api/attendance/employee/${empId}` : '/api/attendance'
+      const res = await api.get(url)
+      setRecords(res.data || [])
+    } catch {
+      setError('Không thể tải dữ liệu chấm công.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await api.get('/api/employees')
+      setEmployees(res.data || [])
+    } catch {
+      // ignore
+    }
+  }
+
+  useEffect(() => {
+    fetchEmployees()
+    fetchRecords('')
+  }, [])
+
+  const handleFilterChange = (e) => {
+    const id = e.target.value
+    setFilterEmpId(id)
+    fetchRecords(id)
+  }
+
+  const getEmpName = (record) => {
+    if (record.employee?.firstName) {
+      return `${record.employee.firstName} ${record.employee.lastName}`
+    }
+    const emp = employees.find((e) => e.id === (record.employee?.id || record.employee))
+    return emp ? `${emp.firstName} ${emp.lastName}` : '-'
+  }
+
+  const handleSave = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    setError('')
+    const payload = {
+      employee: { id: Number(form.employee) },
+      date: form.date,
+      checkIn: form.checkIn,
+      checkOut: form.checkOut,
+    }
+    try {
+      await api.post('/api/attendance', payload)
+      setModalOpen(false)
+      setForm(emptyForm)
+      fetchRecords(filterEmpId)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Chấm công thất bại.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Chấm công</h1>
+        <button
+          onClick={() => { setForm(emptyForm); setError(''); setModalOpen(true) }}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        >
+          <MdAdd className="text-xl" /> Chấm công
+        </button>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Lọc theo nhân viên:</label>
+          <select
+            value={filterEmpId}
+            onChange={handleFilterChange}
+            className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">Tất cả nhân viên</option>
+            {employees.map((emp) => (
+              <option key={emp.id} value={emp.id}>
+                {emp.firstName} {emp.lastName}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nhân viên</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ vào</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ ra</th>
+              </tr>
+            </thead>
+            <tbody>
+              {records.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-8 text-gray-400">Chưa có dữ liệu chấm công.</td>
+                </tr>
+              ) : (
+                records.map((rec, idx) => (
+                  <tr key={rec.id || idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                    <td className="px-6 py-4 font-medium text-gray-800">{getEmpName(rec)}</td>
+                    <td className="px-6 py-4 text-gray-600">{rec.date ? rec.date.split('T')[0] : '-'}</td>
+                    <td className="px-6 py-4 text-gray-600">{rec.checkIn || '-'}</td>
+                    <td className="px-6 py-4 text-gray-600">{rec.checkOut || '-'}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Chấm công">
+        <form onSubmit={handleSave} className="space-y-4">
+          {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+            <select
+              value={form.employee}
+              onChange={(e) => setForm({ ...form, employee: e.target.value })}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">-- Chọn nhân viên --</option>
+              {employees.map((emp) => (
+                <option key={emp.id} value={emp.id}>
+                  {emp.firstName} {emp.lastName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ngày</label>
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Giờ vào</label>
+              <input
+                type="time"
+                value={form.checkIn}
+                onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Giờ ra</label>
+              <input
+                type="time"
+                value={form.checkOut}
+                onChange={(e) => setForm({ ...form, checkOut: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
+              {saving ? 'Đang lưu...' : 'Lưu'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  )
+}
