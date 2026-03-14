@@ -65,7 +65,8 @@ task-management-system/
 ├── docs/             # API specs, database schema, setup guide
 │   ├── API_SPECIFICATION.md
 │   ├── DATABASE_SCHEMA.md
-│   └── SETUP_GUIDE.md
+│   ├── SETUP_GUIDE.md
+│   └── UML_DIAGRAMS.md    # Use Case & Sequence Diagrams (Mermaid)
 └── TIMELINE.md       # Project development timeline
 ```
 
@@ -76,3 +77,4 @@ task-management-system/
 - [Setup Guide](docs/SETUP_GUIDE.md)
 - [API Specification](docs/API_SPECIFICATION.md)
 - [Database Schema](docs/DATABASE_SCHEMA.md)
+- [UML Diagrams (Use Case & Sequence)](docs/UML_DIAGRAMS.md)
