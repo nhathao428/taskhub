@@ -2,6 +2,8 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Task;
 import com.example.taskmanagement.repository.TaskRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,21 +17,26 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    @Cacheable("tasks")
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
+    @Cacheable(value = "tasks", key = "#id")
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Task not found: " + id));
     }
 
+    @CacheEvict(value = "tasks", allEntries = true)
     public Task createTask(Task task) {
         return taskRepository.save(task);
     }
 
+    @CacheEvict(value = "tasks", allEntries = true)
     public Task updateTask(Long id, Task updated) {
-        Task existing = getTaskById(id);
+        Task existing = taskRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + id));
         existing.setTitle(updated.getTitle());
         existing.setDescription(updated.getDescription());
         existing.setDueDate(updated.getDueDate());
@@ -39,6 +46,7 @@ public class TaskService {
         return taskRepository.save(existing);
     }
 
+    @CacheEvict(value = "tasks", allEntries = true)
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
     }
