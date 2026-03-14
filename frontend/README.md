@@ -1,3 +1,73 @@
-# Task Management System Frontend
+# Task Management System — Frontend
 
-This is the frontend for the Task Management System built with React.
+Giao diện người dùng cho Hệ thống Quản lý Công việc, xây dựng bằng React + Vite + Tailwind CSS.
+
+## Tech Stack
+
+- **Vite** + **React 18**
+- **Tailwind CSS** (styling)
+- **React Router DOM v6** (routing)
+- **Axios** (HTTP client với JWT interceptor)
+- **Chart.js + react-chartjs-2** (biểu đồ dashboard)
+- **React Icons** (icons)
+
+## Yêu cầu
+
+- Node.js ≥ 18
+- Backend Spring Boot chạy trên `http://localhost:5000`
+
+## Cài đặt & Chạy
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Mở trình duyệt tại: **http://localhost:5173**
+
+## Các trang
+
+| Đường dẫn | Mô tả |
+|---|---|
+| `/login` | Đăng nhập |
+| `/register` | Đăng ký tài khoản |
+| `/dashboard` | Bảng điều khiển — thống kê + biểu đồ |
+| `/employees` | Quản lý nhân viên (CRUD) |
+| `/projects` | Quản lý dự án (CRUD) |
+| `/tasks` | Quản lý công việc (CRUD) |
+| `/attendance` | Chấm công |
+| `/ai-suggestions` | AI gợi ý nhân viên phù hợp |
+
+## Cấu trúc thư mục
+
+```
+frontend/
+├── index.html
+├── package.json
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+└── src/
+    ├── main.jsx
+    ├── App.jsx
+    ├── index.css
+    ├── api/
+    │   └── axios.js           # Axios instance + JWT interceptor
+    ├── components/
+    │   ├── Layout.jsx
+    │   ├── Sidebar.jsx
+    │   ├── ProtectedRoute.jsx
+    │   └── Modal.jsx
+    ├── pages/
+    │   ├── Login.jsx
+    │   ├── Register.jsx
+    │   ├── Dashboard.jsx
+    │   ├── Employees.jsx
+    │   ├── Projects.jsx
+    │   ├── Tasks.jsx
+    │   ├── Attendance.jsx
+    │   └── AiSuggestions.jsx
+    └── context/
+        └── AuthContext.jsx
+```

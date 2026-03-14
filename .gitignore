@@ -14,3 +14,7 @@ target/
 .project
 .settings/
 .classpath
+
+# Frontend build artifacts
+frontend/dist/
+frontend/node_modules/
