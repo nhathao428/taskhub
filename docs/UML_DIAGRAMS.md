@@ -1,5 +1,21 @@
 # Tài liệu UML — Hệ thống Quản lý Công việc
 
+## Mục lục
+
+- [Mục đích tài liệu](#mục-đích-tài-liệu)
+- [1. Sơ đồ Use Case](#1-sơ-đồ-use-case)
+- [2. Bảng tóm tắt Use Case](#2-bảng-tóm-tắt-use-case)
+- [3. Các Sequence Diagram](#3-các-sequence-diagram)
+  - [3.1 Đăng ký tài khoản](#31-đăng-ký-tài-khoản)
+  - [3.2 Đăng nhập và cấp JWT](#32-đăng-nhập-và-cấp-jwt)
+  - [3.3 Tạo công việc mới](#33-tạo-công-việc-mới)
+  - [3.4 Chấm công](#34-chấm-công)
+  - [3.5 AI gợi ý nhân viên phù hợp](#35-ai-gợi-ý-nhân-viên-phù-hợp)
+  - [3.6 Gửi phản hồi gợi ý](#36-gửi-phản-hồi-gợi-ý)
+- [4. Giải thích thuật toán AI Gợi ý Nhân viên](#4-giải-thích-thuật-toán-ai-gợi-ý-nhân-viên)
+
+---
+
 ## Mục đích tài liệu
 
 Tài liệu này mô tả kiến trúc và các luồng hoạt động chính của **Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành** thông qua các sơ đồ UML được vẽ bằng cú pháp Mermaid (GitHub render trực tiếp).
