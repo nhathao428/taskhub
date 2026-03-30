@@ -20,6 +20,29 @@ function ProgressBar({ label, value }) {
   )
 }
 
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 animate-pulse">
+      <div className="flex items-start justify-between mb-4">
+        <div className="space-y-2">
+          <div className="h-5 bg-gray-200 rounded w-32" />
+          <div className="h-3 bg-gray-100 rounded w-20" />
+        </div>
+        <div className="h-10 w-10 bg-gray-200 rounded-full" />
+      </div>
+      <div className="space-y-3 mb-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="space-y-1">
+            <div className="h-3 bg-gray-100 rounded w-full" />
+            <div className="h-2 bg-gray-200 rounded w-full" />
+          </div>
+        ))}
+      </div>
+      <div className="h-12 bg-indigo-50 rounded-lg" />
+    </div>
+  )
+}
+
 function SuggestionCard({ emp }) {
   const overallPct = Math.round((emp.overallScore || 0) * 100)
   return (
@@ -65,6 +88,7 @@ function SuggestionCard({ emp }) {
 
 export default function AiSuggestions() {
   const [taskTitle, setTaskTitle] = useState('')
+  const [taskDescription, setTaskDescription] = useState('')
   const [skillInput, setSkillInput] = useState('')
   const [skills, setSkills] = useState([])
   const [results, setResults] = useState([])
@@ -95,6 +119,7 @@ export default function AiSuggestions() {
     try {
       const res = await api.post('/api/suggestions/recommend', {
         taskTitle,
+        taskDescription,
         requiredSkills: skills,
       })
       setResults(res.data || [])
@@ -128,6 +153,20 @@ export default function AiSuggestions() {
               required
               placeholder="VD: Phát triển API RESTful cho ứng dụng di động"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mô tả công việc
+              <span className="ml-1 text-gray-400 font-normal">(tùy chọn — giúp AI gợi ý chính xác hơn)</span>
+            </label>
+            <textarea
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              rows={3}
+              placeholder="VD: Xây dựng các endpoint REST API với Spring Boot, tích hợp JWT authentication và kết nối PostgreSQL..."
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
           </div>
 
@@ -167,7 +206,7 @@ export default function AiSuggestions() {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Đang tính toán...
+                AI đang phân tích...
               </>
             ) : (
               <>
@@ -185,6 +224,17 @@ export default function AiSuggestions() {
         </div>
       )}
 
+      {loading && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">AI đang phân tích dữ liệu...</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {!loading && searched && results.length === 0 && !error && (
         <div className="text-center py-12 text-gray-400">
           <MdSmartToy className="text-5xl mx-auto mb-2 opacity-30" />
@@ -192,7 +242,7 @@ export default function AiSuggestions() {
         </div>
       )}
 
-      {results.length > 0 && (
+      {!loading && results.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-700 mb-4">
             Top {results.length} nhân viên phù hợp

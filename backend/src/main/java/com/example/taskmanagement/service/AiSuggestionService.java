@@ -2,7 +2,6 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.dto.EmployeeSuggestionDTO;
 import com.example.taskmanagement.dto.SuggestionRequest;
-import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.entity.Skill;
 import com.example.taskmanagement.entity.Task;
@@ -10,19 +9,26 @@ import com.example.taskmanagement.repository.AttendanceRepository;
 import com.example.taskmanagement.repository.EmployeeRepository;
 import com.example.taskmanagement.repository.SkillRepository;
 import com.example.taskmanagement.repository.TaskRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class AiSuggestionService {
 
-    private static final int MAX_TASKS_THRESHOLD = 5;
+    private static final Logger log = LoggerFactory.getLogger(AiSuggestionService.class);
     private static final int EXPECTED_WORKING_DAYS = 22;
     private static final int TOP_N = 5;
 
@@ -30,29 +36,57 @@ public class AiSuggestionService {
     private final TaskRepository taskRepository;
     private final AttendanceRepository attendanceRepository;
     private final SkillRepository skillRepository;
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper;
+
+    @Value("${openai.api.key:}")
+    private String openAiApiKey;
+
+    @Value("${openai.api.model:gpt-4o-mini}")
+    private String openAiModel;
 
     public AiSuggestionService(EmployeeRepository employeeRepository,
                                 TaskRepository taskRepository,
                                 AttendanceRepository attendanceRepository,
-                                SkillRepository skillRepository) {
+                                SkillRepository skillRepository,
+                                RestClient.Builder restClientBuilder,
+                                ObjectMapper objectMapper) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.attendanceRepository = attendanceRepository;
         this.skillRepository = skillRepository;
+        this.restClient = restClientBuilder.baseUrl("https://api.openai.com").build();
+        this.objectMapper = objectMapper;
     }
 
-    @Cacheable(value = "ai_suggestions", key = "#request.taskTitle + '-' + #request.requiredSkills")
+    @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
     public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
-        List<String> requiredSkills = buildRequiredSkills(request);
+        if (request == null || request.getTaskTitle() == null || request.getTaskTitle().isBlank()) {
+            throw new IllegalArgumentException("Task title is required");
+        }
+
         List<Employee> employees = employeeRepository.findAll();
+        if (employees.isEmpty()) {
+            return List.of();
+        }
 
-        List<EmployeeSuggestionDTO> suggestions = employees.stream()
-                .map(employee -> scoreEmployee(employee, requiredSkills))
-                .sorted(Comparator.comparingDouble(EmployeeSuggestionDTO::getOverallScore).reversed())
-                .limit(TOP_N)
-                .collect(Collectors.toList());
+        List<Long> employeeIds = employees.stream().map(Employee::getEmployeeId).collect(Collectors.toList());
 
-        return suggestions;
+        Map<Long, List<Skill>> skillsByEmployee = skillRepository.findByEmployeeEmployeeIdIn(employeeIds)
+                .stream().collect(Collectors.groupingBy(s -> s.getEmployee().getEmployeeId()));
+
+        Map<Long, Long> activeTasksByEmployee = taskRepository
+                .findByAssignedToEmployeeIdInAndStatusIn(employeeIds, List.of("pending", "in_progress"))
+                .stream().collect(Collectors.groupingBy(t -> t.getAssignedTo().getEmployeeId(), Collectors.counting()));
+
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(30);
+        Map<Long, Long> attendanceByEmployee = attendanceRepository
+                .findByEmployeeEmployeeIdInAndDateBetween(employeeIds, start, end)
+                .stream().collect(Collectors.groupingBy(a -> a.getEmployee().getEmployeeId(), Collectors.counting()));
+
+        String prompt = buildPrompt(request, employees, skillsByEmployee, activeTasksByEmployee, attendanceByEmployee);
+        return callOpenAi(prompt, employees);
     }
 
     @Cacheable(value = "ai_suggestions", key = "'task-' + #taskId")
@@ -65,130 +99,120 @@ public class AiSuggestionService {
         request.setTaskTitle(task.getTitle());
         request.setTaskDescription(task.getDescription());
 
-        List<String> requiredSkills = buildRequiredSkills(request);
-        List<Employee> employees = employeeRepository.findAll();
-
-        return employees.stream()
-                .map(employee -> scoreEmployee(employee, requiredSkills))
-                .sorted(Comparator.comparingDouble(EmployeeSuggestionDTO::getOverallScore).reversed())
-                .limit(TOP_N)
-                .collect(Collectors.toList());
+        return recommendEmployees(request);
     }
 
-    private List<String> buildRequiredSkills(SuggestionRequest request) {
-        List<String> skills = new ArrayList<>();
-        if (request.getRequiredSkills() != null) {
-            skills.addAll(request.getRequiredSkills());
-        }
-        if (request.getTaskTitle() != null) {
-            skills.addAll(extractKeywords(request.getTaskTitle()));
-        }
-        if (request.getTaskDescription() != null) {
-            skills.addAll(extractKeywords(request.getTaskDescription()));
-        }
-        return skills.stream().map(String::toLowerCase).distinct().collect(Collectors.toList());
-    }
-
-    private List<String> extractKeywords(String text) {
-        if (text == null || text.isBlank()) {
-            return List.of();
-        }
-        // Split on non-alphanumeric characters and filter out very short words
-        return List.of(text.toLowerCase().split("[^a-z0-9]+"))
-                .stream()
-                .filter(w -> w.length() > 2)
-                .collect(Collectors.toList());
-    }
-
-    private EmployeeSuggestionDTO scoreEmployee(Employee employee, List<String> requiredSkills) {
-        double skillScore = calculateSkillScore(employee.getEmployeeId(), requiredSkills);
-        double workloadScore = calculateWorkloadScore(employee.getEmployeeId());
-        double performanceScore = calculatePerformanceScore(employee.getEmployeeId());
-        double attendanceScore = calculateAttendanceScore(employee.getEmployeeId());
-
-        double overallScore = (skillScore * 0.35)
-                + (workloadScore * 0.25)
-                + (performanceScore * 0.25)
-                + (attendanceScore * 0.15);
-
-        String reasoning = buildReasoning(skillScore, workloadScore, performanceScore, attendanceScore);
-
-        return new EmployeeSuggestionDTO(
-                employee.getEmployeeId(),
-                employee.getFirstName(),
-                employee.getLastName(),
-                employee.getDepartment(),
-                skillScore,
-                workloadScore,
-                performanceScore,
-                attendanceScore,
-                overallScore,
-                reasoning
-        );
-    }
-
-    private double calculateSkillScore(Long employeeId, List<String> requiredSkills) {
-        if (requiredSkills == null || requiredSkills.isEmpty()) {
-            return 0.5; // neutral score when no skills specified
-        }
-        List<Skill> employeeSkills = skillRepository.findByEmployeeEmployeeId(employeeId);
-        if (employeeSkills.isEmpty()) {
-            return 0.0;
-        }
-        long matched = requiredSkills.stream()
-                .filter(req -> employeeSkills.stream()
-                        .anyMatch(s -> s.getSkillName().toLowerCase().contains(req)
-                                || req.contains(s.getSkillName().toLowerCase())))
-                .count();
-        return (double) matched / requiredSkills.size();
-    }
-
-    private double calculateWorkloadScore(Long employeeId) {
-        List<Task> activeTasks = taskRepository
-                .findByAssignedToEmployeeIdAndStatusIn(employeeId, List.of("pending", "in_progress"));
-        int currentTasks = activeTasks.size();
-        double score = 1.0 - ((double) currentTasks / MAX_TASKS_THRESHOLD);
-        return Math.max(0.0, Math.min(1.0, score));
-    }
-
-    private double calculatePerformanceScore(Long employeeId) {
-        List<Task> allTasks = taskRepository.findByAssignedToEmployeeId(employeeId);
-        List<Task> completed = allTasks.stream()
-                .filter(t -> "completed".equalsIgnoreCase(t.getStatus()))
-                .collect(Collectors.toList());
-        if (completed.isEmpty()) {
-            return 0.5; // neutral score for new employees
-        }
-        // Count completed tasks whose due date is still in the future (completed before the deadline).
-        // Since there is no completedAt field in the schema, a future dueDate on a completed task
-        // is the best available indicator that the task was finished ahead of schedule.
-        java.time.LocalDateTime now = java.time.LocalDateTime.now();
-        long withDeadline = completed.stream().filter(t -> t.getDueDate() != null).count();
-        if (withDeadline == 0) {
-            return 0.5; // no deadline info, return neutral
-        }
-        long onTime = completed.stream()
-                .filter(t -> t.getDueDate() != null && t.getDueDate().isAfter(now))
-                .count();
-        return (double) onTime / withDeadline;
-    }
-
-    private double calculateAttendanceScore(Long employeeId) {
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(30);
-        List<Attendance> records = attendanceRepository
-                .findByEmployeeEmployeeIdAndDateBetween(employeeId, start, end);
-        double score = (double) records.size() / EXPECTED_WORKING_DAYS;
-        return Math.min(1.0, score);
-    }
-
-    private String buildReasoning(double skillScore, double workloadScore,
-                                   double performanceScore, double attendanceScore) {
+    private String buildPrompt(SuggestionRequest request, List<Employee> employees,
+                                Map<Long, List<Skill>> skillsByEmployee,
+                                Map<Long, Long> activeTasksByEmployee,
+                                Map<Long, Long> attendanceByEmployee) {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Skill match: %.0f%%. ", skillScore * 100));
-        sb.append(String.format("Workload availability: %.0f%%. ", workloadScore * 100));
-        sb.append(String.format("On-time performance: %.0f%%. ", performanceScore * 100));
-        sb.append(String.format("Attendance (last 30 days): %.0f%%.", attendanceScore * 100));
+        sb.append("You are an AI assistant helping assign tasks to the most suitable employees in a task management system.\n\n");
+        sb.append("Task Details:\n");
+        sb.append("- Title: ").append(request.getTaskTitle()).append("\n");
+        if (request.getTaskDescription() != null && !request.getTaskDescription().isBlank()) {
+            sb.append("- Description: ").append(request.getTaskDescription()).append("\n");
+        }
+        if (request.getRequiredSkills() != null && !request.getRequiredSkills().isEmpty()) {
+            sb.append("- Required Skills: ").append(String.join(", ", request.getRequiredSkills())).append("\n");
+        }
+
+        sb.append("\nAvailable Employees:\n");
+        for (Employee emp : employees) {
+            List<Skill> skills = skillsByEmployee.getOrDefault(emp.getEmployeeId(), List.of());
+            long activeTasks = activeTasksByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
+            long attendance = attendanceByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
+
+            sb.append("- ID: ").append(emp.getEmployeeId())
+              .append(", Name: ").append(emp.getFirstName()).append(" ").append(emp.getLastName())
+              .append(", Department: ").append(emp.getDepartment())
+              .append(", Position: ").append(emp.getPosition()).append("\n");
+            if (!skills.isEmpty()) {
+                String skillList = skills.stream()
+                        .map(s -> s.getSkillName() + " (" + s.getProficiencyLevel() + ")")
+                        .collect(Collectors.joining(", "));
+                sb.append("  Skills: ").append(skillList).append("\n");
+            }
+            sb.append("  Active tasks: ").append(activeTasks).append("\n");
+            sb.append("  Attendance last 30 days: ").append(attendance).append("/").append(EXPECTED_WORKING_DAYS).append(" days\n");
+        }
+
+        sb.append("\nRank the top ").append(TOP_N).append(" most suitable employees for this task.\n");
+        sb.append("Consider: skill match, workload (fewer active tasks = more available), and attendance.\n");
+        sb.append("Return ONLY a valid JSON array (no markdown, no extra text) with this structure:\n");
+        sb.append("[{\"employeeId\":<number>,\"skillMatchScore\":<0.0-1.0>,\"workloadScore\":<0.0-1.0>,");
+        sb.append("\"performanceScore\":<0.0-1.0>,\"attendanceScore\":<0.0-1.0>,");
+        sb.append("\"overallScore\":<0.0-1.0>,\"reasoning\":\"<brief reason>\"}]");
+
         return sb.toString();
+    }
+
+    private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> employees) {
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+            throw new IllegalStateException("OpenAI API key is not configured. Please set the openai.api.key property.");
+        }
+
+        Map<String, Object> requestBody = Map.of(
+                "model", openAiModel,
+                "messages", List.of(Map.of("role", "user", "content", prompt)),
+                "temperature", 0.3
+        );
+
+        String responseJson = restClient.post()
+                .uri("/v1/chat/completions")
+                .header("Authorization", "Bearer " + openAiApiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(requestBody)
+                .retrieve()
+                .body(String.class);
+
+        return parseOpenAiResponse(responseJson, employees);
+    }
+
+    private List<EmployeeSuggestionDTO> parseOpenAiResponse(String responseJson, List<Employee> employees) {
+        String content = null;
+        try {
+            JsonNode root = objectMapper.readTree(responseJson);
+            content = root.get("choices").get(0).get("message").get("content").asText();
+
+            content = content.trim()
+                    .replaceAll("(?s)^```json\\s*", "")
+                    .replaceAll("(?s)^```\\s*", "")
+                    .replaceAll("(?s)\\s*```$", "");
+
+            JsonNode results = objectMapper.readTree(content);
+
+            Map<Long, Employee> empById = employees.stream()
+                    .collect(Collectors.toMap(Employee::getEmployeeId, e -> e));
+
+            List<EmployeeSuggestionDTO> dtos = new ArrayList<>();
+            for (JsonNode node : results) {
+                Long empId = node.path("employeeId").asLong(-1);
+                Employee emp = empById.get(empId);
+                if (emp == null) {
+                    log.warn("AI returned unknown employeeId: {}. Skipping.", empId);
+                    continue;
+                }
+
+                dtos.add(new EmployeeSuggestionDTO(
+                        emp.getEmployeeId(),
+                        emp.getFirstName(),
+                        emp.getLastName(),
+                        emp.getDepartment(),
+                        node.path("skillMatchScore").asDouble(0.0),
+                        node.path("workloadScore").asDouble(0.0),
+                        node.path("performanceScore").asDouble(0.0),
+                        node.path("attendanceScore").asDouble(0.0),
+                        node.path("overallScore").asDouble(0.0),
+                        node.path("reasoning").asText("")
+                ));
+            }
+            return dtos;
+        } catch (Exception e) {
+            log.error("Failed to parse AI response. Content excerpt: {}. Error: {}",
+                    content != null ? content.substring(0, Math.min(200, content.length())) : "N/A",
+                    e.getMessage(), e);
+            throw new RuntimeException("Failed to parse AI response", e);
+        }
     }
 }
