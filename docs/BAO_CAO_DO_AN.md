@@ -1,4 +1,4 @@
-# BÁO CÁO ĐỒ ÁN MÔN HỌC — CÔNG NGHỆ PHẦN MỀM
+# BÁO CÁO ĐỒ ÁN MÔN HỌC — CÔNG NGHỆ PHẦN MỀM — HUTECH 2025
 
 ---
 
