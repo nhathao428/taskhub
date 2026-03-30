@@ -33,6 +33,9 @@ public class User implements Serializable {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "role", nullable = false, length = 20)
+    private String role = "EMPLOYEE";
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -40,6 +43,9 @@ public class User implements Serializable {
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (role == null) {
+            role = "EMPLOYEE";
         }
     }
 }

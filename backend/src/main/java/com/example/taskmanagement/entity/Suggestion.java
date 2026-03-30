@@ -31,6 +31,9 @@ public class Suggestion implements Serializable {
     @Column(name = "suggestion_text", nullable = false, columnDefinition = "TEXT")
     private String suggestionText;
 
+    @Column(name = "feedback", columnDefinition = "TEXT")
+    private String feedback;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
