@@ -43,4 +43,7 @@ public class Task implements Serializable {
 
     @Column(name = "status", length = 50)
     private String status = "pending";
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 }
