@@ -1,15 +1,15 @@
-# Task Management System — Frontend
+# 🌐 Hệ thống Quản lý Công việc — Frontend
 
 Giao diện người dùng cho Hệ thống Quản lý Công việc, xây dựng bằng React + Vite + Tailwind CSS.
 
-## Tech Stack
+## 🛠️ Công nghệ sử dụng
 
 - **Vite** + **React 18**
-- **Tailwind CSS** (styling)
-- **React Router DOM v6** (routing)
-- **Axios** (HTTP client với JWT interceptor)
-- **Chart.js + react-chartjs-2** (biểu đồ dashboard)
-- **React Icons** (icons)
+- **Tailwind CSS** — tạo kiểu giao diện
+- **React Router DOM v6** — điều hướng trang
+- **Axios** — gọi HTTP kèm JWT interceptor tự động
+- **Chart.js + react-chartjs-2** — biểu đồ bảng điều khiển
+- **React Icons** — bộ icon giao diện
 
 ## Yêu cầu
 
