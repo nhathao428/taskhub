@@ -30,7 +30,7 @@ public class SuggestionService {
 
     public Suggestion submitFeedback(Long id, String feedback) {
         Suggestion suggestion = getSuggestionById(id);
-        suggestion.setSuggestionText(suggestion.getSuggestionText() + "\n[Feedback]: " + feedback);
+        suggestion.setFeedback(feedback);
         return suggestionRepository.save(suggestion);
     }
 }

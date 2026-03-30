@@ -1,6 +1,7 @@
 package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Attendance;
+import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.repository.AttendanceRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,5 +37,24 @@ public class AttendanceService {
     @Cacheable(value = "attendance", key = "'employee-' + #employeeId")
     public List<Attendance> getAttendanceByEmployee(Long employeeId) {
         return attendanceRepository.findByEmployeeEmployeeId(employeeId);
+    }
+
+    @CacheEvict(value = "attendance", allEntries = true)
+    public Attendance checkIn(Long employeeId) {
+        Employee employee = new Employee();
+        employee.setEmployeeId(employeeId);
+
+        Attendance attendance = new Attendance();
+        attendance.setEmployee(employee);
+        attendance.setDate(java.time.LocalDate.now());
+        attendance.setCheckIn(java.time.LocalDateTime.now());
+        return attendanceRepository.save(attendance);
+    }
+
+    @CacheEvict(value = "attendance", allEntries = true)
+    public Attendance checkOut(Long attendanceId) {
+        Attendance attendance = getAttendanceById(attendanceId);
+        attendance.setCheckOut(java.time.LocalDateTime.now());
+        return attendanceRepository.save(attendance);
     }
 }
