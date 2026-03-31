@@ -27,7 +27,7 @@ public class AttendanceService {
     @Cacheable(value = "attendance", key = "#id")
     public Attendance getAttendanceById(Long id) {
         return attendanceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Attendance", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance", "id", id));
     }
 
     @CacheEvict(value = "attendance", allEntries = true)
