@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MdAdd, MdEdit, MdDelete } from 'react-icons/md'
-import api from '../api/axios'
 import Modal from '../components/Modal'
+import { useTasks } from '../hooks/useTasks'
+import { useProjects } from '../hooks/useProjects'
+import { useEmployees } from '../hooks/useEmployees'
 
 const emptyForm = {
   title: '',
@@ -27,34 +29,14 @@ function StatusBadge({ status }) {
 }
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState([])
-  const [projects, setProjects] = useState([])
-  const [employees, setEmployees] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { tasks, loading, error: taskError, createTask, updateTask, deleteTask } = useTasks()
+  const { projects } = useProjects()
+  const { employees } = useEmployees()
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-
-  const fetchAll = async () => {
-    try {
-      const [taskRes, projRes, empRes] = await Promise.all([
-        api.get('/api/tasks'),
-        api.get('/api/projects'),
-        api.get('/api/employees'),
-      ])
-      setTasks(taskRes.data || [])
-      setProjects(projRes.data || [])
-      setEmployees(empRes.data || [])
-    } catch {
-      setError('Không thể tải dữ liệu.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { fetchAll() }, [])
 
   const openAdd = () => {
     setEditTarget(null)
@@ -63,6 +45,12 @@ export default function Tasks() {
     setModalOpen(true)
   }
 
+  const getTaskProjectId = (task) =>
+    task.project?.projectId ?? task.project?.id ?? task.project ?? null
+
+  const getTaskAssigneeId = (task) =>
+    task.assignedTo?.employeeId ?? task.assignedTo?.id ?? task.assignedTo ?? null
+
   const openEdit = (task) => {
     setEditTarget(task)
     setForm({
@@ -70,8 +58,8 @@ export default function Tasks() {
       description: task.description || '',
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       status: task.status || 'PENDING',
-      project: task.project?.id || task.project || null,
-      assignedTo: task.assignedTo?.id || task.assignedTo || null,
+      project: getTaskProjectId(task),
+      assignedTo: getTaskAssigneeId(task),
     })
     setError('')
     setModalOpen(true)
@@ -80,8 +68,7 @@ export default function Tasks() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa công việc này?')) return
     try {
-      await api.delete(`/api/tasks/${id}`)
-      fetchAll()
+      await deleteTask(id)
     } catch {
       alert('Xóa thất bại.')
     }
@@ -101,14 +88,13 @@ export default function Tasks() {
     }
     try {
       if (editTarget) {
-        await api.put(`/api/tasks/${editTarget.id}`, payload)
+        await updateTask(editTarget.taskId ?? editTarget.id, payload)
       } else {
-        await api.post('/api/tasks', payload)
+        await createTask(payload)
       }
       setModalOpen(false)
-      fetchAll()
     } catch (err) {
-      setError(err.response?.data?.message || 'Lưu thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'Lưu thất bại.')
     } finally {
       setSaving(false)
     }
@@ -116,7 +102,7 @@ export default function Tasks() {
 
   const getProjectName = (task) => {
     if (task.project?.name) return task.project.name
-    const proj = projects.find((p) => p.id === task.project)
+    const proj = projects.find((p) => (p.projectId ?? p.id) === task.project)
     return proj?.name || '-'
   }
 
@@ -124,7 +110,7 @@ export default function Tasks() {
     if (task.assignedTo?.firstName) {
       return `${task.assignedTo.firstName} ${task.assignedTo.lastName}`
     }
-    const emp = employees.find((e) => e.id === task.assignedTo)
+    const emp = employees.find((e) => (e.employeeId ?? e.id) === task.assignedTo)
     return emp ? `${emp.firstName} ${emp.lastName}` : '-'
   }
 
@@ -139,6 +125,10 @@ export default function Tasks() {
           <MdAdd className="text-xl" /> Thêm công việc
         </button>
       </div>
+
+      {taskError && (
+        <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{taskError}</div>
+      )}
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         {loading ? (
@@ -166,7 +156,7 @@ export default function Tasks() {
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (
-                    <tr key={task.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                    <tr key={task.taskId ?? task.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
                       <td className="px-6 py-4 font-medium text-gray-800">{task.title}</td>
                       <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{task.description}</td>
                       <td className="px-6 py-4 text-gray-600">{task.dueDate ? task.dueDate.split('T')[0] : '-'}</td>
@@ -177,7 +167,7 @@ export default function Tasks() {
                         <button onClick={() => openEdit(task)} className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm">
                           <MdEdit /> Sửa
                         </button>
-                        <button onClick={() => handleDelete(task.id)} className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm">
+                        <button onClick={() => handleDelete(task.taskId ?? task.id)} className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm">
                           <MdDelete /> Xóa
                         </button>
                       </td>
@@ -246,7 +236,7 @@ export default function Tasks() {
             >
               <option value="">-- Chọn dự án --</option>
               {projects.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
+                <option key={p.projectId ?? p.id} value={p.projectId ?? p.id}>{p.name}</option>
               ))}
             </select>
           </div>
@@ -259,7 +249,7 @@ export default function Tasks() {
             >
               <option value="">-- Chọn nhân viên --</option>
               {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName}</option>
+                <option key={emp.employeeId ?? emp.id} value={emp.employeeId ?? emp.id}>{emp.firstName} {emp.lastName}</option>
               ))}
             </select>
           </div>

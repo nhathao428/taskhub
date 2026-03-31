@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MdAdd, MdEdit, MdDelete } from 'react-icons/md'
-import api from '../api/axios'
 import Modal from '../components/Modal'
+import { useProjects } from '../hooks/useProjects'
 
 const emptyForm = { name: '', description: '', startDate: '', endDate: '', status: 'ACTIVE' }
 
@@ -23,26 +23,12 @@ function StatusBadge({ status }) {
 }
 
 export default function Projects() {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { projects, loading, error: fetchError, createProject, updateProject, deleteProject } = useProjects()
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-
-  const fetchProjects = async () => {
-    try {
-      const res = await api.get('/api/projects')
-      setProjects(res.data || [])
-    } catch {
-      setError('Không thể tải danh sách dự án.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { fetchProjects() }, [])
 
   const openAdd = () => {
     setEditTarget(null)
@@ -67,8 +53,7 @@ export default function Projects() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa dự án này?')) return
     try {
-      await api.delete(`/api/projects/${id}`)
-      fetchProjects()
+      await deleteProject(id)
     } catch {
       alert('Xóa thất bại.')
     }
@@ -80,14 +65,13 @@ export default function Projects() {
     setError('')
     try {
       if (editTarget) {
-        await api.put(`/api/projects/${editTarget.id}`, form)
+        await updateProject(editTarget.projectId ?? editTarget.id, form)
       } else {
-        await api.post('/api/projects', form)
+        await createProject(form)
       }
       setModalOpen(false)
-      fetchProjects()
     } catch (err) {
-      setError(err.response?.data?.message || 'Lưu thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'Lưu thất bại.')
     } finally {
       setSaving(false)
     }
@@ -104,6 +88,10 @@ export default function Projects() {
           <MdAdd className="text-xl" /> Thêm dự án
         </button>
       </div>
+
+      {fetchError && (
+        <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
+      )}
 
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         {loading ? (
@@ -129,7 +117,7 @@ export default function Projects() {
                 </tr>
               ) : (
                 projects.map((proj, idx) => (
-                  <tr key={proj.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                  <tr key={proj.projectId ?? proj.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
                     <td className="px-6 py-4 font-medium text-gray-800">{proj.name}</td>
                     <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{proj.description}</td>
                     <td className="px-6 py-4 text-gray-600">{proj.startDate ? proj.startDate.split('T')[0] : '-'}</td>
@@ -143,7 +131,7 @@ export default function Projects() {
                         <MdEdit /> Sửa
                       </button>
                       <button
-                        onClick={() => handleDelete(proj.id)}
+                        onClick={() => handleDelete(proj.projectId ?? proj.id)}
                         className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
                       >
                         <MdDelete /> Xóa

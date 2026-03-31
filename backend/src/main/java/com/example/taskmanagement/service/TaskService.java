@@ -1,6 +1,7 @@
 package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Task;
+import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.TaskRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,7 +26,7 @@ public class TaskService {
     @Cacheable(value = "tasks", key = "#id")
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Task", id));
     }
 
     @CacheEvict(value = "tasks", allEntries = true)
@@ -36,7 +37,7 @@ public class TaskService {
     @CacheEvict(value = "tasks", allEntries = true)
     public Task updateTask(Long id, Task updated) {
         Task existing = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Task", id));
         existing.setTitle(updated.getTitle());
         existing.setDescription(updated.getDescription());
         existing.setDueDate(updated.getDueDate());

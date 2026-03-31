@@ -1,6 +1,7 @@
 package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Employee;
+import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.EmployeeRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,7 +26,7 @@ public class EmployeeService {
     @Cacheable(value = "employees", key = "#id")
     public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
     }
 
     @CacheEvict(value = "employees", allEntries = true)
@@ -36,7 +37,7 @@ public class EmployeeService {
     @CacheEvict(value = "employees", allEntries = true)
     public Employee updateEmployee(Long id, Employee updated) {
         Employee existing = employeeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
         existing.setFirstName(updated.getFirstName());
         existing.setLastName(updated.getLastName());
         existing.setPosition(updated.getPosition());

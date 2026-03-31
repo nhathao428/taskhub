@@ -1,5 +1,6 @@
 package com.example.taskmanagement.controller;
 
+import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.entity.Project;
 import com.example.taskmanagement.service.ProjectService;
 import org.springframework.http.HttpStatus;
@@ -19,23 +20,23 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getAllProjects() {
-        return ResponseEntity.ok(projectService.getAllProjects());
+    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
+        return ResponseEntity.ok(ApiResponse.ok(projectService.getAllProjects()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProject(@PathVariable Long id) {
-        return ResponseEntity.ok(projectService.getProjectById(id));
+    public ResponseEntity<ApiResponse<Project>> getProject(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(projectService.getProjectById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(project));
+    public ResponseEntity<ApiResponse<Project>> createProject(@RequestBody Project project) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(projectService.createProject(project)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable Long id, @RequestBody Project project) {
-        return ResponseEntity.ok(projectService.updateProject(id, project));
+    public ResponseEntity<ApiResponse<Project>> updateProject(@PathVariable Long id, @RequestBody Project project) {
+        return ResponseEntity.ok(ApiResponse.ok(projectService.updateProject(id, project)));
     }
 
     @DeleteMapping("/{id}")
