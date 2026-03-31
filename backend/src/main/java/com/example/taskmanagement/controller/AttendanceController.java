@@ -1,6 +1,8 @@
 package com.example.taskmanagement.controller;
 
+import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.entity.Attendance;
+import com.example.taskmanagement.exception.BusinessException;
 import com.example.taskmanagement.service.AttendanceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,40 +22,40 @@ public class AttendanceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Attendance>> getAllAttendance() {
-        return ResponseEntity.ok(attendanceService.getAllAttendance());
+    public ResponseEntity<ApiResponse<List<Attendance>>> getAllAttendance() {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.getAllAttendance()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Attendance> getAttendance(@PathVariable Long id) {
-        return ResponseEntity.ok(attendanceService.getAttendanceById(id));
+    public ResponseEntity<ApiResponse<Attendance>> getAttendance(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.getAttendanceById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Attendance> logAttendance(@RequestBody Attendance attendance) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(attendanceService.logAttendance(attendance));
+    public ResponseEntity<ApiResponse<Attendance>> logAttendance(@RequestBody Attendance attendance) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.logAttendance(attendance)));
     }
 
     @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<List<Attendance>> getAttendanceByEmployee(@PathVariable Long employeeId) {
-        return ResponseEntity.ok(attendanceService.getAttendanceByEmployee(employeeId));
+    public ResponseEntity<ApiResponse<List<Attendance>>> getAttendanceByEmployee(@PathVariable Long employeeId) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.getAttendanceByEmployee(employeeId)));
     }
 
     @PostMapping("/checkin")
-    public ResponseEntity<Attendance> checkIn(@RequestBody Map<String, Long> body) {
+    public ResponseEntity<ApiResponse<Attendance>> checkIn(@RequestBody Map<String, Long> body) {
         Long employeeId = body.get("employeeId");
         if (employeeId == null) {
-            return ResponseEntity.badRequest().build();
+            throw new BusinessException("employeeId is required");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(attendanceService.checkIn(employeeId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.checkIn(employeeId)));
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<Attendance> checkOut(@RequestBody Map<String, Long> body) {
+    public ResponseEntity<ApiResponse<Attendance>> checkOut(@RequestBody Map<String, Long> body) {
         Long attendanceId = body.get("attendanceId");
         if (attendanceId == null) {
-            return ResponseEntity.badRequest().build();
+            throw new BusinessException("attendanceId is required");
         }
-        return ResponseEntity.ok(attendanceService.checkOut(attendanceId));
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOut(attendanceId)));
     }
 }

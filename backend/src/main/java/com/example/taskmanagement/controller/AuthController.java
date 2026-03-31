@@ -1,10 +1,12 @@
 package com.example.taskmanagement.controller;
 
+import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.dto.AuthResponse;
 import com.example.taskmanagement.dto.LoginRequest;
 import com.example.taskmanagement.dto.RegisterRequest;
 import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +22,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = userService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody RegisterRequest request) {
         User user = userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(user));
     }
 }

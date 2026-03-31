@@ -2,6 +2,7 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.entity.Employee;
+import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.AttendanceRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +27,7 @@ public class AttendanceService {
     @Cacheable(value = "attendance", key = "#id")
     public Attendance getAttendanceById(Long id) {
         return attendanceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Attendance record not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance", id));
     }
 
     @CacheEvict(value = "attendance", allEntries = true)

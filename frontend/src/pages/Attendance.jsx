@@ -1,58 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MdAdd } from 'react-icons/md'
-import api from '../api/axios'
 import Modal from '../components/Modal'
+import { useAttendance } from '../hooks/useAttendance'
+import { useEmployees } from '../hooks/useEmployees'
 
 const emptyForm = { employee: '', date: '', checkIn: '', checkOut: '' }
 
 export default function Attendance() {
-  const [records, setRecords] = useState([])
-  const [employees, setEmployees] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { records, loading, error: fetchError, refetch, logAttendance } = useAttendance()
+  const { employees } = useEmployees()
   const [filterEmpId, setFilterEmpId] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const fetchRecords = async (empId) => {
-    setLoading(true)
-    try {
-      const url = empId ? `/api/attendance/employee/${empId}` : '/api/attendance'
-      const res = await api.get(url)
-      setRecords(res.data || [])
-    } catch {
-      setError('Không thể tải dữ liệu chấm công.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchEmployees = async () => {
-    try {
-      const res = await api.get('/api/employees')
-      setEmployees(res.data || [])
-    } catch {
-      // ignore
-    }
-  }
-
-  useEffect(() => {
-    fetchEmployees()
-    fetchRecords('')
-  }, [])
-
   const handleFilterChange = (e) => {
     const id = e.target.value
     setFilterEmpId(id)
-    fetchRecords(id)
+    refetch(id)
   }
 
   const getEmpName = (record) => {
     if (record.employee?.firstName) {
       return `${record.employee.firstName} ${record.employee.lastName}`
     }
-    const emp = employees.find((e) => e.id === (record.employee?.id || record.employee))
+    const emp = employees.find((e) => (e.employeeId ?? e.id) === (record.employee?.id ?? record.employee))
     return emp ? `${emp.firstName} ${emp.lastName}` : '-'
   }
 
@@ -67,12 +40,12 @@ export default function Attendance() {
       checkOut: form.checkOut,
     }
     try {
-      await api.post('/api/attendance', payload)
+      await logAttendance(payload)
       setModalOpen(false)
       setForm(emptyForm)
-      fetchRecords(filterEmpId)
+      refetch(filterEmpId)
     } catch (err) {
-      setError(err.response?.data?.message || 'Chấm công thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'Chấm công thất bại.')
     } finally {
       setSaving(false)
     }
@@ -90,6 +63,10 @@ export default function Attendance() {
         </button>
       </div>
 
+      {fetchError && (
+        <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
+      )}
+
       <div className="bg-white rounded-xl shadow-md p-4 mb-4">
         <div className="flex items-center gap-4">
           <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Lọc theo nhân viên:</label>
@@ -100,7 +77,7 @@ export default function Attendance() {
           >
             <option value="">Tất cả nhân viên</option>
             {employees.map((emp) => (
-              <option key={emp.id} value={emp.id}>
+              <option key={emp.employeeId ?? emp.id} value={emp.employeeId ?? emp.id}>
                 {emp.firstName} {emp.lastName}
               </option>
             ))}
@@ -156,7 +133,7 @@ export default function Attendance() {
             >
               <option value="">-- Chọn nhân viên --</option>
               {employees.map((emp) => (
-                <option key={emp.id} value={emp.id}>
+                <option key={emp.employeeId ?? emp.id} value={emp.employeeId ?? emp.id}>
                   {emp.firstName} {emp.lastName}
                 </option>
               ))}

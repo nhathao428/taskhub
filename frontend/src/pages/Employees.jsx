@@ -1,46 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { MdAdd, MdEdit, MdDelete, MdSearch } from 'react-icons/md'
-import api from '../api/axios'
 import Modal from '../components/Modal'
+import { useEmployees } from '../hooks/useEmployees'
 
 const emptyForm = { firstName: '', lastName: '', position: '', department: '' }
 
 export default function Employees() {
-  const [employees, setEmployees] = useState([])
-  const [filtered, setFiltered] = useState([])
+  const { employees, loading, error: fetchError, createEmployee, updateEmployee, deleteEmployee } = useEmployees()
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await api.get('/api/employees')
-      setEmployees(res.data || [])
-      setFiltered(res.data || [])
-    } catch {
-      setError('Không thể tải danh sách nhân viên.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { fetchEmployees() }, [])
-
-  useEffect(() => {
+  const filtered = employees.filter((e) => {
     const q = search.toLowerCase()
-    setFiltered(
-      employees.filter(
-        (e) =>
-          e.firstName?.toLowerCase().includes(q) ||
-          e.lastName?.toLowerCase().includes(q) ||
-          e.department?.toLowerCase().includes(q)
-      )
+    return (
+      e.firstName?.toLowerCase().includes(q) ||
+      e.lastName?.toLowerCase().includes(q) ||
+      e.department?.toLowerCase().includes(q)
     )
-  }, [search, employees])
+  })
 
   const openAdd = () => {
     setEditTarget(null)
@@ -64,8 +45,7 @@ export default function Employees() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa nhân viên này?')) return
     try {
-      await api.delete(`/api/employees/${id}`)
-      fetchEmployees()
+      await deleteEmployee(id)
     } catch {
       alert('Xóa thất bại.')
     }
@@ -77,14 +57,13 @@ export default function Employees() {
     setError('')
     try {
       if (editTarget) {
-        await api.put(`/api/employees/${editTarget.id}`, form)
+        await updateEmployee(editTarget.employeeId ?? editTarget.id, form)
       } else {
-        await api.post('/api/employees', form)
+        await createEmployee(form)
       }
       setModalOpen(false)
-      fetchEmployees()
     } catch (err) {
-      setError(err.response?.data?.message || 'Lưu thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || 'Lưu thất bại.')
     } finally {
       setSaving(false)
     }
@@ -101,6 +80,10 @@ export default function Employees() {
           <MdAdd className="text-xl" /> Thêm nhân viên
         </button>
       </div>
+
+      {fetchError && (
+        <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
+      )}
 
       <div className="bg-white rounded-xl shadow-md p-4 mb-4">
         <div className="relative">
@@ -141,7 +124,7 @@ export default function Employees() {
               ) : (
                 filtered.map((emp, idx) => (
                   <tr
-                    key={emp.id}
+                    key={emp.employeeId ?? emp.id}
                     className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}
                   >
                     <td className="px-6 py-4 text-gray-800">{emp.firstName}</td>
@@ -156,7 +139,7 @@ export default function Employees() {
                         <MdEdit /> Sửa
                       </button>
                       <button
-                        onClick={() => handleDelete(emp.id)}
+                        onClick={() => handleDelete(emp.employeeId ?? emp.id)}
                         className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
                       >
                         <MdDelete /> Xóa

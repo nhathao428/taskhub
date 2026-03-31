@@ -1,5 +1,6 @@
 package com.example.taskmanagement.controller;
 
+import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.entity.Task;
 import com.example.taskmanagement.service.TaskService;
 import org.springframework.http.HttpStatus;
@@ -19,23 +20,23 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks() {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.getAllTasks()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTask(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
+    public ResponseEntity<ApiResponse<Task>> getTask(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.getTaskById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(task));
+    public ResponseEntity<ApiResponse<Task>> createTask(@RequestBody Task task) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(taskService.createTask(task)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
-        return ResponseEntity.ok(taskService.updateTask(id, task));
+    public ResponseEntity<ApiResponse<Task>> updateTask(@PathVariable Long id, @RequestBody Task task) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.updateTask(id, task)));
     }
 
     @DeleteMapping("/{id}")

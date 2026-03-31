@@ -6,6 +6,7 @@ import com.example.taskmanagement.dto.AuthResponse;
 import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.repository.UserRepository;
 import com.example.taskmanagement.security.JwtTokenProvider;
+import com.example.taskmanagement.exception.DuplicateResourceException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,10 +58,10 @@ public class UserService implements UserDetailsService {
 
     public User register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already taken");
+            throw new DuplicateResourceException("User", "username", request.getUsername());
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already registered");
+            throw new DuplicateResourceException("User", "email", request.getEmail());
         }
         User user = new User();
         user.setUsername(request.getUsername());
