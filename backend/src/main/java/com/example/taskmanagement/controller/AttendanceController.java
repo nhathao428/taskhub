@@ -1,15 +1,16 @@
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.ApiResponse;
+import com.example.taskmanagement.dto.CheckInRequest;
+import com.example.taskmanagement.dto.CheckOutRequest;
 import com.example.taskmanagement.entity.Attendance;
-import com.example.taskmanagement.exception.BusinessException;
 import com.example.taskmanagement.service.AttendanceService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -42,20 +43,12 @@ public class AttendanceController {
     }
 
     @PostMapping("/checkin")
-    public ResponseEntity<ApiResponse<Attendance>> checkIn(@RequestBody Map<String, Long> body) {
-        Long employeeId = body.get("employeeId");
-        if (employeeId == null) {
-            throw new BusinessException("employeeId is required");
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.checkIn(employeeId)));
+    public ResponseEntity<ApiResponse<Attendance>> checkIn(@Valid @RequestBody CheckInRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.checkIn(request.employeeId())));
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<ApiResponse<Attendance>> checkOut(@RequestBody Map<String, Long> body) {
-        Long attendanceId = body.get("attendanceId");
-        if (attendanceId == null) {
-            throw new BusinessException("attendanceId is required");
-        }
-        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOut(attendanceId)));
+    public ResponseEntity<ApiResponse<Attendance>> checkOut(@Valid @RequestBody CheckOutRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOut(request.attendanceId())));
     }
 }

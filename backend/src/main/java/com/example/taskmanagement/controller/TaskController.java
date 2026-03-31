@@ -1,8 +1,11 @@
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.ApiResponse;
+import com.example.taskmanagement.dto.CreateTaskRequest;
+import com.example.taskmanagement.dto.UpdateTaskRequest;
 import com.example.taskmanagement.entity.Task;
 import com.example.taskmanagement.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +33,13 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Task>> createTask(@RequestBody Task task) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(taskService.createTask(task)));
+    public ResponseEntity<ApiResponse<Task>> createTask(@Valid @RequestBody CreateTaskRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(taskService.createTask(request)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Task>> updateTask(@PathVariable Long id, @RequestBody Task task) {
-        return ResponseEntity.ok(ApiResponse.ok(taskService.updateTask(id, task)));
+    public ResponseEntity<ApiResponse<Task>> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.updateTask(id, request)));
     }
 
     @DeleteMapping("/{id}")

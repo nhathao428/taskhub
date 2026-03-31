@@ -1,5 +1,7 @@
 package com.example.taskmanagement.service;
 
+import com.example.taskmanagement.dto.CreateEmployeeRequest;
+import com.example.taskmanagement.dto.UpdateEmployeeRequest;
 import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.EmployeeRepository;
@@ -26,22 +28,27 @@ public class EmployeeService {
     @Cacheable(value = "employees", key = "#id")
     public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
     }
 
     @CacheEvict(value = "employees", allEntries = true)
-    public Employee createEmployee(Employee employee) {
+    public Employee createEmployee(CreateEmployeeRequest request) {
+        Employee employee = new Employee();
+        employee.setFirstName(request.firstName());
+        employee.setLastName(request.lastName());
+        employee.setPosition(request.position());
+        employee.setDepartment(request.department());
         return employeeRepository.save(employee);
     }
 
     @CacheEvict(value = "employees", allEntries = true)
-    public Employee updateEmployee(Long id, Employee updated) {
+    public Employee updateEmployee(Long id, UpdateEmployeeRequest request) {
         Employee existing = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
-        existing.setFirstName(updated.getFirstName());
-        existing.setLastName(updated.getLastName());
-        existing.setPosition(updated.getPosition());
-        existing.setDepartment(updated.getDepartment());
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
+        if (request.firstName() != null) existing.setFirstName(request.firstName());
+        if (request.lastName() != null) existing.setLastName(request.lastName());
+        if (request.position() != null) existing.setPosition(request.position());
+        if (request.department() != null) existing.setDepartment(request.department());
         return employeeRepository.save(existing);
     }
 
