@@ -19,7 +19,7 @@ Phần backend của Hệ thống Quản lý Công việc, xây dựng bằng Sp
 
 | Thành phần | Công nghệ |
 |---|---|
-| Ngôn ngữ | Java 25.0.2 |
+| Ngôn ngữ | Java 17+ |
 | Framework | Spring Boot 3.5.0 |
 | Công cụ build | Maven 3.9.14 |
 | Cơ sở dữ liệu | PostgreSQL |

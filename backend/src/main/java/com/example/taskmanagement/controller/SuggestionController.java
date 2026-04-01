@@ -35,8 +35,15 @@ public class SuggestionController {
 
     @PostMapping("/feedback")
     public ResponseEntity<ApiResponse<Suggestion>> submitFeedback(@RequestBody Map<String, String> body) {
-        Long suggestionId = Long.parseLong(body.get("suggestion_id"));
+        String suggestionIdStr = body.get("suggestion_id");
+        if (suggestionIdStr == null || suggestionIdStr.isBlank()) {
+            throw new IllegalArgumentException("suggestion_id is required");
+        }
         String feedback = body.get("feedback");
+        if (feedback == null || feedback.isBlank()) {
+            throw new IllegalArgumentException("feedback is required");
+        }
+        Long suggestionId = Long.parseLong(suggestionIdStr);
         return ResponseEntity.ok(ApiResponse.ok(suggestionService.submitFeedback(suggestionId, feedback)));
     }
 

@@ -4,6 +4,7 @@ import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.AttendanceRepository;
+import com.example.taskmanagement.repository.EmployeeRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.util.List;
 public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public AttendanceService(AttendanceRepository attendanceRepository) {
+    public AttendanceService(AttendanceRepository attendanceRepository, EmployeeRepository employeeRepository) {
         this.attendanceRepository = attendanceRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Cacheable("attendance")
@@ -42,8 +45,8 @@ public class AttendanceService {
 
     @CacheEvict(value = "attendance", allEntries = true)
     public Attendance checkIn(Long employeeId) {
-        Employee employee = new Employee();
-        employee.setEmployeeId(employeeId);
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
 
         Attendance attendance = new Attendance();
         attendance.setEmployee(employee);
