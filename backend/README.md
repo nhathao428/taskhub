@@ -64,7 +64,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-API sẽ khởi động tại: **`http://localhost:8080`**
+API sẽ khởi động tại: **`http://localhost:5000`**
 
 ---
 
