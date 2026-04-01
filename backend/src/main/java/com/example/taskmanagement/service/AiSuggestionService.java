@@ -21,6 +21,7 @@ import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,12 @@ public class AiSuggestionService {
     private static final Logger log = LoggerFactory.getLogger(AiSuggestionService.class);
     private static final int EXPECTED_WORKING_DAYS = 22;
     private static final int TOP_N = 5;
+    /** Penalty applied to workload score per active task (each task reduces score by 20%). */
+    private static final double WORKLOAD_PENALTY_FACTOR = 0.2;
+    /** Neutral skill match score used when no required skills are specified. */
+    private static final double DEFAULT_SKILL_MATCH_SCORE = 0.5;
+    /** Neutral performance score used when no historical performance data is available. */
+    private static final double DEFAULT_PERFORMANCE_SCORE = 0.5;
 
     private final EmployeeRepository employeeRepository;
     private final TaskRepository taskRepository;
@@ -85,6 +92,10 @@ public class AiSuggestionService {
                 .findByEmployeeEmployeeIdInAndDateBetween(employeeIds, start, end)
                 .stream().collect(Collectors.groupingBy(a -> a.getEmployee().getEmployeeId(), Collectors.counting()));
 
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+            log.info("OpenAI API key not configured. Using rule-based fallback scoring.");
+            return calculateFallbackScores(request, employees, skillsByEmployee, activeTasksByEmployee, attendanceByEmployee);
+        }
         String prompt = buildPrompt(request, employees, skillsByEmployee, activeTasksByEmployee, attendanceByEmployee);
         return callOpenAi(prompt, employees);
     }
@@ -100,6 +111,82 @@ public class AiSuggestionService {
         request.setTaskDescription(task.getDescription());
 
         return recommendEmployees(request);
+    }
+
+    private List<EmployeeSuggestionDTO> calculateFallbackScores(SuggestionRequest request,
+                                                                  List<Employee> employees,
+                                                                  Map<Long, List<Skill>> skillsByEmployee,
+                                                                  Map<Long, Long> activeTasksByEmployee,
+                                                                  Map<Long, Long> attendanceByEmployee) {
+        List<String> requiredSkills = request.getRequiredSkills();
+        List<String> normalizedRequired = (requiredSkills != null && !requiredSkills.isEmpty())
+                ? requiredSkills.stream().map(String::toLowerCase).collect(Collectors.toList())
+                : List.of();
+
+        List<EmployeeSuggestionDTO> results = new ArrayList<>();
+
+        for (Employee emp : employees) {
+            List<Skill> skills = skillsByEmployee.getOrDefault(emp.getEmployeeId(), List.of());
+            long activeTasks = activeTasksByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
+            long attendanceDays = attendanceByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
+
+            // Skill Match Score (35%)
+            double skillMatchScore;
+            int matchedSkills = 0;
+            if (normalizedRequired.isEmpty()) {
+                skillMatchScore = DEFAULT_SKILL_MATCH_SCORE;
+            } else {
+                List<String> empSkillNames = skills.stream()
+                        .map(s -> s.getSkillName().toLowerCase())
+                        .collect(Collectors.toList());
+                for (String req : normalizedRequired) {
+                    if (empSkillNames.contains(req)) {
+                        matchedSkills++;
+                    }
+                }
+                skillMatchScore = (double) matchedSkills / normalizedRequired.size();
+            }
+
+            // Workload Score (25%)
+            double workloadScore = Math.max(0.0, 1.0 - activeTasks * WORKLOAD_PENALTY_FACTOR);
+
+            // Attendance Score (15%)
+            double attendanceScore = Math.min(1.0, (double) attendanceDays / EXPECTED_WORKING_DAYS);
+
+            // Performance Score (25%) — default neutral
+            double performanceScore = DEFAULT_PERFORMANCE_SCORE;
+
+            // Overall Score
+            double overallScore = skillMatchScore * 0.35
+                    + workloadScore * 0.25
+                    + performanceScore * 0.25
+                    + attendanceScore * 0.15;
+
+            String reasoning = String.format(
+                    "Rule-based scoring: %d/%d skills matched, %d active tasks, %d/%d attendance days",
+                    matchedSkills,
+                    normalizedRequired.isEmpty() ? 0 : normalizedRequired.size(),
+                    activeTasks,
+                    attendanceDays,
+                    EXPECTED_WORKING_DAYS
+            );
+
+            results.add(new EmployeeSuggestionDTO(
+                    emp.getEmployeeId(),
+                    emp.getFirstName(),
+                    emp.getLastName(),
+                    emp.getDepartment(),
+                    skillMatchScore,
+                    workloadScore,
+                    performanceScore,
+                    attendanceScore,
+                    overallScore,
+                    reasoning
+            ));
+        }
+
+        results.sort(Comparator.comparingDouble(EmployeeSuggestionDTO::getOverallScore).reversed());
+        return results.stream().limit(TOP_N).collect(Collectors.toList());
     }
 
     private String buildPrompt(SuggestionRequest request, List<Employee> employees,
