@@ -34,10 +34,10 @@ export default function Attendance() {
     setSaving(true)
     setError('')
     const payload = {
-      employee: { id: Number(form.employee) },
+      employeeId: Number(form.employee),
       date: form.date,
-      checkIn: form.checkIn,
-      checkOut: form.checkOut,
+      checkIn: form.checkIn || null,
+      checkOut: form.checkOut || null,
     }
     try {
       await logAttendance(payload)

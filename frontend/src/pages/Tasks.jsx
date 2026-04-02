@@ -84,8 +84,8 @@ export default function Tasks() {
       description: form.description,
       dueDate: form.dueDate,
       status: form.status,
-      project: form.project ? { id: Number(form.project) } : null,
-      assignedTo: form.assignedTo ? { id: Number(form.assignedTo) } : null,
+      projectId: form.project ? Number(form.project) : null,
+      assignedToId: form.assignedTo ? Number(form.assignedTo) : null,
     }
     try {
       if (editTarget) {
