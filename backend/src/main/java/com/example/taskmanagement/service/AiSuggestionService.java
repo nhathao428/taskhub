@@ -83,7 +83,7 @@ public class AiSuggestionService {
                 .stream().collect(Collectors.groupingBy(s -> s.getEmployee().getEmployeeId()));
 
         Map<Long, Long> activeTasksByEmployee = taskRepository
-                .findByAssignedToEmployeeIdInAndStatusIn(employeeIds, List.of("pending", "in_progress"))
+                .findByAssignedToEmployeeIdInAndStatusIn(employeeIds, List.of("pending", "in_progress", "PENDING", "IN_PROGRESS"))
                 .stream().collect(Collectors.groupingBy(t -> t.getAssignedTo().getEmployeeId(), Collectors.counting()));
 
         LocalDate end = LocalDate.now();

@@ -1,5 +1,6 @@
 package com.example.taskmanagement.service;
 
+import com.example.taskmanagement.dto.AuthResponse;
 import com.example.taskmanagement.dto.RegisterRequest;
 import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.exception.DuplicateResourceException;
@@ -58,7 +59,7 @@ class UserServiceTest {
         savedUser.setPassword("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-        User result = userService.register(request);
+        AuthResponse result = userService.register(request);
 
         assertNotNull(result);
         assertEquals("testuser", result.getUsername());

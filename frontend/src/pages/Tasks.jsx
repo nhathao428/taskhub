@@ -17,10 +17,13 @@ const emptyForm = {
 const statusConfig = {
   PENDING: { label: 'Chờ xử lý', cls: 'bg-yellow-100 text-yellow-700' },
   Pending: { label: 'Chờ xử lý', cls: 'bg-yellow-100 text-yellow-700' },
+  pending: { label: 'Chờ xử lý', cls: 'bg-yellow-100 text-yellow-700' },
   IN_PROGRESS: { label: 'Đang thực hiện', cls: 'bg-blue-100 text-blue-700' },
   'In Progress': { label: 'Đang thực hiện', cls: 'bg-blue-100 text-blue-700' },
+  in_progress: { label: 'Đang thực hiện', cls: 'bg-blue-100 text-blue-700' },
   COMPLETED: { label: 'Hoàn thành', cls: 'bg-green-100 text-green-700' },
   Completed: { label: 'Hoàn thành', cls: 'bg-green-100 text-green-700' },
+  completed: { label: 'Hoàn thành', cls: 'bg-green-100 text-green-700' },
 }
 
 function StatusBadge({ status }) {
@@ -81,8 +84,8 @@ export default function Tasks() {
     setError('')
     const payload = {
       title: form.title,
-      description: form.description,
-      dueDate: form.dueDate,
+      description: form.description || null,
+      dueDate: form.dueDate || null,
       status: form.status,
       projectId: form.project ? Number(form.project) : null,
       assignedToId: form.assignedTo ? Number(form.assignedTo) : null,

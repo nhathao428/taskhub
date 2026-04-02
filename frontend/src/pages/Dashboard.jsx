@@ -73,9 +73,9 @@ export default function Dashboard() {
     datasets: [
       {
         data: [
-          tasks.filter((t) => t.status === 'PENDING' || t.status === 'Pending').length,
-          tasks.filter((t) => t.status === 'IN_PROGRESS' || t.status === 'In Progress').length,
-          tasks.filter((t) => t.status === 'COMPLETED' || t.status === 'Completed').length,
+          tasks.filter((t) => ['PENDING', 'Pending', 'pending'].includes(t.status)).length,
+          tasks.filter((t) => ['IN_PROGRESS', 'In Progress', 'in_progress'].includes(t.status)).length,
+          tasks.filter((t) => ['COMPLETED', 'Completed', 'completed'].includes(t.status)).length,
         ],
         backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
         borderWidth: 0,

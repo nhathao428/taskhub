@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -80,7 +80,7 @@ class TaskServiceTest {
     @Test
     void testCreateTask_Simple() {
         CreateTaskRequest request = new CreateTaskRequest(
-                "New Task", "Description", LocalDateTime.now(), "pending", null, null);
+                "New Task", "Description", LocalDate.now(), "pending", null, null);
 
         Task saved = new Task();
         saved.setTitle("New Task");
@@ -98,6 +98,7 @@ class TaskServiceTest {
     /** deleteTask → deleteById được gọi với đúng id */
     @Test
     void testDeleteTask() {
+        when(taskRepository.existsById(1L)).thenReturn(true);
         doNothing().when(taskRepository).deleteById(1L);
 
         taskService.deleteTask(1L);

@@ -94,6 +94,7 @@ class EmployeeServiceTest {
     /** deleteEmployee → deleteById được gọi với đúng id */
     @Test
     void testDeleteEmployee() {
+        when(employeeRepository.existsById(1L)).thenReturn(true);
         doNothing().when(employeeRepository).deleteById(1L);
 
         employeeService.deleteEmployee(1L);

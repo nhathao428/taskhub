@@ -107,7 +107,7 @@ export default function Attendance() {
                 </tr>
               ) : (
                 records.map((rec, idx) => (
-                  <tr key={rec.id || idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                  <tr key={rec.attendanceId ?? rec.id ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
                     <td className="px-6 py-4 font-medium text-gray-800">{getEmpName(rec)}</td>
                     <td className="px-6 py-4 text-gray-600">{rec.date ? rec.date.split('T')[0] : '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{rec.checkIn || '-'}</td>

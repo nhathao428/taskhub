@@ -2,7 +2,7 @@ package com.example.taskmanagement.dto;
 
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record UpdateProjectRequest(
         @Size(max = 100, message = "Name must not exceed 100 characters")
@@ -10,9 +10,9 @@ public record UpdateProjectRequest(
 
         String description,
 
-        LocalDateTime startDate,
+        LocalDate startDate,
 
-        LocalDateTime endDate,
+        LocalDate endDate,
 
         @Size(max = 50, message = "Status must not exceed 50 characters")
         String status

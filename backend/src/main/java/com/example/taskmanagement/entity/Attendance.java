@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "attendance")
@@ -33,8 +33,8 @@ public class Attendance implements Serializable {
     private LocalDate date;
 
     @Column(name = "check_in", nullable = false)
-    private LocalDateTime checkIn;
+    private LocalTime checkIn;
 
     @Column(name = "check_out")
-    private LocalDateTime checkOut;
+    private LocalTime checkOut;
 }

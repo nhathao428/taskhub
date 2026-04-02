@@ -65,10 +65,17 @@ export default function Projects() {
     setSaving(true)
     setError('')
     try {
+      const payload = {
+        name: form.name,
+        description: form.description || null,
+        startDate: form.startDate || null,
+        endDate: form.endDate || null,
+        status: form.status,
+      }
       if (editTarget) {
-        await updateProject(editTarget.projectId ?? editTarget.id, form)
+        await updateProject(editTarget.projectId ?? editTarget.id, payload)
       } else {
-        await createProject(form)
+        await createProject(payload)
       }
       setModalOpen(false)
     } catch (err) {

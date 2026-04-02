@@ -62,7 +62,7 @@ public class AttendanceService {
         Attendance attendance = new Attendance();
         attendance.setEmployee(employee);
         attendance.setDate(java.time.LocalDate.now());
-        attendance.setCheckIn(java.time.LocalDateTime.now());
+        attendance.setCheckIn(java.time.LocalTime.now());
         return attendanceRepository.save(attendance);
     }
 
@@ -71,7 +71,7 @@ public class AttendanceService {
     public Attendance checkOut(Long attendanceId) {
         Attendance attendance = attendanceRepository.findById(attendanceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance", "id", attendanceId));
-        attendance.setCheckOut(java.time.LocalDateTime.now());
+        attendance.setCheckOut(java.time.LocalTime.now());
         return attendanceRepository.save(attendance);
     }
 }
