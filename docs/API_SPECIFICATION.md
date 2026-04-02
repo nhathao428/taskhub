@@ -144,12 +144,7 @@ Trả về danh sách tất cả nhân viên.
 
 **`DELETE /api/employees/{id}`**
 
-**Phản hồi thành công (200):**
-```json
-{
-  "message": "Đã xóa nhân viên thành công"
-}
-```
+**Phản hồi thành công (204 No Content)**
 
 ---
 
@@ -207,12 +202,7 @@ Trả về danh sách tất cả nhân viên.
 
 **`DELETE /api/projects/{id}`**
 
-**Phản hồi thành công (200):**
-```json
-{
-  "message": "Đã xóa dự án thành công"
-}
-```
+**Phản hồi thành công (204 No Content)**
 
 ---
 
@@ -273,12 +263,7 @@ Trả về danh sách tất cả nhân viên.
 
 **`DELETE /api/tasks/{id}`**
 
-**Phản hồi thành công (200):**
-```json
-{
-  "message": "Đã xóa công việc thành công"
-}
-```
+**Phản hồi thành công (204 No Content)**
 
 ---
 

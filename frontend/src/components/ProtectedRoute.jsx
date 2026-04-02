@@ -1,9 +1,10 @@
 import { Navigate } from 'react-router-dom'
 import Layout from './Layout'
+import { useAuth } from '../context/AuthContext'
 
 export default function ProtectedRoute({ children }) {
-  const token = localStorage.getItem('token')
-  if (!token) {
+  const { isAuthenticated } = useAuth()
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
   return <Layout>{children}</Layout>

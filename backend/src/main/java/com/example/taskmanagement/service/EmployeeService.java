@@ -8,6 +8,7 @@ import com.example.taskmanagement.repository.EmployeeRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
     }
 
+    @Transactional
     @CacheEvict(value = "employees", allEntries = true)
     public Employee createEmployee(CreateEmployeeRequest request) {
         Employee employee = new Employee();
@@ -41,6 +43,7 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
 
+    @Transactional
     @CacheEvict(value = "employees", allEntries = true)
     public Employee updateEmployee(Long id, UpdateEmployeeRequest request) {
         Employee existing = employeeRepository.findById(id)
@@ -52,6 +55,7 @@ public class EmployeeService {
         return employeeRepository.save(existing);
     }
 
+    @Transactional
     @CacheEvict(value = "employees", allEntries = true)
     public void deleteEmployee(Long id) {
         if (!employeeRepository.existsById(id)) {
