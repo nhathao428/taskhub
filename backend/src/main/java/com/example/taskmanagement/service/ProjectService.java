@@ -8,6 +8,7 @@ import com.example.taskmanagement.repository.ProjectRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class ProjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project", "id", id));
     }
 
+    @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public Project createProject(CreateProjectRequest request) {
         Project project = new Project();
@@ -42,6 +44,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public Project updateProject(Long id, UpdateProjectRequest request) {
         Project existing = projectRepository.findById(id)
@@ -54,6 +57,7 @@ public class ProjectService {
         return projectRepository.save(existing);
     }
 
+    @Transactional
     @CacheEvict(value = "projects", allEntries = true)
     public void deleteProject(Long id) {
         if (!projectRepository.existsById(id)) {

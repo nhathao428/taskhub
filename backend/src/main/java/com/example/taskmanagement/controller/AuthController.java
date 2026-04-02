@@ -4,7 +4,6 @@ import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.dto.AuthResponse;
 import com.example.taskmanagement.dto.LoginRequest;
 import com.example.taskmanagement.dto.RegisterRequest;
-import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,8 +27,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> register(@Valid @RequestBody RegisterRequest request) {
-        User user = userService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(user));
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = userService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
     }
 }

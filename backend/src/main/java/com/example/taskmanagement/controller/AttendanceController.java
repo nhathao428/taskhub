@@ -3,6 +3,7 @@ package com.example.taskmanagement.controller;
 import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.dto.CheckInRequest;
 import com.example.taskmanagement.dto.CheckOutRequest;
+import com.example.taskmanagement.dto.CreateAttendanceRequest;
 import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.service.AttendanceService;
 import jakarta.validation.Valid;
@@ -33,8 +34,8 @@ public class AttendanceController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Attendance>> logAttendance(@RequestBody Attendance attendance) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.logAttendance(attendance)));
+    public ResponseEntity<ApiResponse<Attendance>> logAttendance(@Valid @RequestBody CreateAttendanceRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.logAttendance(request)));
     }
 
     @GetMapping("/employee/{employeeId}")

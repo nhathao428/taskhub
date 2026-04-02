@@ -24,18 +24,21 @@ export function useAttendance() {
 
   const checkIn = useCallback(async (employeeId) => {
     const res = await api.post('/api/attendance/checkin', { employeeId })
+    await fetchRecords()
     return res.data?.data ?? res.data
-  }, [])
+  }, [fetchRecords])
 
   const checkOut = useCallback(async (attendanceId) => {
     const res = await api.post('/api/attendance/checkout', { attendanceId })
+    await fetchRecords()
     return res.data?.data ?? res.data
-  }, [])
+  }, [fetchRecords])
 
   const logAttendance = useCallback(async (data) => {
     const res = await api.post('/api/attendance', data)
+    await fetchRecords()
     return res.data?.data ?? res.data
-  }, [])
+  }, [fetchRecords])
 
   return { records, loading, error, refetch: fetchRecords, checkIn, checkOut, logAttendance }
 }

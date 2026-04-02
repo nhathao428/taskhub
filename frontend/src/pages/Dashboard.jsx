@@ -46,19 +46,19 @@ export default function Dashboard() {
         ])
 
         const today = new Date().toISOString().split('T')[0]
-        const todayCount = (attRes.data || []).filter((a) => {
+        const todayCount = (attRes.data?.data ?? attRes.data ?? []).filter((a) => {
           const d = a.date ? a.date.split('T')[0] : ''
           return d === today
         }).length
 
         setStats({
-          employees: (empRes.data || []).length,
-          projects: (projRes.data || []).length,
-          tasks: (taskRes.data || []).length,
+          employees: (empRes.data?.data ?? empRes.data ?? []).length,
+          projects: (projRes.data?.data ?? projRes.data ?? []).length,
+          tasks: (taskRes.data?.data ?? taskRes.data ?? []).length,
           todayAttendance: todayCount,
         })
-        setTasks(taskRes.data || [])
-        setEmployees(empRes.data || [])
+        setTasks(taskRes.data?.data ?? taskRes.data ?? [])
+        setEmployees(empRes.data?.data ?? empRes.data ?? [])
       } catch (err) {
         console.error('Lỗi khi tải dữ liệu dashboard:', err)
       } finally {

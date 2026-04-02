@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +57,8 @@ public class UserService implements UserDetailsService {
         return new AuthResponse(token, user.getUsername(), user.getEmail());
     }
 
-    public User register(RegisterRequest request) {
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateResourceException("User", "username", request.getUsername());
         }
@@ -68,7 +70,8 @@ public class UserService implements UserDetailsService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("EMPLOYEE");
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new AuthResponse(null, user.getUsername(), user.getEmail());
     }
 
     public List<User> getAllUsers() {
