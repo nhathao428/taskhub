@@ -69,8 +69,9 @@ export default function Tasks() {
     if (!window.confirm('Bạn có chắc muốn xóa công việc này?')) return
     try {
       await deleteTask(id)
-    } catch {
-      alert('Xóa thất bại.')
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Xóa thất bại.'
+      alert(msg)
     }
   }
 

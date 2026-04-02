@@ -54,6 +54,9 @@ public class EmployeeService {
 
     @CacheEvict(value = "employees", allEntries = true)
     public void deleteEmployee(Long id) {
+        if (!employeeRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Employee", "id", id);
+        }
         employeeRepository.deleteById(id);
     }
 }

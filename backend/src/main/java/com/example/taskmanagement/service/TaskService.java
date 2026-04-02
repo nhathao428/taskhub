@@ -82,6 +82,9 @@ public class TaskService {
 
     @CacheEvict(value = "tasks", allEntries = true)
     public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Task", "id", id);
+        }
         taskRepository.deleteById(id);
     }
 }
