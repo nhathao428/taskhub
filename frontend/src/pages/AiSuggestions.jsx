@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MdAdd, MdClose, MdSmartToy } from 'react-icons/md'
+import { MdClose, MdSmartToy } from 'react-icons/md'
 import api from '../api/axios'
 
 function ProgressBar({ label, value }) {
