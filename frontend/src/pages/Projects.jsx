@@ -54,8 +54,9 @@ export default function Projects() {
     if (!window.confirm('Bạn có chắc muốn xóa dự án này?')) return
     try {
       await deleteProject(id)
-    } catch {
-      alert('Xóa thất bại.')
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Xóa thất bại.'
+      alert(msg)
     }
   }
 

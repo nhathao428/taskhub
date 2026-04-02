@@ -46,8 +46,9 @@ export default function Employees() {
     if (!window.confirm('Bạn có chắc muốn xóa nhân viên này?')) return
     try {
       await deleteEmployee(id)
-    } catch {
-      alert('Xóa thất bại.')
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Xóa thất bại.'
+      alert(msg)
     }
   }
 

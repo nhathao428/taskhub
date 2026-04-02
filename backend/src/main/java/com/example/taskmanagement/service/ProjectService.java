@@ -56,6 +56,9 @@ public class ProjectService {
 
     @CacheEvict(value = "projects", allEntries = true)
     public void deleteProject(Long id) {
+        if (!projectRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Project", "id", id);
+        }
         projectRepository.deleteById(id);
     }
 }
