@@ -122,7 +122,7 @@ export default function AiSuggestions() {
         taskDescription,
         requiredSkills: skills,
       })
-      setResults(res.data || [])
+      setResults(res.data?.data ?? res.data ?? [])
     } catch (err) {
       setError(
         err.response?.data?.message || 'Không thể lấy gợi ý. Vui lòng thử lại.'

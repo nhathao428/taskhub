@@ -3,7 +3,7 @@ package com.example.taskmanagement.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record CreateProjectRequest(
         @NotBlank(message = "Project name is required")
@@ -12,9 +12,9 @@ public record CreateProjectRequest(
 
         String description,
 
-        LocalDateTime startDate,
+        LocalDate startDate,
 
-        LocalDateTime endDate,
+        LocalDate endDate,
 
         @Size(max = 50, message = "Status must not exceed 50 characters")
         String status

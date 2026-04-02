@@ -3,7 +3,7 @@ package com.example.taskmanagement.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record CreateTaskRequest(
         @NotBlank(message = "Task title is required")
@@ -12,7 +12,7 @@ public record CreateTaskRequest(
 
         String description,
 
-        LocalDateTime dueDate,
+        LocalDate dueDate,
 
         @Size(max = 50, message = "Status must not exceed 50 characters")
         String status,
