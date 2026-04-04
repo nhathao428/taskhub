@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="680" viewBox="0 0 750 680" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  <rect width="750" height="680" fill="#f8f9fa" rx="8"/>
+  <text x="375" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">Activity Diagram — Chấm công</text>
+
+  <!-- Start -->
+  <circle cx="375" cy="60" r="18" fill="#2c3e50"/>
+  <line x1="375" y1="78" x2="375" y2="100" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Decision: Loại chấm công -->
+  <polygon points="375,100 495,145 375,190 255,145" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+  <text x="375" y="138" text-anchor="middle" font-size="11" fill="#7d3c00">Chọn loại</text>
+  <text x="375" y="154" text-anchor="middle" font-size="11" fill="#7d3c00">chấm công?</text>
+
+  <!-- === BRANCH: CHECK-IN === -->
+  <line x1="255" y1="145" x2="110" y2="145" stroke="#27ae60" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="183" y="137" text-anchor="middle" font-size="11" fill="#1e8449" font-weight="bold">Vào</text>
+
+  <rect x="20" y="163" width="175" height="40" fill="#d5f5e3" stroke="#27ae60" stroke-width="2" rx="8"/>
+  <text x="107" y="179" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">POST /checkin</text>
+  <text x="107" y="193" text-anchor="middle" font-size="10" fill="#555">Xác thực JWT</text>
+  <line x1="107" y1="203" x2="107" y2="225" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <polygon points="107,225 187,265 107,305 27,265" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+  <text x="107" y="258" text-anchor="middle" font-size="10" fill="#7d3c00">Đã chấm</text>
+  <text x="107" y="272" text-anchor="middle" font-size="10" fill="#7d3c00">công hôm nay?</text>
+
+  <!-- Yes: đã chấm -->
+  <line x1="187" y1="265" x2="220" y2="265" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="200" y="257" font-size="10" fill="#c0392b" font-weight="bold">Có</text>
+  <rect x="215" y="248" width="120" height="38" fill="#fadbd8" stroke="#e74c3c" stroke-width="1.5" rx="6"/>
+  <text x="275" y="261" text-anchor="middle" font-size="10" fill="#c0392b">400 Lỗi:</text>
+  <text x="275" y="275" text-anchor="middle" font-size="10" fill="#c0392b">Đã chấm công rồi</text>
+  <line x1="275" y1="286" x2="275" y2="625" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="275" y1="625" x2="363" y2="625" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- No: chưa chấm -->
+  <line x1="107" y1="305" x2="107" y2="328" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="119" y="320" font-size="10" fill="#27ae60" font-weight="bold">Chưa</text>
+
+  <rect x="20" y="332" width="175" height="40" fill="#d5f5e3" stroke="#27ae60" stroke-width="2" rx="8"/>
+  <text x="107" y="348" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">Tạo bản ghi:</text>
+  <text x="107" y="362" text-anchor="middle" font-size="10" fill="#555">ngày + gioVao = now()</text>
+  <line x1="107" y1="372" x2="107" y2="392" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="20" y="395" width="175" height="38" fill="#d5f5e3" stroke="#27ae60" stroke-width="2" rx="8"/>
+  <text x="107" y="410" text-anchor="middle" font-size="11" fill="#1e8449" font-weight="bold">200 OK</text>
+  <text x="107" y="423" text-anchor="middle" font-size="10" fill="#555">Đã chấm công vào</text>
+  <line x1="107" y1="433" x2="107" y2="625" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="107" y1="625" x2="363" y2="625" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- === BRANCH: CHECK-OUT === -->
+  <line x1="495" y1="145" x2="620" y2="145" stroke="#2980b9" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="558" y="137" text-anchor="middle" font-size="11" fill="#2980b9" font-weight="bold">Ra</text>
+
+  <rect x="558" y="163" width="175" height="40" fill="#d6eaf8" stroke="#2980b9" stroke-width="2" rx="8"/>
+  <text x="645" y="179" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">POST /checkout</text>
+  <text x="645" y="193" text-anchor="middle" font-size="10" fill="#555">Xác thực JWT</text>
+  <line x1="645" y1="203" x2="645" y2="225" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <polygon points="645,225 715,265 645,305 575,265" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+  <text x="645" y="258" text-anchor="middle" font-size="10" fill="#7d3c00">Có bản ghi</text>
+  <text x="645" y="272" text-anchor="middle" font-size="10" fill="#7d3c00">vào hôm nay?</text>
+
+  <!-- No: chưa check-in -->
+  <line x1="715" y1="265" x2="730" y2="265" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="722" y="257" font-size="10" fill="#c0392b" font-weight="bold">Không</text>
+  <rect x="560" y="310" width="170" height="38" fill="#fadbd8" stroke="#e74c3c" stroke-width="1.5" rx="6"/>
+  <text x="645" y="323" text-anchor="middle" font-size="10" fill="#c0392b">400 Lỗi:</text>
+  <text x="645" y="337" text-anchor="middle" font-size="10" fill="#c0392b">Chưa chấm công vào</text>
+  <line x1="645" y1="348" x2="645" y2="625" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="645" y1="625" x2="537" y2="625" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- Yes: có bản ghi -->
+  <line x1="645" y1="305" x2="645" y2="328" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="657" y="320" font-size="10" fill="#27ae60" font-weight="bold">Có</text>
+
+  <rect x="560" y="332" width="175" height="40" fill="#d6eaf8" stroke="#2980b9" stroke-width="2" rx="8"/>
+  <text x="647" y="348" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">Cập nhật gioRa</text>
+  <text x="647" y="362" text-anchor="middle" font-size="10" fill="#555">checkOut = now()</text>
+  <line x1="645" y1="372" x2="645" y2="393" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="560" y="397" width="175" height="38" fill="#d6eaf8" stroke="#2980b9" stroke-width="2" rx="8"/>
+  <text x="647" y="412" text-anchor="middle" font-size="11" fill="#2980b9" font-weight="bold">200 OK</text>
+  <text x="647" y="426" text-anchor="middle" font-size="10" fill="#555">Đã chấm công ra</text>
+  <line x1="645" y1="435" x2="645" y2="625" stroke="#2980b9" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="645" y1="625" x2="537" y2="625" stroke="#2980b9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- === BRANCH: XEM LỊCH SỬ === -->
+  <line x1="375" y1="190" x2="375" y2="215" stroke="#8e44ad" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="387" y="208" font-size="11" fill="#8e44ad" font-weight="bold">Xem lịch sử</text>
+  <rect x="295" y="220" width="160" height="40" fill="#e8daef" stroke="#8e44ad" stroke-width="2" rx="8"/>
+  <text x="375" y="236" text-anchor="middle" font-size="11" fill="#4a235a" font-weight="bold">GET /api/attendance</text>
+  <text x="375" y="250" text-anchor="middle" font-size="10" fill="#555">Lấy lịch sử theo NV</text>
+  <line x1="375" y1="260" x2="375" y2="625" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="375" y1="625" x2="375" y2="625" stroke="#8e44ad" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Result box -->
+  <rect x="200" y="620" width="350" height="38" fill="#aed6f1" stroke="#2980b9" stroke-width="2" rx="8"/>
+  <text x="375" y="636" text-anchor="middle" font-size="12" fill="#1a252f" font-weight="bold">Hiển thị kết quả cho người dùng</text>
+  <text x="375" y="650" text-anchor="middle" font-size="10" fill="#555">(cập nhật giao diện)</text>
+  <line x1="375" y1="658" x2="375" y2="668" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- End -->
+  <circle cx="375" cy="670" r="9" fill="none" stroke="#2c3e50" stroke-width="3"/>
+  <circle cx="375" cy="670" r="5" fill="#2c3e50"/>
+</svg>

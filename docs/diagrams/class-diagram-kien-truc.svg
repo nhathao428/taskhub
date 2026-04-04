@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700" font-family="Arial, sans-serif">
+  <rect width="1100" height="700" fill="#f4f6f9" rx="8"/>
+  <text x="550" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Sơ đồ Lớp Kiến trúc — Controller → Service → Repository → Entity</text>
+
+  <!-- Layer labels -->
+  <rect x="15" y="55" width="125" height="600" fill="#ebf5fb" stroke="#2980b9" stroke-width="1.5" rx="6" stroke-dasharray="6,3"/>
+  <text x="77" y="355" text-anchor="middle" font-size="13" font-weight="bold" fill="#2980b9" transform="rotate(-90,77,355)">CONTROLLER LAYER</text>
+
+  <rect x="155" y="55" width="235" height="600" fill="#eafaf1" stroke="#27ae60" stroke-width="1.5" rx="6" stroke-dasharray="6,3"/>
+  <text x="272" y="355" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60" transform="rotate(-90,272,355)">SERVICE LAYER</text>
+
+  <rect x="405" y="55" width="240" height="600" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5" rx="6" stroke-dasharray="6,3"/>
+  <text x="525" y="355" text-anchor="middle" font-size="13" font-weight="bold" fill="#f39c12" transform="rotate(-90,525,355)">REPOSITORY LAYER</text>
+
+  <rect x="660" y="55" width="420" height="600" fill="#f9f0ff" stroke="#8e44ad" stroke-width="1.5" rx="6" stroke-dasharray="6,3"/>
+  <text x="870" y="355" text-anchor="middle" font-size="13" font-weight="bold" fill="#8e44ad" transform="rotate(-90,870,355)">ENTITY LAYER</text>
+
+  <!-- Controllers -->
+  <!-- AuthController -->
+  <rect x="25" y="70" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="103" text-anchor="middle" font-size="11" fill="white">XacThuc</text>
+
+  <rect x="25" y="128" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+
+  <rect x="25" y="186" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+
+  <rect x="25" y="244" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+
+  <rect x="25" y="302" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+
+  <rect x="25" y="360" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
+  <text x="82" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
+  <text x="82" y="393" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+
+  <!-- Services -->
+  <rect x="165" y="70" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="103" text-anchor="middle" font-size="11" fill="white">NguoiDung</text>
+
+  <rect x="165" y="128" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+
+  <rect x="165" y="186" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+
+  <rect x="165" y="244" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+
+  <rect x="165" y="302" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+
+  <rect x="165" y="360" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
+  <text x="227" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
+  <text x="227" y="393" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+
+  <rect x="165" y="430" width="125" height="42" fill="#1abc9c" stroke="#148f77" stroke-width="1.5" rx="4"/>
+  <text x="227" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVuGoiY</text>
+  <text x="227" y="463" text-anchor="middle" font-size="11" fill="white">AI (AiSuggestion)</text>
+
+  <!-- Repositories -->
+  <rect x="415" y="70" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="103" text-anchor="middle" font-size="11" fill="white">NguoiDung</text>
+
+  <rect x="415" y="128" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+
+  <rect x="415" y="186" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+
+  <rect x="415" y="244" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+
+  <rect x="415" y="302" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+
+  <rect x="415" y="360" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="393" text-anchor="middle" font-size="11" fill="white">KyNang</text>
+
+  <rect x="415" y="430" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
+  <text x="480" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
+  <text x="480" y="463" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+
+  <!-- Entities -->
+  <rect x="670" y="70" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="white">NguoiDung</text>
+
+  <rect x="670" y="128" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="150" text-anchor="middle" font-size="12" font-weight="bold" fill="white">NhanVien</text>
+
+  <rect x="670" y="186" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="208" text-anchor="middle" font-size="12" font-weight="bold" fill="white">DuAn</text>
+
+  <rect x="670" y="244" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="white">CongViec</text>
+
+  <rect x="670" y="302" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="324" text-anchor="middle" font-size="12" font-weight="bold" fill="white">ChamCong</text>
+
+  <rect x="670" y="360" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="382" text-anchor="middle" font-size="12" font-weight="bold" fill="white">KyNang</text>
+
+  <rect x="670" y="430" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
+  <text x="725" y="452" text-anchor="middle" font-size="12" font-weight="bold" fill="white">GoiY</text>
+
+  <!-- DB Icon -->
+  <ellipse cx="860" cy="268" rx="60" ry="18" fill="#d5d8dc" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="800" y="268" width="120" height="50" fill="#d5d8dc" stroke="#7f8c8d" stroke-width="2"/>
+  <ellipse cx="860" cy="318" rx="60" ry="18" fill="#bfc9ca" stroke="#7f8c8d" stroke-width="2"/>
+  <text x="860" y="298" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">MySQL</text>
+  <text x="860" y="314" text-anchor="middle" font-size="11" fill="#2c3e50">Database</text>
+
+  <!-- DB connections from entities -->
+  <line x1="780" y1="87" x2="800" y2="270" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="145" x2="800" y2="271" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="204" x2="800" y2="272" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="262" x2="800" y2="274" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="320" x2="800" y2="277" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="378" x2="800" y2="280" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="780" y1="447" x2="800" y2="283" stroke="#8e44ad" stroke-width="1" stroke-dasharray="5,3"/>
+
+  <!-- Controller → Service arrows -->
+  <line x1="140" y1="91" x2="165" y2="91" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="149" x2="165" y2="149" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="207" x2="165" y2="207" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="265" x2="165" y2="265" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="323" x2="165" y2="323" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="381" x2="165" y2="381" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="140" y1="381" x2="152" y2="381" stroke="#555" stroke-width="1"/>
+  <line x1="152" y1="381" x2="152" y2="451" stroke="#555" stroke-width="1"/>
+  <line x1="152" y1="451" x2="165" y2="451" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Service → Repository arrows -->
+  <line x1="290" y1="91" x2="415" y2="91" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="290" y1="149" x2="415" y2="149" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="290" y1="207" x2="415" y2="207" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="290" y1="265" x2="415" y2="265" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="290" y1="323" x2="415" y2="323" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- AI Service → multiple repos -->
+  <line x1="290" y1="451" x2="350" y2="451" stroke="#555" stroke-width="1"/>
+  <line x1="350" y1="149" x2="350" y2="481" stroke="#555" stroke-width="1"/>
+  <line x1="350" y1="149" x2="415" y2="149" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="350" y1="265" x2="415" y2="265" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="350" y1="323" x2="415" y2="323" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="350" y1="381" x2="415" y2="381" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="290" y1="381" x2="415" y2="451" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Repository → Entity arrows -->
+  <line x1="545" y1="91" x2="670" y2="87" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="149" x2="670" y2="145" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="207" x2="670" y2="204" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="265" x2="670" y2="262" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="323" x2="670" y2="320" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="381" x2="670" y2="378" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="545" y1="451" x2="670" y2="447" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#555"/>
+    </marker>
+  </defs>
+
+  <!-- Legend -->
+  <rect x="670" y="500" width="390" height="155" fill="white" stroke="#bdc3c7" stroke-width="1.5" rx="5"/>
+  <text x="865" y="520" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">Chú thích các lớp</text>
+  <rect x="685" y="530" width="20" height="14" fill="#2980b9" rx="2"/>
+  <text x="712" y="542" font-size="11" fill="#333">Controller — Nhận request HTTP, xác thực JWT</text>
+  <rect x="685" y="552" width="20" height="14" fill="#27ae60" rx="2"/>
+  <text x="712" y="564" font-size="11" fill="#333">Service — Xử lý nghiệp vụ, logic chính</text>
+  <rect x="685" y="574" width="20" height="14" fill="#1abc9c" rx="2"/>
+  <text x="712" y="586" font-size="11" fill="#333">AI Service — Gợi ý nhân viên (OpenAI/fallback)</text>
+  <rect x="685" y="596" width="20" height="14" fill="#f39c12" rx="2"/>
+  <text x="712" y="608" font-size="11" fill="#333">Repository — Truy vấn database (JPA)</text>
+  <rect x="685" y="618" width="20" height="14" fill="#8e44ad" rx="2"/>
+  <text x="712" y="630" font-size="11" fill="#333">Entity — Ánh xạ bảng cơ sở dữ liệu</text>
+  <text x="712" y="646" font-size="11" fill="#555">→ Phụ thuộc (dependency injection)</text>
+</svg>
