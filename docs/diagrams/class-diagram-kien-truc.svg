@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700" font-family="Arial, sans-serif">
-  <rect width="1100" height="700" fill="#f4f6f9" rx="8"/>
+  <rect width="1100" height="700" fill="white" rx="8"/>
   <text x="550" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Sơ đồ Lớp Kiến trúc — Controller → Service → Repository → Entity</text>
 
   <!-- Layer labels -->
@@ -17,109 +17,109 @@
 
   <!-- Controllers -->
   <!-- AuthController -->
-  <rect x="25" y="70" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="103" text-anchor="middle" font-size="11" fill="white">XacThuc</text>
+  <rect x="25" y="70" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="103" text-anchor="middle" font-size="11" fill="#333">XacThuc</text>
 
-  <rect x="25" y="128" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+  <rect x="25" y="128" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="161" text-anchor="middle" font-size="11" fill="#333">NhanVien</text>
 
-  <rect x="25" y="186" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+  <rect x="25" y="186" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="219" text-anchor="middle" font-size="11" fill="#333">DuAn</text>
 
-  <rect x="25" y="244" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+  <rect x="25" y="244" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="277" text-anchor="middle" font-size="11" fill="#333">CongViec</text>
 
-  <rect x="25" y="302" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+  <rect x="25" y="302" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="335" text-anchor="middle" font-size="11" fill="#333">ChamCong</text>
 
-  <rect x="25" y="360" width="115" height="42" fill="#2980b9" stroke="#1a5276" stroke-width="1.5" rx="4"/>
-  <text x="82" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">BoDieuKhien</text>
-  <text x="82" y="393" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+  <rect x="25" y="360" width="115" height="42" fill="white" stroke="#2980b9" stroke-width="1.5" rx="4"/>
+  <text x="82" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">BoDieuKhien</text>
+  <text x="82" y="393" text-anchor="middle" font-size="11" fill="#333">GoiY</text>
 
   <!-- Services -->
-  <rect x="165" y="70" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="103" text-anchor="middle" font-size="11" fill="white">NguoiDung</text>
+  <rect x="165" y="70" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="103" text-anchor="middle" font-size="11" fill="#333">NguoiDung</text>
 
-  <rect x="165" y="128" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+  <rect x="165" y="128" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="161" text-anchor="middle" font-size="11" fill="#333">NhanVien</text>
 
-  <rect x="165" y="186" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+  <rect x="165" y="186" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="219" text-anchor="middle" font-size="11" fill="#333">DuAn</text>
 
-  <rect x="165" y="244" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+  <rect x="165" y="244" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="277" text-anchor="middle" font-size="11" fill="#333">CongViec</text>
 
-  <rect x="165" y="302" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+  <rect x="165" y="302" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="335" text-anchor="middle" font-size="11" fill="#333">ChamCong</text>
 
-  <rect x="165" y="360" width="125" height="42" fill="#27ae60" stroke="#1e8449" stroke-width="1.5" rx="4"/>
-  <text x="227" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVu</text>
-  <text x="227" y="393" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+  <rect x="165" y="360" width="125" height="42" fill="white" stroke="#27ae60" stroke-width="1.5" rx="4"/>
+  <text x="227" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVu</text>
+  <text x="227" y="393" text-anchor="middle" font-size="11" fill="#333">GoiY</text>
 
-  <rect x="165" y="430" width="125" height="42" fill="#1abc9c" stroke="#148f77" stroke-width="1.5" rx="4"/>
-  <text x="227" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="white">DichVuGoiY</text>
-  <text x="227" y="463" text-anchor="middle" font-size="11" fill="white">AI (AiSuggestion)</text>
+  <rect x="165" y="430" width="125" height="42" fill="white" stroke="#1abc9c" stroke-width="1.5" rx="4"/>
+  <text x="227" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">DichVuGoiY</text>
+  <text x="227" y="463" text-anchor="middle" font-size="11" fill="#333">AI (AiSuggestion)</text>
 
   <!-- Repositories -->
-  <rect x="415" y="70" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="103" text-anchor="middle" font-size="11" fill="white">NguoiDung</text>
+  <rect x="415" y="70" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="88" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="103" text-anchor="middle" font-size="11" fill="#333">NguoiDung</text>
 
-  <rect x="415" y="128" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="161" text-anchor="middle" font-size="11" fill="white">NhanVien</text>
+  <rect x="415" y="128" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="146" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="161" text-anchor="middle" font-size="11" fill="#333">NhanVien</text>
 
-  <rect x="415" y="186" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="219" text-anchor="middle" font-size="11" fill="white">DuAn</text>
+  <rect x="415" y="186" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="204" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="219" text-anchor="middle" font-size="11" fill="#333">DuAn</text>
 
-  <rect x="415" y="244" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="277" text-anchor="middle" font-size="11" fill="white">CongViec</text>
+  <rect x="415" y="244" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="262" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="277" text-anchor="middle" font-size="11" fill="#333">CongViec</text>
 
-  <rect x="415" y="302" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="335" text-anchor="middle" font-size="11" fill="white">ChamCong</text>
+  <rect x="415" y="302" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="320" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="335" text-anchor="middle" font-size="11" fill="#333">ChamCong</text>
 
-  <rect x="415" y="360" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="393" text-anchor="middle" font-size="11" fill="white">KyNang</text>
+  <rect x="415" y="360" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="378" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="393" text-anchor="middle" font-size="11" fill="#333">KyNang</text>
 
-  <rect x="415" y="430" width="130" height="42" fill="#f39c12" stroke="#b7770d" stroke-width="1.5" rx="4"/>
-  <text x="480" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="white">KhoLuu</text>
-  <text x="480" y="463" text-anchor="middle" font-size="11" fill="white">GoiY</text>
+  <rect x="415" y="430" width="130" height="42" fill="white" stroke="#f39c12" stroke-width="1.5" rx="4"/>
+  <text x="480" y="448" text-anchor="middle" font-size="11" font-weight="bold" fill="#333">KhoLuu</text>
+  <text x="480" y="463" text-anchor="middle" font-size="11" fill="#333">GoiY</text>
 
   <!-- Entities -->
-  <rect x="670" y="70" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="white">NguoiDung</text>
+  <rect x="670" y="70" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="92" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">NguoiDung</text>
 
-  <rect x="670" y="128" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="150" text-anchor="middle" font-size="12" font-weight="bold" fill="white">NhanVien</text>
+  <rect x="670" y="128" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="150" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">NhanVien</text>
 
-  <rect x="670" y="186" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="208" text-anchor="middle" font-size="12" font-weight="bold" fill="white">DuAn</text>
+  <rect x="670" y="186" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="208" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">DuAn</text>
 
-  <rect x="670" y="244" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="white">CongViec</text>
+  <rect x="670" y="244" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="266" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">CongViec</text>
 
-  <rect x="670" y="302" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="324" text-anchor="middle" font-size="12" font-weight="bold" fill="white">ChamCong</text>
+  <rect x="670" y="302" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="324" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">ChamCong</text>
 
-  <rect x="670" y="360" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="382" text-anchor="middle" font-size="12" font-weight="bold" fill="white">KyNang</text>
+  <rect x="670" y="360" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="382" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">KyNang</text>
 
-  <rect x="670" y="430" width="110" height="35" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5" rx="4"/>
-  <text x="725" y="452" text-anchor="middle" font-size="12" font-weight="bold" fill="white">GoiY</text>
+  <rect x="670" y="430" width="110" height="35" fill="white" stroke="#8e44ad" stroke-width="1.5" rx="4"/>
+  <text x="725" y="452" text-anchor="middle" font-size="12" font-weight="bold" fill="#333">GoiY</text>
 
   <!-- DB Icon -->
   <ellipse cx="860" cy="268" rx="60" ry="18" fill="#d5d8dc" stroke="#7f8c8d" stroke-width="2"/>

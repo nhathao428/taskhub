@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="950" height="560" viewBox="0 0 950 560" font-family="Arial, sans-serif">
-  <rect width="950" height="560" fill="#f8f9fa" rx="8"/>
+  <rect width="950" height="560" fill="white" rx="8"/>
   <text x="475" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Sơ đồ Use Case — Quản lý Dự án &amp; Công việc</text>
 
   <!-- System boundary -->
@@ -41,7 +41,7 @@
   <text x="420" y="457" text-anchor="middle" font-size="12" fill="#1a5c2f" font-weight="bold">tiến độ công việc</text>
 
   <!-- Actor: Quản lý (left) -->
-  <circle cx="70" cy="200" r="20" fill="#d7bde2" stroke="#7d3c98" stroke-width="2"/>
+  <circle cx="70" cy="200" r="20" fill="white" stroke="#7d3c98" stroke-width="2"/>
   <line x1="70" y1="220" x2="70" y2="270" stroke="#7d3c98" stroke-width="2"/>
   <line x1="45" y1="242" x2="95" y2="242" stroke="#7d3c98" stroke-width="2"/>
   <line x1="70" y1="270" x2="50" y2="300" stroke="#7d3c98" stroke-width="2"/>
@@ -49,7 +49,7 @@
   <text x="70" y="320" text-anchor="middle" font-size="13" fill="#4a235a" font-weight="bold">Quản lý</text>
 
   <!-- Actor: Nhân viên (right) -->
-  <circle cx="880" cy="390" r="20" fill="#a9dfbf" stroke="#1e8449" stroke-width="2"/>
+  <circle cx="880" cy="390" r="20" fill="white" stroke="#1e8449" stroke-width="2"/>
   <line x1="880" y1="410" x2="880" y2="460" stroke="#1e8449" stroke-width="2"/>
   <line x1="855" y1="430" x2="905" y2="430" stroke="#1e8449" stroke-width="2"/>
   <line x1="880" y1="460" x2="860" y2="488" stroke="#1e8449" stroke-width="2"/>
