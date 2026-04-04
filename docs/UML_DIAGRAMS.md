@@ -1,10 +1,28 @@
 # 📊 Sơ đồ UML — Hệ thống Quản lý Công việc
 
-Tài liệu này chứa các sơ đồ Use Case và Sequence mô tả luồng hoạt động chính của hệ thống.
+Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Activity mô tả kiến trúc và luồng hoạt động chính của hệ thống.
 
 ---
 
-## 1. Sơ đồ Use Case — Quản lý Chấm công
+## 1. Sơ đồ Use Case
+
+### 1.1. Use Case — Xác thực
+
+```mermaid
+graph TB
+    subgraph "Hệ thống Xác thực"
+        UC1["Đăng ký tài khoản"]
+        UC2["Đăng nhập"]
+        UC3["Đăng xuất"]
+    end
+    ND((Người dùng\nchưa đăng nhập)) --> UC1
+    ND --> UC2
+    DND((Người dùng\nđã đăng nhập)) --> UC3
+```
+
+---
+
+### 1.2. Use Case — Quản lý Chấm công
 
 ```mermaid
 graph TB
@@ -23,7 +41,7 @@ graph TB
 
 ---
 
-## 2. Sơ đồ Use Case — Quản lý Dự án & Công việc
+### 1.3. Use Case — Quản lý Dự án & Công việc
 
 ```mermaid
 graph TB
@@ -48,7 +66,7 @@ graph TB
 
 ---
 
-## 3. Sơ đồ Use Case — AI Gợi ý Nhân viên
+### 1.4. Use Case — AI Gợi ý Nhân viên
 
 ```mermaid
 graph TB
@@ -75,7 +93,145 @@ graph TB
 
 ---
 
-## 4. Sơ đồ Sequence — Đăng nhập
+## 2. Sơ đồ lớp — Class Diagram
+
+### 2.1. Entity Classes
+
+```mermaid
+classDiagram
+    class User {
+        -Long userId
+        -String username
+        -String password
+        -String email
+        -String role
+        -LocalDateTime createdAt
+        +onCreate()
+    }
+
+    class Employee {
+        -Long employeeId
+        -User user
+        -String firstName
+        -String lastName
+        -String position
+        -String department
+        -LocalDateTime hiredAt
+        +onCreate()
+    }
+
+    class Project {
+        -Long projectId
+        -String name
+        -String description
+        -LocalDate startDate
+        -LocalDate endDate
+        -String status
+    }
+
+    class Task {
+        -Long taskId
+        -Project project
+        -Employee assignedTo
+        -String title
+        -String description
+        -LocalDate dueDate
+        -String status
+        -LocalDateTime completedAt
+    }
+
+    class Attendance {
+        -Long attendanceId
+        -Employee employee
+        -LocalDate date
+        -LocalTime checkIn
+        -LocalTime checkOut
+    }
+
+    class Skill {
+        -Long skillId
+        -Employee employee
+        -String skillName
+        -String proficiencyLevel
+    }
+
+    class Suggestion {
+        -Long suggestionId
+        -User user
+        -String suggestionText
+        -String feedback
+        -LocalDateTime createdAt
+        +onCreate()
+    }
+
+    Employee "*" --> "1" User : user
+    Task "*" --> "1" Project : project
+    Task "*" --> "0..1" Employee : assignedTo
+    Attendance "*" --> "1" Employee : employee
+    Skill "*" --> "1" Employee : employee
+    Suggestion "*" --> "1" User : user
+```
+
+### 2.2. Service, Controller & Repository Classes
+
+```mermaid
+classDiagram
+    class AuthController
+    class EmployeeController
+    class ProjectController
+    class TaskController
+    class AttendanceController
+    class SuggestionController
+
+    class UserService
+    class EmployeeService
+    class ProjectService
+    class TaskService
+    class AttendanceService
+    class SuggestionService
+    class AiSuggestionService
+
+    class UserRepository
+    class EmployeeRepository
+    class ProjectRepository
+    class TaskRepository
+    class AttendanceRepository
+    class SkillRepository
+    class SuggestionRepository
+
+    AuthController --> UserService
+    EmployeeController --> EmployeeService
+    ProjectController --> ProjectService
+    TaskController --> TaskService
+    AttendanceController --> AttendanceService
+    SuggestionController --> SuggestionService
+    SuggestionController --> AiSuggestionService
+
+    UserService --> UserRepository
+    EmployeeService --> EmployeeRepository
+    ProjectService --> ProjectRepository
+    TaskService --> TaskRepository
+    AttendanceService --> AttendanceRepository
+    SuggestionService --> SuggestionRepository
+    AiSuggestionService --> EmployeeRepository
+    AiSuggestionService --> SkillRepository
+    AiSuggestionService --> TaskRepository
+    AiSuggestionService --> AttendanceRepository
+
+    UserRepository --> User
+    EmployeeRepository --> Employee
+    ProjectRepository --> Project
+    TaskRepository --> Task
+    AttendanceRepository --> Attendance
+    SkillRepository --> Skill
+    SuggestionRepository --> Suggestion
+```
+
+---
+
+## 3. Sơ đồ tuần tự — Sequence Diagram
+
+### 3.1. Đăng nhập
 
 ```mermaid
 sequenceDiagram
@@ -89,7 +245,8 @@ sequenceDiagram
     BE->>DB: Truy vấn thông tin người dùng
     DB-->>BE: Trả về dữ liệu người dùng
     alt Xác thực thành công
-        BE-->>FE: 200 OK + JWT Token
+        Note over BE: So sánh mật khẩu với BCrypt
+        BE-->>FE: 200 OK + JWT Token + role
         FE-->>ND: Chuyển hướng đến Bảng điều khiển
     else Xác thực thất bại
         BE-->>FE: 401 Không được phép
@@ -99,7 +256,7 @@ sequenceDiagram
 
 ---
 
-## 5. Sơ đồ Sequence — Chấm công
+### 3.2. Chấm công
 
 ```mermaid
 sequenceDiagram
@@ -111,13 +268,21 @@ sequenceDiagram
     NV->>FE: Nhấn nút "Chấm công vào"
     FE->>BE: POST /api/attendance/checkin
     Note over BE: Xác thực JWT
-    BE->>DB: Lưu bản ghi chấm công (ngày, giờ vào)
-    DB-->>BE: Xác nhận đã lưu
-    BE-->>FE: 200 OK
-    FE-->>NV: Hiển thị "Đã chấm công vào"
+    BE->>DB: Kiểm tra đã chấm công hôm nay chưa
+    DB-->>BE: Kết quả kiểm tra
+    alt Chưa chấm công
+        BE->>DB: Lưu bản ghi chấm công (ngày, giờ vào)
+        DB-->>BE: Xác nhận đã lưu
+        BE-->>FE: 200 OK
+        FE-->>NV: Hiển thị "Đã chấm công vào"
+    else Đã chấm công rồi
+        BE-->>FE: 400 Bad Request
+        FE-->>NV: Hiển thị lỗi "Đã chấm công rồi"
+    end
 
     NV->>FE: Nhấn nút "Chấm công ra"
     FE->>BE: POST /api/attendance/checkout
+    Note over BE: Xác thực JWT
     BE->>DB: Cập nhật giờ ra
     DB-->>BE: Xác nhận
     BE-->>FE: 200 OK
@@ -126,51 +291,55 @@ sequenceDiagram
 
 ---
 
-## 6. Sơ đồ Sequence — AI Gợi ý Nhân viên
+### 3.3. AI Gợi ý Nhân viên
 
 ```mermaid
 sequenceDiagram
     participant QL as Quản lý
-    participant BDK as Bộ điều khiển Gợi ý
-    participant AI as Dịch vụ Gợi ý AI
-    participant KLN as Kho lưu Nhân viên
-    participant KLK as Kho lưu Kỹ năng
-    participant KLCV as Kho lưu Công việc
-    participant KLCC as Kho lưu Chấm công
+    participant BDK as SuggestionController
+    participant AI as AiSuggestionService
+    participant EmpRepo as EmployeeRepository
+    participant SkillRepo as SkillRepository
+    participant TaskRepo as TaskRepository
+    participant AttRepo as AttendanceRepository
+    participant OpenAI as OpenAI API
 
-    Note over QL,KLCC: Luồng AI phân tích và đề xuất top 5 nhân viên phù hợp nhất
+    Note over QL,OpenAI: Luồng AI phân tích và đề xuất top 5 nhân viên phù hợp nhất
 
     QL->>BDK: POST /api/suggestions/recommend
     Note over BDK: Xác thực JWT — chỉ Quản lý mới được gọi
 
-    BDK->>AI: gợiÝNhânViên(tiêu đề, kỹ năng yêu cầu)
+    BDK->>AI: recommendEmployees(request)
 
-    AI->>KLN: Lấy toàn bộ danh sách nhân viên
-    KLN-->>AI: Danh sách tất cả nhân viên
+    AI->>EmpRepo: findAll()
+    EmpRepo-->>AI: List~Employee~
 
-    loop Với mỗi nhân viên trong danh sách
-        AI->>KLK: Lấy danh sách kỹ năng của nhân viên
-        KLK-->>AI: Danh sách kỹ năng
+    AI->>SkillRepo: findByEmployeeEmployeeIdIn(ids)
+    SkillRepo-->>AI: List~Skill~ (batch — groupingBy employeeId)
 
-        AI->>KLCV: Đếm công việc đang thực hiện
-        KLCV-->>AI: Số lượng công việc hiện tại
+    AI->>TaskRepo: findByAssignedToEmployeeIdInAndStatusIn(ids, statuses)
+    TaskRepo-->>AI: List~Task~ (batch — groupingBy employeeId)
 
-        AI->>KLCV: Lấy các công việc đã hoàn thành
-        KLCV-->>AI: Danh sách công việc đã hoàn thành
+    AI->>AttRepo: findByEmployeeEmployeeIdInAndDateBetween(ids, start, end)
+    AttRepo-->>AI: List~Attendance~ (batch — groupingBy employeeId)
 
-        AI->>KLCC: Lấy bản ghi chấm công 30 ngày gần nhất
-        KLCC-->>AI: Danh sách chấm công
-
-        Note over AI: Tính điểm tổng hợp: Kỹ năng (35%) + Khối lượng (25%) + Hiệu suất (25%) + Chấm công (15%)
+    alt OpenAI API Key có cấu hình
+        AI->>AI: buildPrompt(request, employees, skills, tasks, attendance)
+        AI->>OpenAI: POST /v1/chat/completions
+        OpenAI-->>AI: JSON response
+        AI->>AI: parseOpenAiResponse(responseJson, employees)
+    else Không có API Key (Fallback)
+        AI->>AI: calculateFallbackScores(...)
+        Note over AI: Tính điểm rule-based: Skill 35% + Workload 25% + Performance 25% + Attendance 15%
     end
 
-    AI-->>BDK: Top 5 nhân viên phù hợp nhất (sắp xếp theo điểm giảm dần)
+    AI-->>BDK: Top 5 EmployeeSuggestionDTO (sắp xếp theo overallScore giảm dần)
     BDK-->>QL: 200 OK + Danh sách gợi ý kèm lý do
 ```
 
 ---
 
-## 7. Sơ đồ Sequence — Quản lý Công việc (Tạo + Phân công)
+### 3.4. Quản lý Công việc (Tạo + Phân công)
 
 ```mermaid
 sequenceDiagram
@@ -193,4 +362,176 @@ sequenceDiagram
     DB-->>BE: Xác nhận
     BE-->>FE: 200 OK
     FE-->>QL: Cập nhật giao diện
+```
+
+---
+
+## 4. Sơ đồ hoạt động — Activity Diagram
+
+### 4.1. Đăng nhập
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B[Nhập username + password]
+    B --> C{Username tồn tại?}
+    C -- Không --> D[Hiển thị lỗi: Sai thông tin đăng nhập]
+    D --> B
+    C -- Có --> E{Password khớp BCrypt?}
+    E -- Không --> D
+    E -- Có --> F[Tạo JWT Token]
+    F --> G[Trả về token + role]
+    G --> H[Chuyển đến Dashboard]
+    H --> I([Kết thúc])
+```
+
+---
+
+### 4.2. Đăng ký
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B[Nhập username, email, password]
+    B --> C{Username đã tồn tại?}
+    C -- Có --> D[Hiển thị lỗi: Username đã tồn tại]
+    D --> B
+    C -- Không --> E{Email đã tồn tại?}
+    E -- Có --> F[Hiển thị lỗi: Email đã tồn tại]
+    F --> B
+    E -- Không --> G[Mã hóa password BCrypt]
+    G --> H[Tạo User mới với role = EMPLOYEE]
+    H --> I[Lưu vào database]
+    I --> J[Trả về thông tin user]
+    J --> K([Kết thúc])
+```
+
+---
+
+### 4.3. Quản lý Nhân viên
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B{Chọn thao tác?}
+    B -- Xem --> C[GET /api/employees]
+    C --> D[Hiển thị danh sách nhân viên]
+    B -- Thêm --> E[Nhập thông tin nhân viên]
+    E --> F[POST /api/employees]
+    F --> G{Dữ liệu hợp lệ?}
+    G -- Không --> H[Hiển thị lỗi validation]
+    H --> E
+    G -- Có --> I[Lưu nhân viên mới]
+    I --> D
+    B -- Sửa --> J[Chọn nhân viên cần sửa]
+    J --> K[PUT /api/employees/{id}]
+    K --> D
+    B -- Xóa --> L[Chọn nhân viên cần xóa]
+    L --> M[DELETE /api/employees/{id}]
+    M --> D
+    D --> N([Kết thúc])
+```
+
+---
+
+### 4.4. Chấm công
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B{Loại chấm công?}
+    B -- Chấm công vào --> C[POST /api/attendance/checkin]
+    C --> D{Đã chấm công hôm nay?}
+    D -- Có --> E[Hiển thị lỗi: Đã chấm công rồi]
+    D -- Không --> F[Tạo record mới: date + checkIn time]
+    F --> G[Lưu vào DB]
+    G --> H[Hiển thị: Đã chấm công vào]
+    B -- Chấm công ra --> I[POST /api/attendance/checkout]
+    I --> J{Có record chấm công vào?}
+    J -- Không --> K[Hiển thị lỗi: Chưa chấm công vào]
+    J -- Có --> L[Cập nhật checkOut time]
+    L --> M[Hiển thị: Đã chấm công ra]
+    B -- Xem lịch sử --> N[GET /api/attendance]
+    N --> O[Hiển thị lịch sử chấm công]
+    H --> P([Kết thúc])
+    M --> P
+    O --> P
+    E --> P
+    K --> P
+```
+
+---
+
+### 4.5. AI Gợi ý Nhân viên
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B[Nhập: taskTitle, taskDescription, requiredSkills]
+    B --> C[POST /api/suggestions/recommend]
+    C --> D[findAll employees — batch query]
+    D --> E[findByEmployeeEmployeeIdIn — batch skills]
+    E --> F[findByAssignedToEmployeeIdInAndStatusIn — batch active tasks]
+    F --> G[findByEmployeeEmployeeIdInAndDateBetween — batch attendance 30 ngày]
+    G --> H{OpenAI API Key có cấu hình?}
+    H -- Có --> I[buildPrompt với dữ liệu thực tế]
+    I --> J[POST /v1/chat/completions tới OpenAI GPT]
+    J --> K[parseOpenAiResponse]
+    K --> L[Top 5 EmployeeSuggestionDTO]
+    H -- Không --> M[calculateFallbackScores]
+    M --> N[Skill Match 35%]
+    M --> O[Workload 25%]
+    M --> P[Performance 25%]
+    M --> Q[Attendance 15%]
+    N --> R[Tính overallScore tổng hợp]
+    O --> R
+    P --> R
+    Q --> R
+    R --> S[Sắp xếp giảm dần theo overallScore]
+    S --> L
+    L --> T[Hiển thị kết quả gợi ý + lý do]
+    T --> U([Kết thúc])
+```
+
+---
+
+### 4.6. Quản lý Dự án
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B{Chọn thao tác?}
+    B -- Xem --> C[GET /api/projects]
+    C --> D[Hiển thị danh sách dự án]
+    B -- Tạo mới --> E[Nhập: name, description, startDate, endDate]
+    E --> F[POST /api/projects]
+    F --> G[Lưu dự án mới, status = ongoing]
+    G --> D
+    B -- Cập nhật --> H[Chọn dự án cần sửa]
+    H --> I[PUT /api/projects/{id}]
+    I --> D
+    B -- Xóa --> J[DELETE /api/projects/{id}]
+    J --> D
+    D --> K([Kết thúc])
+```
+
+---
+
+### 4.7. Quản lý Công việc
+
+```mermaid
+flowchart TD
+    A([Bắt đầu]) --> B{Chọn thao tác?}
+    B -- Xem --> C[GET /api/tasks]
+    C --> D[Hiển thị danh sách công việc]
+    B -- Tạo --> E[Nhập: title, description, dueDate, projectId]
+    E --> F[POST /api/tasks]
+    F --> G[Tạo task, status = pending]
+    G --> D
+    B -- Phân công --> H[Chọn task + chọn nhân viên]
+    H --> I[PUT /api/tasks/{id} với assignedTo]
+    I --> D
+    B -- Cập nhật trạng thái --> J[Chọn task]
+    J --> K{Status mới?}
+    K -- COMPLETED --> L[Cập nhật completedAt = now]
+    K -- IN_PROGRESS --> M[Cập nhật status]
+    L --> D
+    M --> D
+    B -- Xóa --> N[DELETE /api/tasks/{id}]
+    N --> D
+    D --> O([Kết thúc])
 ```
