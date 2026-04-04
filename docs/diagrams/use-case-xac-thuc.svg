@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" font-family="Arial, sans-serif">
   <!-- Background -->
-  <rect width="800" height="500" fill="#f8f9fa" rx="8"/>
+  <rect width="800" height="500" fill="white" rx="8"/>
   <!-- Title -->
   <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Sơ đồ Use Case — Xác thực Người dùng</text>
   <!-- System boundary -->
@@ -20,7 +20,7 @@
   <text x="420" y="392" text-anchor="middle" font-size="11" fill="#1a5276">hệ thống</text>
   <!-- Actor: Người dùng chưa đăng nhập -->
   <!-- Stick figure left -->
-  <circle cx="90" cy="185" r="18" fill="#a9cce3" stroke="#2471a3" stroke-width="2"/>
+  <circle cx="90" cy="185" r="18" fill="white" stroke="#2471a3" stroke-width="2"/>
   <line x1="90" y1="203" x2="90" y2="250" stroke="#2471a3" stroke-width="2"/>
   <line x1="65" y1="225" x2="115" y2="225" stroke="#2471a3" stroke-width="2"/>
   <line x1="90" y1="250" x2="70" y2="280" stroke="#2471a3" stroke-width="2"/>
@@ -28,7 +28,7 @@
   <text x="90" y="300" text-anchor="middle" font-size="11" fill="#1a5276" font-weight="bold">Người dùng</text>
   <text x="90" y="313" text-anchor="middle" font-size="11" fill="#1a5276">chưa đăng nhập</text>
   <!-- Actor: Người dùng đã đăng nhập -->
-  <circle cx="90" cy="355" r="18" fill="#a9cce3" stroke="#2471a3" stroke-width="2"/>
+  <circle cx="90" cy="355" r="18" fill="white" stroke="#2471a3" stroke-width="2"/>
   <line x1="90" y1="373" x2="90" y2="420" stroke="#2471a3" stroke-width="2"/>
   <line x1="65" y1="395" x2="115" y2="395" stroke="#2471a3" stroke-width="2"/>
   <line x1="90" y1="420" x2="70" y2="450" stroke="#2471a3" stroke-width="2"/>

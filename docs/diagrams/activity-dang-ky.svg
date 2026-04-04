@@ -4,7 +4,7 @@
       <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
     </marker>
   </defs>
-  <rect width="500" height="680" fill="#f8f9fa" rx="8"/>
+  <rect width="500" height="680" fill="white" rx="8"/>
   <text x="250" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">Activity Diagram — Đăng ký Tài khoản</text>
 
   <!-- Start -->
