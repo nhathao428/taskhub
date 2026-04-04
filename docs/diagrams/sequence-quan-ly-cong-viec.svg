@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="580" viewBox="0 0 900 580" font-family="Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arr-dash" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#888"/>
+    </marker>
+  </defs>
+  <rect width="900" height="580" fill="#f8f9fa" rx="8"/>
+  <text x="450" y="30" text-anchor="middle" font-size="19" font-weight="bold" fill="#2c3e50">Sequence Diagram — Quản lý Công việc (Tạo + Phân công)</text>
+
+  <!-- Lifeline headers -->
+  <rect x="30" y="50" width="100" height="50" fill="#8e44ad" stroke="#7d3c98" stroke-width="2" rx="5"/>
+  <text x="80" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Quản lý</text>
+  <text x="80" y="86" text-anchor="middle" font-size="10" fill="#d2b4de">(Actor)</text>
+
+  <rect x="185" y="50" width="110" height="50" fill="#8e44ad" stroke="#7d3c98" stroke-width="2" rx="5"/>
+  <text x="240" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Giao diện</text>
+  <text x="240" y="86" text-anchor="middle" font-size="10" fill="#d2b4de">(Frontend)</text>
+
+  <rect x="355" y="50" width="130" height="50" fill="#e67e22" stroke="#ca6f1e" stroke-width="2" rx="5"/>
+  <text x="420" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="white">TaskController</text>
+  <text x="420" y="82" text-anchor="middle" font-size="10" fill="#fdebd0">+ TaskService</text>
+  <text x="420" y="95" text-anchor="middle" font-size="9" fill="#fdebd0">(Backend)</text>
+
+  <rect x="550" y="50" width="110" height="50" fill="#27ae60" stroke="#1e8449" stroke-width="2" rx="5"/>
+  <text x="605" y="70" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Cơ sở dữ liệu</text>
+  <text x="605" y="86" text-anchor="middle" font-size="10" fill="#a9dfbf">(MySQL)</text>
+
+  <!-- Lifelines -->
+  <line x1="80" y1="100" x2="80" y2="560" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="240" y1="100" x2="240" y2="560" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="420" y1="100" x2="420" y2="560" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="605" y1="100" x2="605" y2="560" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+  <!-- === TẠO CÔNG VIỆC === -->
+  <rect x="30" y="115" width="840" height="185" fill="#f5eef8" stroke="#8e44ad" stroke-width="1.5" rx="5" stroke-dasharray="7,3"/>
+  <text x="48" y="133" font-size="12" font-weight="bold" fill="#7d3c98">Tạo công việc mới</text>
+
+  <line x1="80" y1="148" x2="230" y2="148" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="155" y="140" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">Điền thông tin công việc</text>
+  <text x="155" y="154" text-anchor="middle" font-size="9" fill="#555">{title, description, dueDate, projectId}</text>
+
+  <line x1="240" y1="172" x2="350" y2="172" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="295" y="164" text-anchor="middle" font-size="11" fill="#1a252f">POST /api/tasks</text>
+
+  <rect x="355" y="180" width="130" height="22" fill="#fef9e7" stroke="#f39c12" stroke-width="1" rx="3"/>
+  <text x="420" y="195" text-anchor="middle" font-size="9" fill="#7d6608">Xác thực JWT (ADMIN role)</text>
+
+  <line x1="420" y1="215" x2="595" y2="215" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="507" y="207" text-anchor="middle" font-size="10" fill="#1a252f">INSERT task (status = PENDING)</text>
+
+  <line x1="595" y1="233" x2="430" y2="233" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="512" y="226" text-anchor="middle" font-size="10" fill="#555">Xác nhận đã tạo</text>
+
+  <line x1="420" y1="255" x2="250" y2="268" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="335" y="252" text-anchor="middle" font-size="10" fill="#8e44ad" font-weight="bold">201 Created — Task mới</text>
+
+  <line x1="240" y1="280" x2="90" y2="292" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="165" y="277" text-anchor="middle" font-size="10" fill="#7d3c98">Hiển thị task trong danh sách</text>
+
+  <!-- === PHÂN CÔNG === -->
+  <rect x="30" y="315" width="840" height="220" fill="#eaf4fb" stroke="#2980b9" stroke-width="1.5" rx="5" stroke-dasharray="7,3"/>
+  <text x="48" y="333" font-size="12" font-weight="bold" fill="#2980b9">Phân công nhân viên cho công việc</text>
+
+  <line x1="80" y1="350" x2="230" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="155" y="342" text-anchor="middle" font-size="11" fill="#1a252f" font-weight="bold">Chọn task + chọn nhân viên</text>
+
+  <line x1="240" y1="370" x2="350" y2="370" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="295" y="362" text-anchor="middle" font-size="11" fill="#1a252f">PUT /api/tasks/{id}</text>
+  <text x="295" y="378" text-anchor="middle" font-size="9" fill="#555">{assignedTo: employeeId}</text>
+
+  <rect x="355" y="388" width="130" height="22" fill="#fef9e7" stroke="#f39c12" stroke-width="1" rx="3"/>
+  <text x="420" y="403" text-anchor="middle" font-size="9" fill="#7d6608">Xác thực JWT (ADMIN role)</text>
+
+  <line x1="420" y1="422" x2="595" y2="422" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="507" y="415" text-anchor="middle" font-size="10" fill="#1a252f">Kiểm tra task tồn tại + nhân viên hợp lệ</text>
+
+  <line x1="595" y1="440" x2="430" y2="440" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="512" y="433" text-anchor="middle" font-size="9" fill="#555">Dữ liệu hợp lệ</text>
+
+  <line x1="420" y1="460" x2="595" y2="460" stroke="#333" stroke-width="2" marker-end="url(#arr)"/>
+  <text x="507" y="453" text-anchor="middle" font-size="10" fill="#1a252f">UPDATE task.assigned_to = employeeId</text>
+
+  <line x1="595" y1="478" x2="430" y2="478" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="512" y="472" text-anchor="middle" font-size="9" fill="#555">Đã cập nhật</text>
+
+  <line x1="420" y1="498" x2="250" y2="508" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="335" y="492" text-anchor="middle" font-size="10" fill="#2980b9" font-weight="bold">200 OK — Đã phân công</text>
+
+  <line x1="240" y1="520" x2="90" y2="530" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-dash)"/>
+  <text x="165" y="516" text-anchor="middle" font-size="10" fill="#2980b9">Cập nhật giao diện: task đã gán NV</text>
+</svg>

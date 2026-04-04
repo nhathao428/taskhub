@@ -1,6 +1,6 @@
 # 📊 Sơ đồ UML — Hệ thống Quản lý Công việc
 
-Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Activity mô tả kiến trúc và luồng hoạt động chính của hệ thống.
+Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Activity mô tả kiến trúc và luồng hoạt động chính của hệ thống. Tất cả sơ đồ được vẽ bằng SVG thuần tiếng Việt, phù hợp để đưa vào báo cáo đồ án.
 
 ---
 
@@ -8,88 +8,33 @@ Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Act
 
 ### 1.1. Use Case — Xác thực
 
-```mermaid
-graph TB
-    subgraph "Hệ thống Xác thực"
-        UC1["Đăng ký tài khoản"]
-        UC2["Đăng nhập"]
-        UC3["Đăng xuất"]
-    end
-    ND((Người dùng\nchưa đăng nhập)) --> UC1
-    ND --> UC2
-    DND((Người dùng\nđã đăng nhập)) --> UC3
-```
+Mô tả các chức năng xác thực của hệ thống: đăng ký tài khoản, đăng nhập và đăng xuất. Hệ thống sử dụng JWT Token để xác thực phiên làm việc, token có hiệu lực 24 giờ.
+
+![Use Case Xác thực](diagrams/use-case-xac-thuc.svg)
 
 ---
 
 ### 1.2. Use Case — Quản lý Chấm công
 
-```mermaid
-graph TB
-    subgraph "Hệ thống Chấm công"
-        UC1["Chấm công vào"]
-        UC2["Chấm công ra"]
-        UC3["Xem lịch sử chấm công"]
-        UC4["Báo cáo chấm công"]
-    end
-    NV((Nhân viên)) --> UC1
-    NV --> UC2
-    NV --> UC3
-    QL((Quản lý)) --> UC3
-    QL --> UC4
-```
+Mô tả luồng chấm công của nhân viên: chấm công vào (check-in), chấm công ra (check-out), xem lịch sử và báo cáo. Quản lý có thêm quyền xem báo cáo tổng hợp. Mỗi nhân viên chỉ được chấm công một lần mỗi ngày.
+
+![Use Case Chấm công](diagrams/use-case-cham-cong.svg)
 
 ---
 
 ### 1.3. Use Case — Quản lý Dự án & Công việc
 
-```mermaid
-graph TB
-    subgraph "Hệ thống Quản lý Dự án"
-        UC1["Tạo dự án"]
-        UC2["Chỉnh sửa dự án"]
-        UC3["Xóa dự án"]
-        UC4["Tạo công việc"]
-        UC5["Phân công công việc"]
-        UC6["Cập nhật tiến độ"]
-        UC7["Xem công việc"]
-    end
-    QL((Quản lý)) --> UC1
-    QL --> UC2
-    QL --> UC3
-    QL --> UC4
-    QL --> UC5
-    NV((Nhân viên)) --> UC6
-    NV --> UC7
-    QL --> UC7
-```
+Mô tả đầy đủ các chức năng CRUD dự án và công việc. Quản lý có toàn quyền tạo/sửa/xóa dự án và công việc, đồng thời phân công nhân viên. Nhân viên có thể xem và cập nhật tiến độ công việc được giao.
+
+![Use Case Dự án và Công việc](diagrams/use-case-du-an-cong-viec.svg)
 
 ---
 
 ### 1.4. Use Case — AI Gợi ý Nhân viên
 
-```mermaid
-graph TB
-    subgraph "Hệ thống AI Gợi ý"
-        UC1["Yêu cầu gợi ý nhân viên"]
-        UC2["Phân tích kỹ năng"]
-        UC3["Đánh giá khối lượng công việc"]
-        UC4["Tính điểm hiệu suất"]
-        UC5["Kiểm tra chấm công"]
-        UC6["Trả về top 5 nhân viên"]
-        UC7["Gửi phản hồi"]
-    end
-    QL((Quản lý)) --> UC1
-    UC1 --> UC2
-    UC1 --> UC3
-    UC1 --> UC4
-    UC1 --> UC5
-    UC2 --> UC6
-    UC3 --> UC6
-    UC4 --> UC6
-    UC5 --> UC6
-    QL --> UC7
-```
+Mô tả quy trình AI gợi ý nhân viên phù hợp. Hệ thống phân tích 4 tiêu chí: kỹ năng (35%), khối lượng công việc (25%), hiệu suất (25%), chấm công (15%). Có thể sử dụng OpenAI GPT hoặc thuật toán rule-based khi không có API key.
+
+![Use Case AI Gợi ý](diagrams/use-case-ai-goi-y.svg)
 
 ---
 
@@ -97,135 +42,17 @@ graph TB
 
 ### 2.1. Sơ đồ lớp thực thể (Entity)
 
-```mermaid
-classDiagram
-    class NguoiDung {
-        -Long maNguoiDung
-        -String tenDangNhap
-        -String matKhau
-        -String email
-        -String vaiTro
-        -LocalDateTime ngayTao
-        +khởiTạoMặcĐịnh()
-    }
+Mô tả 7 thực thể chính của hệ thống và mối quan hệ giữa chúng. `NhanVien` liên kết với `NguoiDung` (ManyToOne), `CongViec` thuộc về `DuAn` và được phân công cho `NhanVien`. `ChamCong` và `KyNang` đều gắn với `NhanVien`. `GoiY` thuộc về `NguoiDung`.
 
-    class NhanVien {
-        -Long maNhanVien
-        -NguoiDung nguoiDung
-        -String ho
-        -String ten
-        -String chucVu
-        -String phongBan
-        -LocalDateTime ngayVaoLam
-        +khởiTạoMặcĐịnh()
-    }
+![Class Diagram Thực thể](diagrams/class-diagram-thuc-the.svg)
 
-    class DuAn {
-        -Long maDuAn
-        -String tenDuAn
-        -String moTa
-        -LocalDate ngayBatDau
-        -LocalDate ngayKetThuc
-        -String trangThai
-    }
-
-    class CongViec {
-        -Long maCongViec
-        -DuAn duAn
-        -NhanVien nguoiDuocGiao
-        -String tieuDe
-        -String moTa
-        -LocalDate hanHoanThanh
-        -String trangThai
-        -LocalDateTime thoiDiemHoanThanh
-    }
-
-    class ChamCong {
-        -Long maChamCong
-        -NhanVien nhanVien
-        -LocalDate ngay
-        -LocalTime gioVao
-        -LocalTime gioRa
-    }
-
-    class KyNang {
-        -Long maKyNang
-        -NhanVien nhanVien
-        -String tenKyNang
-        -String mucDoThanhThao
-    }
-
-    class GoiY {
-        -Long maGoiY
-        -NguoiDung nguoiDung
-        -String noiDungGoiY
-        -String phanHoi
-        -LocalDateTime ngayTao
-        +khởiTạoMặcĐịnh()
-    }
-
-    NhanVien "*" --> "1" NguoiDung : liên kết tài khoản
-    CongViec "*" --> "1" DuAn : thuộc dự án
-    CongViec "*" --> "0..1" NhanVien : được phân công
-    ChamCong "*" --> "1" NhanVien : ghi nhận chấm công
-    KyNang "*" --> "1" NhanVien : sở hữu
-    GoiY "*" --> "1" NguoiDung : người tạo
-```
+---
 
 ### 2.2. Sơ đồ lớp kiến trúc (Controller — Service — Repository)
 
-```mermaid
-classDiagram
-    class BoDieuKhienXacThuc
-    class BoDieuKhienNhanVien
-    class BoDieuKhienDuAn
-    class BoDieuKhienCongViec
-    class BoDieuKhienChamCong
-    class BoDieuKhienGoiY
+Mô tả kiến trúc phân tầng của ứng dụng Spring Boot: Controller nhận request HTTP và xác thực JWT, Service xử lý nghiệp vụ, Repository truy vấn database thông qua JPA, Entity ánh xạ bảng MySQL. `AiSuggestionService` là service đặc biệt truy vấn nhiều repository.
 
-    class DichVuNguoiDung
-    class DichVuNhanVien
-    class DichVuDuAn
-    class DichVuCongViec
-    class DichVuChamCong
-    class DichVuGoiY
-    class DichVuGoiYAI
-
-    class KhoLuuNguoiDung
-    class KhoLuuNhanVien
-    class KhoLuuDuAn
-    class KhoLuuCongViec
-    class KhoLuuChamCong
-    class KhoLuuKyNang
-    class KhoLuuGoiY
-
-    BoDieuKhienXacThuc --> DichVuNguoiDung
-    BoDieuKhienNhanVien --> DichVuNhanVien
-    BoDieuKhienDuAn --> DichVuDuAn
-    BoDieuKhienCongViec --> DichVuCongViec
-    BoDieuKhienChamCong --> DichVuChamCong
-    BoDieuKhienGoiY --> DichVuGoiY
-    BoDieuKhienGoiY --> DichVuGoiYAI
-
-    DichVuNguoiDung --> KhoLuuNguoiDung
-    DichVuNhanVien --> KhoLuuNhanVien
-    DichVuDuAn --> KhoLuuDuAn
-    DichVuCongViec --> KhoLuuCongViec
-    DichVuChamCong --> KhoLuuChamCong
-    DichVuGoiY --> KhoLuuGoiY
-    DichVuGoiYAI --> KhoLuuNhanVien
-    DichVuGoiYAI --> KhoLuuKyNang
-    DichVuGoiYAI --> KhoLuuCongViec
-    DichVuGoiYAI --> KhoLuuChamCong
-
-    KhoLuuNguoiDung --> NguoiDung
-    KhoLuuNhanVien --> NhanVien
-    KhoLuuDuAn --> DuAn
-    KhoLuuCongViec --> CongViec
-    KhoLuuChamCong --> ChamCong
-    KhoLuuKyNang --> KyNang
-    KhoLuuGoiY --> GoiY
-```
+![Class Diagram Kiến trúc](diagrams/class-diagram-kien-truc.svg)
 
 ---
 
@@ -233,136 +60,33 @@ classDiagram
 
 ### 3.1. Đăng nhập
 
-```mermaid
-sequenceDiagram
-    participant ND as Người dùng
-    participant FE as Giao diện
-    participant BE as Máy chủ
-    participant DB as Cơ sở dữ liệu
+Mô tả luồng xác thực JWT đầy đủ: từ Client → AuthController → AuthenticationManager → UserDetailsService → Database → BCrypt comparison → JWT generation. Phân nhánh rõ ràng: thành công (200 OK + token) hoặc thất bại (401 Unauthorized).
 
-    ND->>FE: Nhập tên đăng nhập + mật khẩu
-    FE->>BE: POST /api/auth/login
-    BE->>DB: Truy vấn thông tin người dùng
-    DB-->>BE: Trả về dữ liệu người dùng
-    alt Xác thực thành công
-        Note over BE: So sánh mật khẩu với BCrypt
-        BE-->>FE: 200 OK + JWT Token + role
-        FE-->>ND: Chuyển hướng đến Bảng điều khiển
-    else Xác thực thất bại
-        BE-->>FE: 401 Không được phép
-        FE-->>ND: Hiển thị thông báo lỗi
-    end
-```
+![Sequence Đăng nhập](diagrams/sequence-dang-nhap.svg)
 
 ---
 
 ### 3.2. Chấm công
 
-```mermaid
-sequenceDiagram
-    participant NV as Nhân viên
-    participant FE as Giao diện
-    participant BE as Máy chủ
-    participant DB as Cơ sở dữ liệu
+Mô tả luồng check-in và check-out: xác thực JWT, kiểm tra trùng lặp (đã chấm công hôm nay chưa), lưu bản ghi với timestamp. Check-out cập nhật giờ ra. Có xử lý lỗi cho từng trường hợp.
 
-    NV->>FE: Nhấn nút "Chấm công vào"
-    FE->>BE: POST /api/attendance/checkin
-    Note over BE: Xác thực JWT
-    BE->>DB: Kiểm tra đã chấm công hôm nay chưa
-    DB-->>BE: Kết quả kiểm tra
-    alt Chưa chấm công
-        BE->>DB: Lưu bản ghi chấm công (ngày, giờ vào)
-        DB-->>BE: Xác nhận đã lưu
-        BE-->>FE: 200 OK
-        FE-->>NV: Hiển thị "Đã chấm công vào"
-    else Đã chấm công rồi
-        BE-->>FE: 400 Bad Request
-        FE-->>NV: Hiển thị lỗi "Đã chấm công rồi"
-    end
-
-    NV->>FE: Nhấn nút "Chấm công ra"
-    FE->>BE: POST /api/attendance/checkout
-    Note over BE: Xác thực JWT
-    BE->>DB: Cập nhật giờ ra
-    DB-->>BE: Xác nhận
-    BE-->>FE: 200 OK
-    FE-->>NV: Hiển thị "Đã chấm công ra"
-```
+![Sequence Chấm công](diagrams/sequence-cham-cong.svg)
 
 ---
 
 ### 3.3. AI Gợi ý Nhân viên
 
-```mermaid
-sequenceDiagram
-    participant QL as Quản lý
-    participant BDK as SuggestionController
-    participant AI as AiSuggestionService
-    participant EmpRepo as EmployeeRepository
-    participant SkillRepo as SkillRepository
-    participant TaskRepo as TaskRepository
-    participant AttRepo as AttendanceRepository
-    participant OpenAI as OpenAI API
+Mô tả luồng AI gợi ý dựa trên code thực tế của `AiSuggestionService`: 4 batch query song song (Employee, Skill, Task, Attendance), rồi phân nhánh OpenAI API (nếu có key) hoặc fallback rule-based (Kỹ năng 35% + Khối lượng 25% + Hiệu suất 25% + Chấm công 15%), trả về top 5.
 
-    Note over QL,OpenAI: Luồng AI phân tích và đề xuất top 5 nhân viên phù hợp nhất
-
-    QL->>BDK: POST /api/suggestions/recommend
-    Note over BDK: Xác thực JWT — chỉ Quản lý mới được gọi
-
-    BDK->>AI: recommendEmployees(request)
-
-    AI->>EmpRepo: findAll()
-    EmpRepo-->>AI: List~Employee~
-
-    AI->>SkillRepo: findByEmployeeEmployeeIdIn(ids)
-    SkillRepo-->>AI: List~Skill~ (batch — groupingBy employeeId)
-
-    AI->>TaskRepo: findByAssignedToEmployeeIdInAndStatusIn(ids, statuses)
-    TaskRepo-->>AI: List~Task~ (batch — groupingBy employeeId)
-
-    AI->>AttRepo: findByEmployeeEmployeeIdInAndDateBetween(ids, start, end)
-    AttRepo-->>AI: List~Attendance~ (batch — groupingBy employeeId)
-
-    alt OpenAI API Key có cấu hình
-        AI->>AI: buildPrompt(request, employees, skills, tasks, attendance)
-        AI->>OpenAI: POST /v1/chat/completions
-        OpenAI-->>AI: JSON response
-        AI->>AI: parseOpenAiResponse(responseJson, employees)
-    else Không có API Key (Fallback)
-        AI->>AI: calculateFallbackScores(...)
-        Note over AI: Tính điểm rule-based: Skill 35% + Workload 25% + Performance 25% + Attendance 15%
-    end
-
-    AI-->>BDK: Top 5 EmployeeSuggestionDTO (sắp xếp theo overallScore giảm dần)
-    BDK-->>QL: 200 OK + Danh sách gợi ý kèm lý do
-```
+![Sequence AI Gợi ý](diagrams/sequence-ai-goi-y.svg)
 
 ---
 
 ### 3.4. Quản lý Công việc (Tạo + Phân công)
 
-```mermaid
-sequenceDiagram
-    participant QL as Quản lý
-    participant FE as Giao diện
-    participant BE as Máy chủ
-    participant DB as Cơ sở dữ liệu
+Mô tả luồng tạo công việc mới (POST /api/tasks, status = PENDING) và phân công nhân viên (PUT /api/tasks/{id}, cập nhật assigned_to). Cả hai luồng đều yêu cầu xác thực JWT với role ADMIN.
 
-    QL->>FE: Điền thông tin công việc mới
-    FE->>BE: POST /api/tasks
-    Note over BE: Xác thực JWT
-    BE->>DB: Lưu công việc mới
-    DB-->>BE: Xác nhận đã tạo
-    BE-->>FE: 201 Đã tạo
-    FE-->>QL: Hiển thị công việc mới trong danh sách
-
-    QL->>FE: Phân công nhân viên cho công việc
-    FE->>BE: PUT /api/tasks/{id}
-    BE->>DB: Cập nhật assigned_to
-    DB-->>BE: Xác nhận
-    BE-->>FE: 200 OK
-    FE-->>QL: Cập nhật giao diện
-```
+![Sequence Quản lý Công việc](diagrams/sequence-quan-ly-cong-viec.svg)
 
 ---
 
@@ -370,168 +94,54 @@ sequenceDiagram
 
 ### 4.1. Đăng nhập
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B[Nhập username + password]
-    B --> C{Username tồn tại?}
-    C -- Không --> D[Hiển thị lỗi: Sai thông tin đăng nhập]
-    D --> B
-    C -- Có --> E{Password khớp BCrypt?}
-    E -- Không --> D
-    E -- Có --> F[Tạo JWT Token]
-    F --> G[Trả về token + role]
-    G --> H[Chuyển đến Dashboard]
-    H --> I([Kết thúc])
-```
+Mô tả luồng đăng nhập với 2 lần kiểm tra: username có tồn tại không, sau đó password có khớp BCrypt không. Cả hai nhánh lỗi đều quay về form nhập liệu. Thành công thì tạo JWT và chuyển đến Dashboard.
+
+![Activity Đăng nhập](diagrams/activity-dang-nhap.svg)
 
 ---
 
 ### 4.2. Đăng ký
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B[Nhập username, email, password]
-    B --> C{Username đã tồn tại?}
-    C -- Có --> D[Hiển thị lỗi: Username đã tồn tại]
-    D --> B
-    C -- Không --> E{Email đã tồn tại?}
-    E -- Có --> F[Hiển thị lỗi: Email đã tồn tại]
-    F --> B
-    E -- Không --> G[Mã hóa password BCrypt]
-    G --> H[Tạo User mới với role = EMPLOYEE]
-    H --> I[Lưu vào database]
-    I --> J[Trả về thông tin user]
-    J --> K([Kết thúc])
-```
+Mô tả luồng đăng ký với 2 lần kiểm tra trùng: username và email. Nếu hợp lệ, mã hóa mật khẩu bằng BCrypt, tạo User với role = EMPLOYEE (mặc định), lưu vào database.
+
+![Activity Đăng ký](diagrams/activity-dang-ky.svg)
 
 ---
 
 ### 4.3. Quản lý Nhân viên
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B{Chọn thao tác?}
-    B -- Xem --> C[GET /api/employees]
-    C --> D[Hiển thị danh sách nhân viên]
-    B -- Thêm --> E[Nhập thông tin nhân viên]
-    E --> F[POST /api/employees]
-    F --> G{Dữ liệu hợp lệ?}
-    G -- Không --> H[Hiển thị lỗi validation]
-    H --> E
-    G -- Có --> I[Lưu nhân viên mới]
-    I --> D
-    B -- Sửa --> J[Chọn nhân viên cần sửa]
-    J --> K[PUT /api/employees/{id}]
-    K --> D
-    B -- Xóa --> L[Chọn nhân viên cần xóa]
-    L --> M[DELETE /api/employees/{id}]
-    M --> D
-    D --> N([Kết thúc])
-```
+Mô tả 4 thao tác CRUD nhân viên: Xem danh sách (GET), Thêm mới (POST với validation), Sửa (PUT), Xóa (DELETE). Tất cả thao tác đều trở về màn hình danh sách nhân viên sau khi hoàn tất.
+
+![Activity Quản lý Nhân viên](diagrams/activity-quan-ly-nhan-vien.svg)
 
 ---
 
 ### 4.4. Chấm công
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B{Loại chấm công?}
-    B -- Chấm công vào --> C[POST /api/attendance/checkin]
-    C --> D{Đã chấm công hôm nay?}
-    D -- Có --> E[Hiển thị lỗi: Đã chấm công rồi]
-    D -- Không --> F[Tạo record mới: date + checkIn time]
-    F --> G[Lưu vào DB]
-    G --> H[Hiển thị: Đã chấm công vào]
-    B -- Chấm công ra --> I[POST /api/attendance/checkout]
-    I --> J{Có record chấm công vào?}
-    J -- Không --> K[Hiển thị lỗi: Chưa chấm công vào]
-    J -- Có --> L[Cập nhật checkOut time]
-    L --> M[Hiển thị: Đã chấm công ra]
-    B -- Xem lịch sử --> N[GET /api/attendance]
-    N --> O[Hiển thị lịch sử chấm công]
-    H --> P([Kết thúc])
-    M --> P
-    O --> P
-    E --> P
-    K --> P
-```
+Mô tả 3 luồng: Chấm công vào (kiểm tra trùng → tạo bản ghi mới), Chấm công ra (kiểm tra có bản ghi vào → cập nhật giờ ra), Xem lịch sử (GET danh sách). Mỗi luồng có xử lý lỗi riêng.
+
+![Activity Chấm công](diagrams/activity-cham-cong.svg)
 
 ---
 
 ### 4.5. AI Gợi ý Nhân viên
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B[Nhập: taskTitle, taskDescription, requiredSkills]
-    B --> C[POST /api/suggestions/recommend]
-    C --> D[findAll employees — batch query]
-    D --> E[findByEmployeeEmployeeIdIn — batch skills]
-    E --> F[findByAssignedToEmployeeIdInAndStatusIn — batch active tasks]
-    F --> G[findByEmployeeEmployeeIdInAndDateBetween — batch attendance 30 ngày]
-    G --> H{OpenAI API Key có cấu hình?}
-    H -- Có --> I[buildPrompt với dữ liệu thực tế]
-    I --> J[POST /v1/chat/completions tới OpenAI GPT]
-    J --> K[parseOpenAiResponse]
-    K --> L[Top 5 EmployeeSuggestionDTO]
-    H -- Không --> M[calculateFallbackScores]
-    M --> N[Skill Match 35%]
-    M --> O[Workload 25%]
-    M --> P[Performance 25%]
-    M --> Q[Attendance 15%]
-    N --> R[Tính overallScore tổng hợp]
-    O --> R
-    P --> R
-    Q --> R
-    R --> S[Sắp xếp giảm dần theo overallScore]
-    S --> L
-    L --> T[Hiển thị kết quả gợi ý + lý do]
-    T --> U([Kết thúc])
-```
+Mô tả luồng AI đầy đủ: nhập yêu cầu → batch query 4 bảng → phân nhánh OpenAI/fallback → tính điểm 4 tiêu chí → lấy top 5 → trả kết quả kèm lý do. Công thức: Kỹ năng×35% + Khối lượng×25% + Hiệu suất×25% + Chấm công×15%.
+
+![Activity AI Gợi ý](diagrams/activity-ai-goi-y.svg)
 
 ---
 
 ### 4.6. Quản lý Dự án
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B{Chọn thao tác?}
-    B -- Xem --> C[GET /api/projects]
-    C --> D[Hiển thị danh sách dự án]
-    B -- Tạo mới --> E[Nhập: name, description, startDate, endDate]
-    E --> F[POST /api/projects]
-    F --> G[Lưu dự án mới, status = ongoing]
-    G --> D
-    B -- Cập nhật --> H[Chọn dự án cần sửa]
-    H --> I[PUT /api/projects/{id}]
-    I --> D
-    B -- Xóa --> J[DELETE /api/projects/{id}]
-    J --> D
-    D --> K([Kết thúc])
-```
+Mô tả 4 thao tác CRUD dự án: Xem danh sách, Tạo mới (với ngày bắt đầu/kết thúc, status = ongoing), Cập nhật, Xóa. Tất cả đều trả về danh sách dự án sau khi thực hiện.
+
+![Activity Quản lý Dự án](diagrams/activity-quan-ly-du-an.svg)
 
 ---
 
 ### 4.7. Quản lý Công việc
 
-```mermaid
-flowchart TD
-    A([Bắt đầu]) --> B{Chọn thao tác?}
-    B -- Xem --> C[GET /api/tasks]
-    C --> D[Hiển thị danh sách công việc]
-    B -- Tạo --> E[Nhập: title, description, dueDate, projectId]
-    E --> F[POST /api/tasks]
-    F --> G[Tạo task, status = pending]
-    G --> D
-    B -- Phân công --> H[Chọn task + chọn nhân viên]
-    H --> I[PUT /api/tasks/{id} với assignedTo]
-    I --> D
-    B -- Cập nhật trạng thái --> J[Chọn task]
-    J --> K{Status mới?}
-    K -- COMPLETED --> L[Cập nhật completedAt = now]
-    K -- IN_PROGRESS --> M[Cập nhật status]
-    L --> D
-    M --> D
-    B -- Xóa --> N[DELETE /api/tasks/{id}]
-    N --> D
-    D --> O([Kết thúc])
-```
+Mô tả 5 thao tác: Xem, Tạo mới (status = PENDING), Phân công nhân viên, Cập nhật trạng thái (nếu COMPLETED thì set completedAt = now()), Xóa. Trường `completedAt` được dùng bởi AI để tính hiệu suất.
+
+![Activity Quản lý Công việc](diagrams/activity-quan-ly-cong-viec.svg)
