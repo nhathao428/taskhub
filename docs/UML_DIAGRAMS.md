@@ -95,136 +95,136 @@ graph TB
 
 ## 2. Sơ đồ lớp — Class Diagram
 
-### 2.1. Entity Classes
+### 2.1. Sơ đồ lớp thực thể (Entity)
 
 ```mermaid
 classDiagram
-    class User {
-        -Long userId
-        -String username
-        -String password
+    class NguoiDung {
+        -Long maNguoiDung
+        -String tenDangNhap
+        -String matKhau
         -String email
-        -String role
-        -LocalDateTime createdAt
-        +onCreate()
+        -String vaiTro
+        -LocalDateTime ngayTao
+        +khởiTạoMặcĐịnh()
     }
 
-    class Employee {
-        -Long employeeId
-        -User user
-        -String firstName
-        -String lastName
-        -String position
-        -String department
-        -LocalDateTime hiredAt
-        +onCreate()
+    class NhanVien {
+        -Long maNhanVien
+        -NguoiDung nguoiDung
+        -String ho
+        -String ten
+        -String chucVu
+        -String phongBan
+        -LocalDateTime ngayVaoLam
+        +khởiTạoMặcĐịnh()
     }
 
-    class Project {
-        -Long projectId
-        -String name
-        -String description
-        -LocalDate startDate
-        -LocalDate endDate
-        -String status
+    class DuAn {
+        -Long maDuAn
+        -String tenDuAn
+        -String moTa
+        -LocalDate ngayBatDau
+        -LocalDate ngayKetThuc
+        -String trangThai
     }
 
-    class Task {
-        -Long taskId
-        -Project project
-        -Employee assignedTo
-        -String title
-        -String description
-        -LocalDate dueDate
-        -String status
-        -LocalDateTime completedAt
+    class CongViec {
+        -Long maCongViec
+        -DuAn duAn
+        -NhanVien nguoiDuocGiao
+        -String tieuDe
+        -String moTa
+        -LocalDate hanHoanThanh
+        -String trangThai
+        -LocalDateTime thoiDiemHoanThanh
     }
 
-    class Attendance {
-        -Long attendanceId
-        -Employee employee
-        -LocalDate date
-        -LocalTime checkIn
-        -LocalTime checkOut
+    class ChamCong {
+        -Long maChamCong
+        -NhanVien nhanVien
+        -LocalDate ngay
+        -LocalTime gioVao
+        -LocalTime gioRa
     }
 
-    class Skill {
-        -Long skillId
-        -Employee employee
-        -String skillName
-        -String proficiencyLevel
+    class KyNang {
+        -Long maKyNang
+        -NhanVien nhanVien
+        -String tenKyNang
+        -String mucDoThanhThao
     }
 
-    class Suggestion {
-        -Long suggestionId
-        -User user
-        -String suggestionText
-        -String feedback
-        -LocalDateTime createdAt
-        +onCreate()
+    class GoiY {
+        -Long maGoiY
+        -NguoiDung nguoiDung
+        -String noiDungGoiY
+        -String phanHoi
+        -LocalDateTime ngayTao
+        +khởiTạoMặcĐịnh()
     }
 
-    Employee "*" --> "1" User : user
-    Task "*" --> "1" Project : project
-    Task "*" --> "0..1" Employee : assignedTo
-    Attendance "*" --> "1" Employee : employee
-    Skill "*" --> "1" Employee : employee
-    Suggestion "*" --> "1" User : user
+    NhanVien "*" --> "1" NguoiDung : liên kết tài khoản
+    CongViec "*" --> "1" DuAn : thuộc dự án
+    CongViec "*" --> "0..1" NhanVien : được phân công
+    ChamCong "*" --> "1" NhanVien : ghi nhận chấm công
+    KyNang "*" --> "1" NhanVien : sở hữu
+    GoiY "*" --> "1" NguoiDung : người tạo
 ```
 
-### 2.2. Service, Controller & Repository Classes
+### 2.2. Sơ đồ lớp kiến trúc (Controller — Service — Repository)
 
 ```mermaid
 classDiagram
-    class AuthController
-    class EmployeeController
-    class ProjectController
-    class TaskController
-    class AttendanceController
-    class SuggestionController
+    class BoDieuKhienXacThuc
+    class BoDieuKhienNhanVien
+    class BoDieuKhienDuAn
+    class BoDieuKhienCongViec
+    class BoDieuKhienChamCong
+    class BoDieuKhienGoiY
 
-    class UserService
-    class EmployeeService
-    class ProjectService
-    class TaskService
-    class AttendanceService
-    class SuggestionService
-    class AiSuggestionService
+    class DichVuNguoiDung
+    class DichVuNhanVien
+    class DichVuDuAn
+    class DichVuCongViec
+    class DichVuChamCong
+    class DichVuGoiY
+    class DichVuGoiYAI
 
-    class UserRepository
-    class EmployeeRepository
-    class ProjectRepository
-    class TaskRepository
-    class AttendanceRepository
-    class SkillRepository
-    class SuggestionRepository
+    class KhoLuuNguoiDung
+    class KhoLuuNhanVien
+    class KhoLuuDuAn
+    class KhoLuuCongViec
+    class KhoLuuChamCong
+    class KhoLuuKyNang
+    class KhoLuuGoiY
 
-    AuthController --> UserService
-    EmployeeController --> EmployeeService
-    ProjectController --> ProjectService
-    TaskController --> TaskService
-    AttendanceController --> AttendanceService
-    SuggestionController --> SuggestionService
-    SuggestionController --> AiSuggestionService
+    BoDieuKhienXacThuc --> DichVuNguoiDung
+    BoDieuKhienNhanVien --> DichVuNhanVien
+    BoDieuKhienDuAn --> DichVuDuAn
+    BoDieuKhienCongViec --> DichVuCongViec
+    BoDieuKhienChamCong --> DichVuChamCong
+    BoDieuKhienGoiY --> DichVuGoiY
+    BoDieuKhienGoiY --> DichVuGoiYAI
 
-    UserService --> UserRepository
-    EmployeeService --> EmployeeRepository
-    ProjectService --> ProjectRepository
-    TaskService --> TaskRepository
-    AttendanceService --> AttendanceRepository
-    SuggestionService --> SuggestionRepository
-    AiSuggestionService --> EmployeeRepository
-    AiSuggestionService --> SkillRepository
-    AiSuggestionService --> TaskRepository
-    AiSuggestionService --> AttendanceRepository
+    DichVuNguoiDung --> KhoLuuNguoiDung
+    DichVuNhanVien --> KhoLuuNhanVien
+    DichVuDuAn --> KhoLuuDuAn
+    DichVuCongViec --> KhoLuuCongViec
+    DichVuChamCong --> KhoLuuChamCong
+    DichVuGoiY --> KhoLuuGoiY
+    DichVuGoiYAI --> KhoLuuNhanVien
+    DichVuGoiYAI --> KhoLuuKyNang
+    DichVuGoiYAI --> KhoLuuCongViec
+    DichVuGoiYAI --> KhoLuuChamCong
 
-    UserRepository --> User
-    EmployeeRepository --> Employee
-    ProjectRepository --> Project
-    TaskRepository --> Task
-    AttendanceRepository --> Attendance
-    SkillRepository --> Skill
-    SuggestionRepository --> Suggestion
+    KhoLuuNguoiDung --> NguoiDung
+    KhoLuuNhanVien --> NhanVien
+    KhoLuuDuAn --> DuAn
+    KhoLuuCongViec --> CongViec
+    KhoLuuChamCong --> ChamCong
+    KhoLuuKyNang --> KyNang
+    KhoLuuGoiY --> GoiY
 ```
 
 ---
