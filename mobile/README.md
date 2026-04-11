@@ -10,9 +10,9 @@
 |---|---|
 | Framework | Flutter 3.x |
 | Ngôn ngữ | Dart ≥ 3.0 |
-| HTTP Client | `http` ^1.1.0 |
-| State Management | `get` (GetX) ^4.6.6 |
-| Local Storage | `hive` + `hive_flutter` ^2.2.3 |
+| HTTP Client | `http` ^1.2.2 |
+| State Management | `provider` ^6.1.2 |
+| Local Storage | `shared_preferences` ^2.3.2 |
 
 ---
 
@@ -20,7 +20,7 @@
 
 - **Flutter SDK** 3.x trở lên — [Hướng dẫn cài đặt Flutter](https://docs.flutter.dev/get-started/install)
 - **Android Studio** (để chạy Android Emulator) hoặc **Xcode** (để chạy iOS Simulator, cần macOS)
-- Backend Spring Boot đang chạy tại `http://localhost:5000`
+- Backend Spring Boot đang chạy tại `http://localhost:8080`
 
 ---
 
@@ -48,11 +48,13 @@ flutter run
 
 | Tính năng | Mô tả |
 |---|---|
-| 🔐 Đăng nhập / Đăng ký | Xác thực bằng JWT, lưu token cục bộ với Hive |
-| 📋 Quản lý công việc | Xem danh sách, tạo và cập nhật công việc |
-| 📂 Quản lý dự án | Xem danh sách và chi tiết dự án |
-| 🕐 Chấm công | Ghi nhận giờ vào/ra từ thiết bị di động |
-| 👥 Danh sách nhân viên | Xem thông tin nhân viên |
+| 🔐 Đăng nhập / Đăng ký | Xác thực bằng JWT, lưu token cục bộ với SharedPreferences |
+| 📊 Dashboard thống kê | Tổng quan nhân viên, dự án, công việc, chấm công hôm nay |
+| 👥 Quản lý nhân viên | Xem danh sách, thêm nhân viên mới |
+| 📂 Quản lý dự án | Xem danh sách, tạo dự án mới |
+| 📋 Quản lý công việc | Xem danh sách, tạo và cập nhật trạng thái công việc |
+| 🕐 Chấm công | Check-in / Check-out, xem lịch sử chấm công |
+| 🤖 AI Gợi ý | Nhập tiêu đề + kỹ năng, nhận top 5 nhân viên phù hợp |
 
 ---
 
@@ -61,25 +63,33 @@ flutter run
 ```
 mobile/
 ├── pubspec.yaml              # Cấu hình dự án và phụ thuộc
-├── pubspec.lock
 ├── lib/
-│   ├── main.dart             # Điểm vào ứng dụng
-│   ├── app/
-│   │   ├── routes/           # Cấu hình điều hướng (GetX)
-│   │   └── bindings/         # Dependency injection
-│   ├── core/
-│   │   ├── api/              # HTTP client + interceptors
-│   │   └── storage/          # Hive local storage (JWT token)
-│   ├── features/
-│   │   ├── auth/             # Đăng nhập, đăng ký
-│   │   ├── tasks/            # Quản lý công việc
-│   │   ├── projects/         # Quản lý dự án
-│   │   ├── employees/        # Danh sách nhân viên
-│   │   └── attendance/       # Chấm công
-│   └── shared/
-│       └── widgets/          # Các widget dùng chung
-└── android/                  # Cấu hình Android
-└── ios/                      # Cấu hình iOS
+│   ├── main.dart             # Điểm vào ứng dụng, khai báo routes
+│   ├── models/               # Data models
+│   │   ├── user.dart
+│   │   ├── employee.dart
+│   │   ├── project.dart
+│   │   ├── task.dart
+│   │   ├── attendance.dart
+│   │   └── employee_suggestion.dart
+│   ├── services/             # API service
+│   │   └── api_service.dart  # Tất cả HTTP requests + JWT interceptor
+│   ├── providers/            # State management (Provider)
+│   │   ├── auth_provider.dart
+│   │   └── data_provider.dart
+│   ├── screens/              # Các màn hình
+│   │   ├── login_screen.dart
+│   │   ├── register_screen.dart
+│   │   ├── dashboard_screen.dart
+│   │   ├── employees_screen.dart
+│   │   ├── projects_screen.dart
+│   │   ├── tasks_screen.dart
+│   │   ├── attendance_screen.dart
+│   │   └── ai_suggestions_screen.dart
+│   └── widgets/              # Widget dùng chung
+│       ├── loading_widget.dart
+│       └── status_badge.dart
+└── README.md
 ```
 
 ---
@@ -94,9 +104,6 @@ flutter build apk --debug
 
 # Build APK (release)
 flutter build apk --release
-
-# Build Android App Bundle (dùng cho Google Play)
-flutter build appbundle --release
 ```
 
 File APK sẽ nằm tại: `build/app/outputs/flutter-apk/app-release.apk`
@@ -106,20 +113,18 @@ File APK sẽ nằm tại: `build/app/outputs/flutter-apk/app-release.apk`
 ```bash
 # Build cho iOS Simulator
 flutter build ios --simulator
-
-# Build cho thiết bị thật (cần Apple Developer Account)
-flutter build ios --release
 ```
 
 ---
 
 ## 🔗 Kết nối Backend
 
-Cấu hình URL backend trong file cấu hình API của ứng dụng (ví dụ: `lib/core/api/api_client.dart`):
+Backend URL mặc định là `http://10.0.2.2:8080` (cho Android Emulator trỏ về localhost của máy host).
 
-```dart
-const String baseUrl = 'http://localhost:5000'; // Thay bằng IP thực khi dùng thiết bị thật
+Để thay đổi URL khi build, truyền biến môi trường:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://192.168.1.x:8080
 ```
 
-> **Khi dùng Android Emulator:** Thay `localhost` bằng `10.0.2.2` để trỏ vào máy host.
-> **Khi dùng thiết bị thật:** Sử dụng địa chỉ IP thực của máy chạy backend trong cùng mạng LAN.
+> **Khi dùng thiết bị thật:** Thay bằng địa chỉ IP thực của máy chạy backend trong cùng mạng LAN.
