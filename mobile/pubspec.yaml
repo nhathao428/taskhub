@@ -1,6 +1,6 @@
 name: task_management_system
 
-description: A Flutter project for task management.
+description: Ứng dụng di động Hệ thống Quản lý Công việc cho Doanh nghiệp.
 
 publish_to: 'none'
 
@@ -12,10 +12,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.0
-  get: ^4.6.6
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
