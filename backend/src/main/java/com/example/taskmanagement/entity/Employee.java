@@ -1,9 +1,8 @@
 package com.example.taskmanagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -11,14 +10,19 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "employees")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"user"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Employee implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id")
