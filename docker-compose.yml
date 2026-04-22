@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: task_management_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
