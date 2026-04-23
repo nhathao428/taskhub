@@ -13,5 +13,8 @@ public record UpdateEmployeeRequest(
         String position,
 
         @Size(max = 50, message = "Department must not exceed 50 characters")
-        String department
+        String department,
+
+        @Size(max = 100, message = "Group must not exceed 100 characters")
+        String group
 ) {}

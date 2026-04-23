@@ -47,6 +47,9 @@ public class Employee implements Serializable {
     @Column(name = "hired_at")
     private LocalDateTime hiredAt;
 
+    @Column(name = "employee_group", length = 100)
+    private String group;
+
     @PrePersist
     protected void onCreate() {
         if (hiredAt == null) {

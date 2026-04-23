@@ -8,6 +8,7 @@ import com.example.taskmanagement.service.ProjectService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,13 +24,13 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects() {
-        return ResponseEntity.ok(ApiResponse.ok(projectService.getAllProjects()));
+    public ResponseEntity<ApiResponse<List<Project>>> getAllProjects(Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.ok(projectService.getAllProjects(authentication)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Project>> getProject(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok(projectService.getProjectById(id)));
+    public ResponseEntity<ApiResponse<Project>> getProject(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(ApiResponse.ok(projectService.getProjectById(id, authentication)));
     }
 
     @PostMapping

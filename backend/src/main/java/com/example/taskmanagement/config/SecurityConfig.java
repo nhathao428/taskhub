@@ -6,6 +6,7 @@ import com.example.taskmanagement.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -72,6 +73,26 @@ public class SecurityConfig {
                         "/api-docs/**", "/v3/api-docs/**",
                         "/h2-console/**"
                 ).permitAll()
+
+                // EMPLOYEE: read-only on projects and tasks; everything else requires higher role
+                .requestMatchers(HttpMethod.GET, "/api/projects/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/tasks/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+
+                // Write operations on projects/tasks/employees/attendance/suggestions require MANAGER or ADMIN
+                .requestMatchers(HttpMethod.POST, "/api/projects/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/projects/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/projects/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/projects/**").hasAnyRole("MANAGER", "ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/api/tasks/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/tasks/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/tasks/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/tasks/**").hasAnyRole("MANAGER", "ADMIN")
+
+                .requestMatchers("/api/employees/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers("/api/attendance/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers("/api/suggestions/**").hasAnyRole("MANAGER", "ADMIN")
+
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
