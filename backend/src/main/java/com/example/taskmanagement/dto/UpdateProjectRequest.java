@@ -15,5 +15,8 @@ public record UpdateProjectRequest(
         LocalDate endDate,
 
         @Size(max = 50, message = "Status must not exceed 50 characters")
-        String status
+        String status,
+
+        @Size(max = 100, message = "Group must not exceed 100 characters")
+        String group
 ) {}

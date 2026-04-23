@@ -42,4 +42,7 @@ public class Project implements Serializable {
 
     @Column(name = "status", length = 50)
     private String status = "ongoing";
+
+    @Column(name = "project_group", length = 100)
+    private String group;
 }

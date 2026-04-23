@@ -40,6 +40,7 @@ public class EmployeeService {
         employee.setLastName(request.lastName());
         employee.setPosition(request.position());
         employee.setDepartment(request.department());
+        employee.setGroup(request.group());
         return employeeRepository.save(employee);
     }
 
@@ -52,6 +53,7 @@ public class EmployeeService {
         if (request.lastName() != null) existing.setLastName(request.lastName());
         if (request.position() != null) existing.setPosition(request.position());
         if (request.department() != null) existing.setDepartment(request.department());
+        if (request.group() != null) existing.setGroup(request.group());
         return employeeRepository.save(existing);
     }
 

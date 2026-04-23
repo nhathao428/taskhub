@@ -71,7 +71,7 @@ class EmployeeServiceTest {
     @Test
     void testCreateEmployee() {
         CreateEmployeeRequest request = new CreateEmployeeRequest(
-                "John", "Doe", "Developer", "Engineering");
+                "John", "Doe", "Developer", "Engineering", null);
 
         Employee saved = new Employee();
         saved.setFirstName("John");

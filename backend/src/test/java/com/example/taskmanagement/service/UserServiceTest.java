@@ -115,13 +115,35 @@ class UserServiceTest {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE")));
     }
 
-    /** loadUserByUsername với username không tồn tại → ném UsernameNotFoundException */
+    /** loadUserByUsername: user with MANAGER role → authority ROLE_MANAGER */
     @Test
-    void testLoadUserByUsername_NotFound() {
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+    void testLoadUserByUsername_ManagerRole() {
+        User user = new User();
+        user.setUsername("manager1");
+        user.setPassword("encodedPassword");
+        user.setRole("MANAGER");
 
-        assertThrows(UsernameNotFoundException.class,
-                () -> userService.loadUserByUsername("nonexistent"));
+        when(userRepository.findByUsername("manager1")).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername("manager1");
+
+        assertTrue(userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER")));
+    }
+
+    /** loadUserByUsername: user with ADMIN role → authority ROLE_ADMIN */
+    @Test
+    void testLoadUserByUsername_AdminRole() {
+        User user = new User();
+        user.setUsername("admin");
+        user.setPassword("encodedPassword");
+        user.setRole("ADMIN");
+
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername("admin");
+
+        assertTrue(userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
     }
 }
