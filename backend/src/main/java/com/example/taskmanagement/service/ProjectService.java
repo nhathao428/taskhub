@@ -58,7 +58,7 @@ public class ProjectService {
         }
         // EMPLOYEE: return only projects belonging to their group
         Optional<String> group = resolveEmployeeGroup(auth);
-        if (group.isEmpty() || group.get() == null || group.get().isBlank()) {
+        if (group.map(String::isBlank).orElse(true)) {
             return List.of();
         }
         return projectRepository.findByGroup(group.get());
@@ -71,7 +71,7 @@ public class ProjectService {
         }
         // EMPLOYEE: ensure project belongs to their group
         Optional<String> group = resolveEmployeeGroup(auth);
-        if (group.isEmpty() || group.get() == null || group.get().isBlank()) {
+        if (group.map(String::isBlank).orElse(true)) {
             throw new AccessDeniedException("No group assigned to employee");
         }
         return projectRepository.findByProjectIdAndGroup(id, group.get())
