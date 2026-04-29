@@ -128,3 +128,18 @@ flutter run --dart-define=API_BASE_URL=http://192.168.1.x:8080
 ```
 
 > **Khi dùng thiết bị thật:** Thay bằng địa chỉ IP thực của máy chạy backend trong cùng mạng LAN.
+
+---
+
+## 🔧 Nếu terminal không nhận lệnh Flutter (Windows)
+
+1. Tải Flutter SDK tại [Flutter docs](https://docs.flutter.dev/get-started/install/windows).
+2. Giải nén vào thư mục ổn định, ví dụ: `C:\src\flutter`.
+3. Thêm `C:\src\flutter\bin` vào biến môi trường `PATH`.
+4. Mở terminal mới và chạy:
+   - `flutter --version`
+   - `flutter doctor`
+5. Trong thư mục `mobile`, chạy:
+   - `flutter pub get`
+   - `flutter analyze`
+   - `flutter test`
