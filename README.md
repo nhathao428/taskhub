@@ -2,6 +2,14 @@
 
 Hệ thống quản lý toàn diện giúp doanh nghiệp nhỏ quản lý nhân sự, chấm công, dự án, tiến độ công việc và nhận gợi ý phân công nhân viên thông minh từ AI (OpenAI GPT).
 
+## 🚀 Deploy demo (free)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nhathao428/task-management-system)
+
+Render Blueprint (`render.yaml`) tự tạo backend (Docker) + frontend (static) + Postgres free. Cold start ~30s sau 15ph idle. Sau khi deploy, set `OPENAI_API_KEY` ở Dashboard nếu muốn bật AI suggestion.
+
+Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
+
 ---
 
 ## 🏗️ Kiến trúc tổng quan
