@@ -1,0 +1,33 @@
+{$DOMAIN} {
+    encode gzip
+
+    # API → Spring Boot backend (path /api/... forwarded as-is)
+    handle /api/* {
+        reverse_proxy backend:5000
+    }
+
+    # Swagger / OpenAPI docs (optional, useful for prod debugging)
+    handle /swagger-ui* {
+        reverse_proxy backend:5000
+    }
+    handle /api-docs* {
+        reverse_proxy backend:5000
+    }
+    handle /v3/api-docs* {
+        reverse_proxy backend:5000
+    }
+
+    # Everything else → React SPA (nginx)
+    handle {
+        reverse_proxy frontend:80
+    }
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+}
