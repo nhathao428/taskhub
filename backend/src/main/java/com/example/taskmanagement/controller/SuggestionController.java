@@ -6,6 +6,7 @@ import com.example.taskmanagement.dto.SuggestionRequest;
 import com.example.taskmanagement.entity.Suggestion;
 import com.example.taskmanagement.service.AiSuggestionService;
 import com.example.taskmanagement.service.SuggestionService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class SuggestionController {
 
     @PostMapping("/recommend")
     public ResponseEntity<ApiResponse<List<EmployeeSuggestionDTO>>> recommendEmployees(
-            @RequestBody SuggestionRequest request) {
+            @Valid @RequestBody SuggestionRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(aiSuggestionService.recommendEmployees(request)));
     }
 

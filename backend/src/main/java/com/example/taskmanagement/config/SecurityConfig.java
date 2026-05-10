@@ -74,6 +74,14 @@ public class SecurityConfig {
                         "/h2-console/**"
                 ).permitAll()
 
+                // Employee self-service endpoints — must come BEFORE the broader rules below
+                .requestMatchers(HttpMethod.GET, "/api/employees/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/tasks/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/tasks/*/status").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/attendance/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkin").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkout").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+
                 // EMPLOYEE: read-only on projects and tasks; everything else requires higher role
                 .requestMatchers(HttpMethod.GET, "/api/projects/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/tasks/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")

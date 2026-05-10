@@ -9,6 +9,7 @@ import com.example.taskmanagement.service.AttendanceService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,5 +52,20 @@ public class AttendanceController {
     @PostMapping("/checkout")
     public ResponseEntity<ApiResponse<Attendance>> checkOut(@Valid @RequestBody CheckOutRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOut(request.attendanceId())));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<Attendance>>> getMyAttendance(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.getMyAttendance(auth)));
+    }
+
+    @PostMapping("/me/checkin")
+    public ResponseEntity<ApiResponse<Attendance>> checkInSelf(Authentication auth) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.checkInSelf(auth)));
+    }
+
+    @PostMapping("/me/checkout")
+    public ResponseEntity<ApiResponse<Attendance>> checkOutSelf(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOutSelf(auth)));
     }
 }

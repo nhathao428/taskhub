@@ -7,6 +7,7 @@ import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.EmployeeRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,17 +17,21 @@ import java.util.List;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final CurrentUserService currentUserService;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, CurrentUserService currentUserService) {
         this.employeeRepository = employeeRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Cacheable("employees")
+    @Transactional(readOnly = true)
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
     @Cacheable(value = "employees", key = "#id")
+    @Transactional(readOnly = true)
     public Employee getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", id));
@@ -64,5 +69,11 @@ public class EmployeeService {
             throw new ResourceNotFoundException("Employee", "id", id);
         }
         employeeRepository.deleteById(id);
+    }
+
+    /** Returns the Employee profile linked to the currently authenticated user. */
+    @Transactional(readOnly = true)
+    public Employee getMyProfile(Authentication auth) {
+        return currentUserService.getCurrentEmployee(auth);
     }
 }

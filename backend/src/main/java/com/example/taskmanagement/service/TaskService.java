@@ -11,9 +11,12 @@ import com.example.taskmanagement.repository.ProjectRepository;
 import com.example.taskmanagement.repository.TaskRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,19 +25,26 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
+    private final CurrentUserService currentUserService;
 
-    public TaskService(TaskRepository taskRepository, ProjectRepository projectRepository, EmployeeRepository employeeRepository) {
+    public TaskService(TaskRepository taskRepository,
+                       ProjectRepository projectRepository,
+                       EmployeeRepository employeeRepository,
+                       CurrentUserService currentUserService) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.employeeRepository = employeeRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Cacheable("tasks")
+    @Transactional(readOnly = true)
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
     @Cacheable(value = "tasks", key = "#id")
+    @Transactional(readOnly = true)
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", "id", id));
@@ -90,5 +100,37 @@ public class TaskService {
             throw new ResourceNotFoundException("Task", "id", id);
         }
         taskRepository.deleteById(id);
+    }
+
+    /** Returns all tasks assigned to the currently authenticated employee. */
+    @Transactional(readOnly = true)
+    public List<Task> getMyTasks(Authentication auth) {
+        Employee me = currentUserService.getCurrentEmployee(auth);
+        return taskRepository.findByAssignedToEmployeeId(me.getEmployeeId());
+    }
+
+    /** Allows an employee to update the status of a task assigned to them. */
+    @Transactional
+    @CacheEvict(value = "tasks", allEntries = true)
+    public Task updateMyTaskStatus(Long taskId, String newStatus, Authentication auth) {
+        Employee me = currentUserService.getCurrentEmployee(auth);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task", "id", taskId));
+
+        if (task.getAssignedTo() == null
+                || !task.getAssignedTo().getEmployeeId().equals(me.getEmployeeId())) {
+            throw new AccessDeniedException("You can only update tasks assigned to you");
+        }
+
+        String normalized = newStatus.toLowerCase();
+        task.setStatus(normalized);
+        if ("completed".equals(normalized)) {
+            if (task.getCompletedAt() == null) {
+                task.setCompletedAt(LocalDateTime.now());
+            }
+        } else {
+            task.setCompletedAt(null);
+        }
+        return taskRepository.save(task);
     }
 }

@@ -33,6 +33,9 @@ class TaskServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private TaskService taskService;
 

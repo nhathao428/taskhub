@@ -8,6 +8,7 @@ import com.example.taskmanagement.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,11 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Employee>>> getAllEmployees() {
         return ResponseEntity.ok(ApiResponse.ok(employeeService.getAllEmployees()));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<Employee>> getMyProfile(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(employeeService.getMyProfile(auth)));
     }
 
     @GetMapping("/{id}")

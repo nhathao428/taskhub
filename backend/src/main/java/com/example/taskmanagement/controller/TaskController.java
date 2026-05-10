@@ -3,11 +3,13 @@ package com.example.taskmanagement.controller;
 import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.dto.CreateTaskRequest;
 import com.example.taskmanagement.dto.UpdateTaskRequest;
+import com.example.taskmanagement.dto.UpdateTaskStatusRequest;
 import com.example.taskmanagement.entity.Task;
 import com.example.taskmanagement.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,9 +29,22 @@ public class TaskController {
         return ResponseEntity.ok(ApiResponse.ok(taskService.getAllTasks()));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<Task>>> getMyTasks(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.getMyTasks(auth)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Task>> getTask(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.ok(taskService.getTaskById(id)));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Task>> updateMyTaskStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTaskStatusRequest request,
+            Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.updateMyTaskStatus(id, request.status(), auth)));
     }
 
     @PostMapping
@@ -43,8 +58,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

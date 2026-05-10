@@ -1,21 +1,17 @@
 package com.example.taskmanagement.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class SuggestionRequest {
     private Long taskId;
+    @NotBlank(message = "Task title is required")
     private String taskTitle;
     private String taskDescription;
-    private List<String> requiredSkills;
     private Long projectId;
 
     public String getCacheKey() {
-        String sortedSkills = requiredSkills == null ? "" :
-                requiredSkills.stream().sorted().collect(Collectors.joining(","));
-        return taskTitle + "-" + sortedSkills;
+        return taskId != null ? "id-" + taskId : "title-" + taskTitle;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
@@ -13,4 +14,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByDate(LocalDate date);
     List<Attendance> findByEmployeeEmployeeIdAndDateBetween(Long employeeId, LocalDate start, LocalDate end);
     List<Attendance> findByEmployeeEmployeeIdInAndDateBetween(List<Long> employeeIds, LocalDate start, LocalDate end);
+    List<Attendance> findByEmployeeEmployeeIdOrderByDateDescCheckInDesc(Long employeeId);
+    Optional<Attendance> findFirstByEmployeeEmployeeIdAndDateAndCheckOutIsNullOrderByCheckInDesc(Long employeeId, LocalDate date);
 }

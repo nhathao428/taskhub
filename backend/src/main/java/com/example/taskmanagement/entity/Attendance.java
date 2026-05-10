@@ -31,6 +31,7 @@ public class Attendance implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private Employee employee;
 
     @Column(name = "date", nullable = false)

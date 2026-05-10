@@ -3,11 +3,11 @@ package com.example.taskmanagement.service;
 import com.example.taskmanagement.dto.EmployeeSuggestionDTO;
 import com.example.taskmanagement.dto.SuggestionRequest;
 import com.example.taskmanagement.entity.Employee;
-import com.example.taskmanagement.entity.Skill;
 import com.example.taskmanagement.entity.Task;
+import com.example.taskmanagement.exception.BusinessException;
+import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.AttendanceRepository;
 import com.example.taskmanagement.repository.EmployeeRepository;
-import com.example.taskmanagement.repository.SkillRepository;
 import com.example.taskmanagement.repository.TaskRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,29 +20,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Suggests the most suitable employees for a task using OpenAI.
+ * Backend collects raw historical data per employee (past task progress, completion timing,
+ * attendance) and lets the AI rank and explain — no rule-based scoring.
+ */
 @Service
 public class AiSuggestionService {
 
     private static final Logger log = LoggerFactory.getLogger(AiSuggestionService.class);
-    private static final int EXPECTED_WORKING_DAYS = 22;
     private static final int TOP_N = 5;
-    /** Penalty applied to workload score per active task (each task reduces score by 20%). */
-    private static final double WORKLOAD_PENALTY_FACTOR = 0.2;
-    /** Neutral skill match score used when no required skills are specified. */
-    private static final double DEFAULT_SKILL_MATCH_SCORE = 0.5;
-    /** Neutral performance score used when no historical performance data is available. */
-    private static final double DEFAULT_PERFORMANCE_SCORE = 0.5;
+    private static final int ATTENDANCE_WINDOW_DAYS = 30;
+    private static final int EXPECTED_WORKING_DAYS = 22;
 
     private final EmployeeRepository employeeRepository;
     private final TaskRepository taskRepository;
     private final AttendanceRepository attendanceRepository;
-    private final SkillRepository skillRepository;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -53,15 +53,13 @@ public class AiSuggestionService {
     private String openAiModel;
 
     public AiSuggestionService(EmployeeRepository employeeRepository,
-                                TaskRepository taskRepository,
-                                AttendanceRepository attendanceRepository,
-                                SkillRepository skillRepository,
-                                RestClient.Builder restClientBuilder,
-                                ObjectMapper objectMapper) {
+                               TaskRepository taskRepository,
+                               AttendanceRepository attendanceRepository,
+                               RestClient.Builder restClientBuilder,
+                               ObjectMapper objectMapper) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.attendanceRepository = attendanceRepository;
-        this.skillRepository = skillRepository;
         this.restClient = restClientBuilder.baseUrl("https://api.openai.com").build();
         this.objectMapper = objectMapper;
     }
@@ -71,39 +69,22 @@ public class AiSuggestionService {
         if (request == null || request.getTaskTitle() == null || request.getTaskTitle().isBlank()) {
             throw new IllegalArgumentException("Task title is required");
         }
+        requireApiKey();
 
         List<Employee> employees = employeeRepository.findAll();
         if (employees.isEmpty()) {
             return List.of();
         }
 
-        List<Long> employeeIds = employees.stream().map(Employee::getEmployeeId).collect(Collectors.toList());
-
-        Map<Long, List<Skill>> skillsByEmployee = skillRepository.findByEmployeeEmployeeIdIn(employeeIds)
-                .stream().collect(Collectors.groupingBy(s -> s.getEmployee().getEmployeeId()));
-
-        Map<Long, Long> activeTasksByEmployee = taskRepository
-                .findByAssignedToEmployeeIdInAndStatusIn(employeeIds, List.of("pending", "in_progress", "PENDING", "IN_PROGRESS"))
-                .stream().collect(Collectors.groupingBy(t -> t.getAssignedTo().getEmployeeId(), Collectors.counting()));
-
-        LocalDate end = LocalDate.now();
-        LocalDate start = end.minusDays(30);
-        Map<Long, Long> attendanceByEmployee = attendanceRepository
-                .findByEmployeeEmployeeIdInAndDateBetween(employeeIds, start, end)
-                .stream().collect(Collectors.groupingBy(a -> a.getEmployee().getEmployeeId(), Collectors.counting()));
-
-        if (openAiApiKey == null || openAiApiKey.isBlank()) {
-            log.info("OpenAI API key not configured. Using rule-based fallback scoring.");
-            return calculateFallbackScores(request, employees, skillsByEmployee, activeTasksByEmployee, attendanceByEmployee);
-        }
-        String prompt = buildPrompt(request, employees, skillsByEmployee, activeTasksByEmployee, attendanceByEmployee);
+        Map<Long, EmployeeStats> statsByEmployee = collectStats(employees);
+        String prompt = buildPrompt(request, employees, statsByEmployee);
         return callOpenAi(prompt, employees);
     }
 
     @Cacheable(value = "ai_suggestions", key = "'task-' + #taskId")
     public List<EmployeeSuggestionDTO> recommendEmployeesForTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found: " + taskId));
+                .orElseThrow(() -> new ResourceNotFoundException("Task", "id", taskId));
 
         SuggestionRequest request = new SuggestionRequest();
         request.setTaskId(taskId);
@@ -113,132 +94,129 @@ public class AiSuggestionService {
         return recommendEmployees(request);
     }
 
-    private List<EmployeeSuggestionDTO> calculateFallbackScores(SuggestionRequest request,
-                                                                  List<Employee> employees,
-                                                                  Map<Long, List<Skill>> skillsByEmployee,
-                                                                  Map<Long, Long> activeTasksByEmployee,
-                                                                  Map<Long, Long> attendanceByEmployee) {
-        List<String> requiredSkills = request.getRequiredSkills();
-        List<String> normalizedRequired = (requiredSkills != null && !requiredSkills.isEmpty())
-                ? requiredSkills.stream().map(String::toLowerCase).collect(Collectors.toList())
-                : List.of();
-
-        List<EmployeeSuggestionDTO> results = new ArrayList<>();
-
-        for (Employee emp : employees) {
-            List<Skill> skills = skillsByEmployee.getOrDefault(emp.getEmployeeId(), List.of());
-            long activeTasks = activeTasksByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
-            long attendanceDays = attendanceByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
-
-            // Skill Match Score (35%)
-            double skillMatchScore;
-            int matchedSkills = 0;
-            if (normalizedRequired.isEmpty()) {
-                skillMatchScore = DEFAULT_SKILL_MATCH_SCORE;
-            } else {
-                List<String> empSkillNames = skills.stream()
-                        .map(s -> s.getSkillName().toLowerCase())
-                        .collect(Collectors.toList());
-                for (String req : normalizedRequired) {
-                    if (empSkillNames.contains(req)) {
-                        matchedSkills++;
-                    }
-                }
-                skillMatchScore = (double) matchedSkills / normalizedRequired.size();
-            }
-
-            // Workload Score (25%)
-            double workloadScore = Math.max(0.0, 1.0 - activeTasks * WORKLOAD_PENALTY_FACTOR);
-
-            // Attendance Score (15%)
-            double attendanceScore = Math.min(1.0, (double) attendanceDays / EXPECTED_WORKING_DAYS);
-
-            // Performance Score (25%) — default neutral
-            double performanceScore = DEFAULT_PERFORMANCE_SCORE;
-
-            // Overall Score
-            double overallScore = skillMatchScore * 0.35
-                    + workloadScore * 0.25
-                    + performanceScore * 0.25
-                    + attendanceScore * 0.15;
-
-            String reasoning = String.format(
-                    "Rule-based scoring: %d/%d skills matched, %d active tasks, %d/%d attendance days",
-                    matchedSkills,
-                    normalizedRequired.isEmpty() ? 0 : normalizedRequired.size(),
-                    activeTasks,
-                    attendanceDays,
-                    EXPECTED_WORKING_DAYS
-            );
-
-            results.add(new EmployeeSuggestionDTO(
-                    emp.getEmployeeId(),
-                    emp.getFirstName(),
-                    emp.getLastName(),
-                    emp.getDepartment(),
-                    skillMatchScore,
-                    workloadScore,
-                    performanceScore,
-                    attendanceScore,
-                    overallScore,
-                    reasoning
-            ));
+    private void requireApiKey() {
+        if (openAiApiKey == null || openAiApiKey.isBlank()) {
+            throw new BusinessException("AI suggestion is unavailable: OPENAI_API_KEY is not configured");
         }
+    }
 
-        results.sort(Comparator.comparingDouble(EmployeeSuggestionDTO::getOverallScore).reversed());
-        return results.stream().limit(TOP_N).collect(Collectors.toList());
+    /** Aggregates per-employee historical stats: task progress, completion timing, attendance. */
+    private Map<Long, EmployeeStats> collectStats(List<Employee> employees) {
+        List<Long> employeeIds = employees.stream().map(Employee::getEmployeeId).toList();
+
+        Map<Long, List<Task>> tasksByEmployee = taskRepository.findByAssignedToEmployeeIdIn(employeeIds)
+                .stream()
+                .filter(t -> t.getAssignedTo() != null)
+                .collect(Collectors.groupingBy(t -> t.getAssignedTo().getEmployeeId()));
+
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(ATTENDANCE_WINDOW_DAYS);
+        Map<Long, Long> attendanceDays = attendanceRepository
+                .findByEmployeeEmployeeIdInAndDateBetween(employeeIds, start, end)
+                .stream()
+                .filter(a -> a.getEmployee() != null)
+                .collect(Collectors.groupingBy(a -> a.getEmployee().getEmployeeId(), Collectors.counting()));
+
+        Map<Long, EmployeeStats> result = new HashMap<>();
+        for (Long empId : employeeIds) {
+            List<Task> tasks = tasksByEmployee.getOrDefault(empId, List.of());
+            EmployeeStats stats = new EmployeeStats();
+            stats.totalTasks = tasks.size();
+            stats.activeTasks = (int) tasks.stream()
+                    .filter(t -> isActive(t.getStatus()))
+                    .count();
+            stats.completedTasks = (int) tasks.stream()
+                    .filter(t -> isCompleted(t.getStatus()))
+                    .count();
+
+            List<Task> finishedWithDue = tasks.stream()
+                    .filter(t -> isCompleted(t.getStatus())
+                            && t.getDueDate() != null
+                            && t.getCompletedAt() != null)
+                    .toList();
+            stats.completedWithDueDate = finishedWithDue.size();
+            stats.completedOnTime = (int) finishedWithDue.stream()
+                    .filter(t -> !t.getCompletedAt().toLocalDate().isAfter(t.getDueDate()))
+                    .count();
+            stats.avgDaysLate = finishedWithDue.stream()
+                    .mapToLong(t -> Math.max(0, ChronoUnit.DAYS.between(
+                            t.getDueDate(), t.getCompletedAt().toLocalDate())))
+                    .average()
+                    .orElse(0.0);
+
+            stats.attendanceDays = attendanceDays.getOrDefault(empId, 0L).intValue();
+            result.put(empId, stats);
+        }
+        return result;
+    }
+
+    private boolean isActive(String status) {
+        if (status == null) return false;
+        String s = status.toLowerCase();
+        return s.equals("pending") || s.equals("in_progress");
+    }
+
+    private boolean isCompleted(String status) {
+        return status != null && status.toLowerCase().equals("completed");
     }
 
     private String buildPrompt(SuggestionRequest request, List<Employee> employees,
-                                Map<Long, List<Skill>> skillsByEmployee,
-                                Map<Long, Long> activeTasksByEmployee,
-                                Map<Long, Long> attendanceByEmployee) {
+                               Map<Long, EmployeeStats> statsByEmployee) {
         StringBuilder sb = new StringBuilder();
-        sb.append("You are an AI assistant helping assign tasks to the most suitable employees in a task management system.\n\n");
-        sb.append("Task Details:\n");
-        sb.append("- Title: ").append(request.getTaskTitle()).append("\n");
+        sb.append("Bạn là trợ lý AI giúp quản lý chọn nhân viên phù hợp nhất để giao một task. ")
+          .append("Dữ liệu có thể bằng tiếng Việt hoặc tiếng Anh.\n\n");
+
+        sb.append("=== TASK CẦN GIAO ===\n");
+        sb.append("- Tiêu đề: ").append(request.getTaskTitle()).append("\n");
         if (request.getTaskDescription() != null && !request.getTaskDescription().isBlank()) {
-            sb.append("- Description: ").append(request.getTaskDescription()).append("\n");
-        }
-        if (request.getRequiredSkills() != null && !request.getRequiredSkills().isEmpty()) {
-            sb.append("- Required Skills: ").append(String.join(", ", request.getRequiredSkills())).append("\n");
+            sb.append("- Mô tả: ").append(request.getTaskDescription()).append("\n");
         }
 
-        sb.append("\nAvailable Employees:\n");
+        sb.append("\n=== DỮ LIỆU LỊCH SỬ CỦA TỪNG NHÂN VIÊN ===\n");
+        sb.append("(số liệu thô — KHÔNG được tính điểm/score, hãy đánh giá định tính)\n\n");
         for (Employee emp : employees) {
-            List<Skill> skills = skillsByEmployee.getOrDefault(emp.getEmployeeId(), List.of());
-            long activeTasks = activeTasksByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
-            long attendance = attendanceByEmployee.getOrDefault(emp.getEmployeeId(), 0L);
-
-            sb.append("- ID: ").append(emp.getEmployeeId())
-              .append(", Name: ").append(emp.getFirstName()).append(" ").append(emp.getLastName())
-              .append(", Department: ").append(emp.getDepartment())
-              .append(", Position: ").append(emp.getPosition()).append("\n");
-            if (!skills.isEmpty()) {
-                String skillList = skills.stream()
-                        .map(s -> s.getSkillName() + " (" + s.getProficiencyLevel() + ")")
-                        .collect(Collectors.joining(", "));
-                sb.append("  Skills: ").append(skillList).append("\n");
+            EmployeeStats stats = statsByEmployee.getOrDefault(emp.getEmployeeId(), new EmployeeStats());
+            sb.append("• ID=").append(emp.getEmployeeId())
+              .append(" | ").append(emp.getFirstName()).append(" ").append(emp.getLastName())
+              .append(" | ").append(emp.getDepartment() != null ? emp.getDepartment() : "—")
+              .append(" | ").append(emp.getPosition() != null ? emp.getPosition() : "—").append("\n");
+            sb.append("    - Tiến độ task trước: ")
+              .append(stats.completedTasks).append(" hoàn thành / ")
+              .append(stats.totalTasks).append(" tổng task được giao")
+              .append(" (").append(stats.activeTasks).append(" đang xử lý)\n");
+            if (stats.completedWithDueDate > 0) {
+                sb.append("    - Thời gian hoàn thành: ")
+                  .append(stats.completedOnTime).append("/").append(stats.completedWithDueDate)
+                  .append(" task hoàn thành đúng hạn");
+                if (stats.avgDaysLate > 0) {
+                    sb.append(", trung bình trễ ").append(String.format("%.1f", stats.avgDaysLate)).append(" ngày");
+                }
+                sb.append("\n");
+            } else {
+                sb.append("    - Thời gian hoàn thành: chưa có task hoàn thành nào có due date\n");
             }
-            sb.append("  Active tasks: ").append(activeTasks).append("\n");
-            sb.append("  Attendance last 30 days: ").append(attendance).append("/").append(EXPECTED_WORKING_DAYS).append(" days\n");
+            sb.append("    - Chấm công ").append(ATTENDANCE_WINDOW_DAYS).append(" ngày qua: ")
+              .append(stats.attendanceDays).append("/").append(EXPECTED_WORKING_DAYS).append(" ngày làm việc\n");
         }
 
-        sb.append("\nRank the top ").append(TOP_N).append(" most suitable employees for this task.\n");
-        sb.append("Consider: skill match, workload (fewer active tasks = more available), and attendance.\n");
-        sb.append("Return ONLY a valid JSON array (no markdown, no extra text) with this structure:\n");
-        sb.append("[{\"employeeId\":<number>,\"skillMatchScore\":<0.0-1.0>,\"workloadScore\":<0.0-1.0>,");
-        sb.append("\"performanceScore\":<0.0-1.0>,\"attendanceScore\":<0.0-1.0>,");
-        sb.append("\"overallScore\":<0.0-1.0>,\"reasoning\":\"<brief reason>\"}]");
+        sb.append("\n=== HƯỚNG DẪN ===\n");
+        sb.append("Hãy gợi ý TOP ").append(TOP_N).append(" nhân viên phù hợp nhất với task trên, dựa trên 3 tiêu chí (theo thứ tự ưu tiên):\n");
+        sb.append("  1. Tiến độ task trước — tỷ lệ hoàn thành cao, ít task tồn đọng.\n");
+        sb.append("  2. Thời gian hoàn thành task trước — hoàn thành đúng hạn nhiều, ít trễ.\n");
+        sb.append("  3. Chấm công — đi làm đầy đủ.\n\n");
+        sb.append("KHÔNG cần tính điểm số. Hãy đánh giá định tính, so sánh giữa các nhân viên dựa trên dữ liệu trên ")
+          .append("rồi xếp hạng. Nhân viên chưa có lịch sử thì xét workload hiện tại + chấm công.\n\n");
+
+        sb.append("=== ĐỊNH DẠNG TRẢ VỀ ===\n");
+        sb.append("Trả về DUY NHẤT một mảng JSON hợp lệ (không kèm markdown, không text thừa), ")
+          .append("đã sắp xếp theo độ phù hợp giảm dần:\n");
+        sb.append("[{\"employeeId\":<số>,\"rank\":<1.." ).append(TOP_N).append(">,")
+          .append("\"reasoning\":\"<lý do ngắn gọn bằng tiếng Việt: nêu cụ thể tiến độ, đúng hạn, chấm công của họ>\"}]");
 
         return sb.toString();
     }
 
     private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> employees) {
-        if (openAiApiKey == null || openAiApiKey.isBlank()) {
-            throw new IllegalStateException("OpenAI API key is not configured. Please set the openai.api.key property.");
-        }
-
         Map<String, Object> requestBody = Map.of(
                 "model", openAiModel,
                 "messages", List.of(Map.of("role", "user", "content", prompt)),
@@ -273,6 +251,7 @@ public class AiSuggestionService {
                     .collect(Collectors.toMap(Employee::getEmployeeId, e -> e));
 
             List<EmployeeSuggestionDTO> dtos = new ArrayList<>();
+            int fallbackRank = 1;
             for (JsonNode node : results) {
                 Long empId = node.path("employeeId").asLong(-1);
                 Employee emp = empById.get(empId);
@@ -280,19 +259,16 @@ public class AiSuggestionService {
                     log.warn("AI returned unknown employeeId: {}. Skipping.", empId);
                     continue;
                 }
-
+                int rank = node.path("rank").asInt(fallbackRank);
                 dtos.add(new EmployeeSuggestionDTO(
                         emp.getEmployeeId(),
                         emp.getFirstName(),
                         emp.getLastName(),
                         emp.getDepartment(),
-                        node.path("skillMatchScore").asDouble(0.0),
-                        node.path("workloadScore").asDouble(0.0),
-                        node.path("performanceScore").asDouble(0.0),
-                        node.path("attendanceScore").asDouble(0.0),
-                        node.path("overallScore").asDouble(0.0),
+                        rank,
                         node.path("reasoning").asText("")
                 ));
+                fallbackRank++;
             }
             return dtos;
         } catch (Exception e) {
@@ -301,5 +277,15 @@ public class AiSuggestionService {
                     e.getMessage(), e);
             throw new RuntimeException("Failed to parse AI response", e);
         }
+    }
+
+    private static class EmployeeStats {
+        int totalTasks;
+        int activeTasks;
+        int completedTasks;
+        int completedWithDueDate;
+        int completedOnTime;
+        double avgDaysLate;
+        int attendanceDays;
     }
 }

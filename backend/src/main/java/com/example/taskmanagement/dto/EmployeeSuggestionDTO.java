@@ -12,10 +12,6 @@ public class EmployeeSuggestionDTO {
     private String firstName;
     private String lastName;
     private String department;
-    private double skillMatchScore;
-    private double workloadScore;
-    private double performanceScore;
-    private double attendanceScore;
-    private double overallScore;
+    private int rank;
     private String reasoning;
 }
