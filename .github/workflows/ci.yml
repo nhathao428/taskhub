@@ -25,6 +25,9 @@ jobs:
           cache: maven
 
       - name: Build and test
+        env:
+          JWT_SECRET: ciSecretKeyThatIsAtLeast256BitsLongForCITesting1234567890
+          ADMIN_PASSWORD: ciTestAdminPassword
         run: mvn --batch-mode verify
 
   frontend:
@@ -49,3 +52,28 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  mobile:
+    name: Mobile (Flutter)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
