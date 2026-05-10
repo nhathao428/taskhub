@@ -43,8 +43,9 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 
 | Tính năng | Mô tả |
 |---|---|
-| 🔐 Xác thực JWT | Đăng ký, đăng nhập, phân quyền theo vai trò (Admin / Employee) |
-| 👥 Quản lý nhân viên | CRUD nhân viên, quản lý kỹ năng (skill + mức độ thành thạo) |
+| 🔐 Xác thực JWT | Đăng ký, đăng nhập, phân quyền 3 vai trò (Admin / Manager / Employee) |
+| 👥 Quản lý nhân viên | CRUD nhân viên, hồ sơ phòng ban / chức vụ / nhóm |
+| 👤 Self-service nhân viên | Xem task được giao, cập nhật trạng thái, tự check-in/out, xem lịch sử chấm công |
 | 📋 Quản lý dự án | Tạo, cập nhật, xóa dự án; liên kết với công việc |
 | ✅ Quản lý công việc | Tạo công việc, phân công nhân viên, theo dõi trạng thái |
 | 🕐 Chấm công | Ghi nhận giờ vào/ra theo ngày, xem lịch sử chấm công |
@@ -116,7 +117,7 @@ cd backend
 # Cấu hình database trong src/main/resources/application.properties
 # Xem mục "Cấu hình Backend" bên dưới
 
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 API sẽ khởi động tại: `http://localhost:5000`
@@ -124,21 +125,27 @@ API sẽ khởi động tại: `http://localhost:5000`
 #### Cấu hình Backend (`application.properties`)
 
 ```properties
-# Kết nối PostgreSQL
+# Kết nối PostgreSQL (chỉ dùng khi SPRING_PROFILES_ACTIVE=postgres,
+# mặc định backend chạy H2 in-memory cho dev)
 spring.datasource.url=jdbc:postgresql://localhost:5432/task_management_db
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 
-# JWT
-jwt.secret=mySecretKeyThatIsAtLeast256BitsLong1234567890
+# JWT — bắt buộc set qua env var, không có default value
+app.jwt.secret=${JWT_SECRET}
+app.jwt.expiration=86400000
 
-# Redis Cache
-spring.redis.host=localhost
-spring.redis.port=6379
+# Redis Cache (set CACHE_TYPE=redis khi có Redis server, default 'none')
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+spring.cache.type=${CACHE_TYPE:none}
 
-# OpenAI (cho tính năng AI gợi ý)
-openai.api.key=sk-...
-openai.model=gpt-4o-mini
+# OpenAI (cho tính năng AI gợi ý — không có key thì endpoint trả 422)
+openai.api.key=${OPENAI_API_KEY:}
+openai.api.model=${OPENAI_MODEL:gpt-4o-mini}
+
+# Admin seed (bắt buộc set ADMIN_PASSWORD)
+app.admin.password=${ADMIN_PASSWORD}
 
 # Server port
 server.port=5000
@@ -178,23 +185,29 @@ flutter build ios     # Build iOS (cần macOS + Xcode)
 |---|---|---|---|
 | `POST` | `/api/auth/register` | Đăng ký tài khoản | Không |
 | `POST` | `/api/auth/login` | Đăng nhập, nhận JWT | Không |
-| `GET` | `/api/employees` | Danh sách nhân viên | ✅ |
-| `POST` | `/api/employees` | Thêm nhân viên | ✅ |
-| `PUT` | `/api/employees/{id}` | Cập nhật nhân viên | ✅ |
-| `DELETE` | `/api/employees/{id}` | Xóa nhân viên | ✅ |
-| `GET` | `/api/projects` | Danh sách dự án | ✅ |
-| `POST` | `/api/projects` | Tạo dự án mới | ✅ |
-| `PUT` | `/api/projects/{id}` | Cập nhật dự án | ✅ |
-| `DELETE` | `/api/projects/{id}` | Xóa dự án | ✅ |
-| `GET` | `/api/tasks` | Danh sách công việc | ✅ |
-| `POST` | `/api/tasks` | Tạo công việc mới | ✅ |
-| `PUT` | `/api/tasks/{id}` | Cập nhật công việc | ✅ |
-| `DELETE` | `/api/tasks/{id}` | Xóa công việc | ✅ |
-| `POST` | `/api/attendance/checkin` | Chấm công vào | ✅ |
-| `POST` | `/api/attendance/checkout` | Chấm công ra | ✅ |
-| `GET` | `/api/attendance` | Lịch sử chấm công | ✅ |
-| `POST` | `/api/suggestions/recommend` | AI gợi ý nhân viên | ✅ |
-| `POST` | `/api/suggestions/recommend/{taskId}` | AI gợi ý theo task ID | ✅ |
+| `GET` | `/api/employees` | Danh sách nhân viên | Manager / Admin |
+| `GET` | `/api/employees/me` | Profile của nhân viên đang đăng nhập | Mọi role |
+| `POST` | `/api/employees` | Thêm nhân viên | Manager / Admin |
+| `PUT` | `/api/employees/{id}` | Cập nhật nhân viên | Manager / Admin |
+| `DELETE` | `/api/employees/{id}` | Xóa nhân viên | Manager / Admin |
+| `GET` | `/api/projects` | Danh sách dự án | Mọi role |
+| `POST` | `/api/projects` | Tạo dự án mới | Manager / Admin |
+| `PUT` | `/api/projects/{id}` | Cập nhật dự án | Manager / Admin |
+| `DELETE` | `/api/projects/{id}` | Xóa dự án | Manager / Admin |
+| `GET` | `/api/tasks` | Danh sách tất cả công việc | Mọi role |
+| `GET` | `/api/tasks/me` | Task được giao cho nhân viên hiện tại | Mọi role |
+| `POST` | `/api/tasks` | Tạo công việc mới | Manager / Admin |
+| `PUT` | `/api/tasks/{id}` | Cập nhật toàn bộ công việc | Manager / Admin |
+| `PATCH` | `/api/tasks/{id}/status` | Đổi status task của chính mình | Mọi role |
+| `DELETE` | `/api/tasks/{id}` | Xóa công việc | Manager / Admin |
+| `GET` | `/api/attendance` | Lịch sử chấm công toàn bộ | Manager / Admin |
+| `GET` | `/api/attendance/me` | Lịch sử chấm công của bản thân | Mọi role |
+| `POST` | `/api/attendance/me/checkin` | Tự check-in (lấy ID từ JWT) | Mọi role |
+| `POST` | `/api/attendance/me/checkout` | Tự check-out (đóng bản ghi mở hôm nay) | Mọi role |
+| `POST` | `/api/attendance/checkin` | Check-in cho nhân viên bất kỳ | Manager / Admin |
+| `POST` | `/api/attendance/checkout` | Đóng bản ghi chấm công cụ thể | Manager / Admin |
+| `POST` | `/api/suggestions/recommend` | AI gợi ý nhân viên cho task | Manager / Admin |
+| `GET` | `/api/suggestions/recommend/{taskId}` | AI gợi ý theo task ID có sẵn | Manager / Admin |
 
 > Xem đặc tả đầy đủ tại [docs/API_SPECIFICATION.md](docs/API_SPECIFICATION.md)
 
@@ -230,8 +243,11 @@ task-management-system/
 │   ├── DATABASE_SCHEMA.md
 │   ├── SETUP_GUIDE.md
 │   └── UML_DIAGRAMS.md
-├── docker-compose.yml              # PostgreSQL + Redis + Backend
-├── TIMELINE.md                     # Kế hoạch phát triển 10 tuần
+├── docker-compose.yml              # PostgreSQL + Redis + Backend (dev)
+├── docker-compose.prod.yml         # Production overrides + Caddy HTTPS
+├── Caddyfile                       # Reverse proxy + auto Let's Encrypt
+├── render.yaml                     # Render Blueprint (one-click deploy)
+├── DEPLOY.md                       # Hướng dẫn deploy production lên VPS
 └── README.md
 ```
 
@@ -239,18 +255,18 @@ task-management-system/
 
 ## 🤖 Tính năng AI Gợi ý Nhân viên
 
-Hệ thống tích hợp **OpenAI GPT** để phân tích và đề xuất nhân viên phù hợp nhất cho từng công việc.
+Hệ thống tích hợp **OpenAI GPT** để phân tích và đề xuất nhân viên phù hợp nhất cho từng công việc. AI ra quyết định hoàn toàn — backend không tự tính điểm.
 
 ### Cách hoạt động
 
-1. Frontend gửi thông tin công việc (`tiêu đề`, `mô tả`, `kỹ năng yêu cầu`) đến backend.
-2. Backend thu thập dữ liệu thực tế của toàn bộ nhân viên:
-   - Kỹ năng và mức độ thành thạo
-   - Số lượng task đang thực hiện (workload)
-   - Tỷ lệ hoàn thành task
-   - Số ngày chấm công trong 30 ngày gần nhất
-3. Toàn bộ dữ liệu được gửi cho OpenAI GPT dưới dạng ngữ cảnh (prompt).
-4. AI phân tích và trả về **top 5 nhân viên** phù hợp nhất kèm điểm đánh giá và lý do.
+1. Manager gửi thông tin công việc (`tiêu đề`, `mô tả tùy chọn`) đến backend.
+2. Backend thu thập **dữ liệu thô** của tất cả nhân viên:
+   - **Tiến độ task trước**: tổng task được giao, số đã hoàn thành, số đang xử lý
+   - **Thời gian hoàn thành**: số task đúng hạn / tổng task có due date, trung bình số ngày trễ
+   - **Chấm công**: số ngày làm việc trong 30 ngày gần nhất
+3. Backend đẩy raw data + 3 tiêu chí ưu tiên cho OpenAI GPT (`gpt-4o-mini`) qua prompt tiếng Việt.
+4. AI **tự xếp hạng** top 5 nhân viên kèm reasoning bằng tiếng Việt — không có tính điểm bằng code.
+5. Nếu `OPENAI_API_KEY` chưa được set, endpoint trả về **HTTP 422** (`AI suggestion is unavailable`).
 
 ### Ví dụ Request
 
@@ -258,8 +274,7 @@ Hệ thống tích hợp **OpenAI GPT** để phân tích và đề xuất nhân
 POST /api/suggestions/recommend
 {
   "taskTitle": "Phát triển API thanh toán",
-  "taskDescription": "Xây dựng REST API tích hợp cổng thanh toán VNPay",
-  "requiredSkills": ["Java", "Spring Boot", "REST API"]
+  "taskDescription": "Xây dựng REST API tích hợp cổng thanh toán VNPay"
 }
 ```
 
@@ -271,13 +286,17 @@ POST /api/suggestions/recommend
     "employeeId": 3,
     "firstName": "Nguyễn",
     "lastName": "Văn A",
-    "department": "Engineering",
-    "skillMatchScore": 0.95,
-    "workloadScore": 0.80,
-    "performanceScore": 0.90,
-    "attendanceScore": 0.85,
-    "overallScore": 0.88,
-    "reasoning": "Nhân viên có kỹ năng Java và Spring Boot xuất sắc, workload hiện tại thấp, tỷ lệ hoàn thành task cao."
+    "department": "Kỹ thuật",
+    "rank": 1,
+    "reasoning": "Hoàn thành 9/10 task được giao, trong đó 8/9 đúng hạn, đi làm 21/22 ngày — phù hợp nhất với task đòi hỏi tin cậy về tiến độ."
+  },
+  {
+    "employeeId": 7,
+    "firstName": "Trần",
+    "lastName": "Thị B",
+    "department": "Kỹ thuật",
+    "rank": 2,
+    "reasoning": "Tỷ lệ hoàn thành cao (7/8), đúng hạn 6/7, chấm công 20/22 ngày."
   }
 ]
 ```
@@ -291,8 +310,8 @@ POST /api/suggestions/recommend
 | [Đặc tả API](docs/API_SPECIFICATION.md) | Danh sách tất cả API endpoints kèm mô tả và ví dụ |
 | [Lược đồ Cơ sở dữ liệu](docs/DATABASE_SCHEMA.md) | Cấu trúc bảng và quan hệ dữ liệu |
 | [Hướng dẫn Cài đặt](docs/SETUP_GUIDE.md) | Hướng dẫn cài đặt môi trường chi tiết |
-| [Sơ đồ UML](docs/UML_DIAGRAMS.md) | Sơ đồ Use Case và Sequence |
-| [Kế hoạch Phát triển](TIMELINE.md) | Lộ trình phát triển 10 tuần |
+| [Sơ đồ UML](docs/UML_DIAGRAMS.md) | Use Case, Class, Sequence, Activity diagrams |
+| [Hướng dẫn Deploy](DEPLOY.md) | Triển khai production lên VPS với Docker + Caddy |
 | [Backend](backend/README.md) | Tài liệu chi tiết về phần backend |
 | [Frontend](frontend/README.md) | Tài liệu chi tiết về phần frontend |
 | [Mobile](mobile/README.md) | Tài liệu chi tiết về ứng dụng di động |

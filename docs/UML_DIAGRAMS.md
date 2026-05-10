@@ -32,7 +32,7 @@ Mô tả đầy đủ các chức năng CRUD dự án và công việc. Quản l
 
 ### 1.4. Use Case — AI Gợi ý Nhân viên
 
-Mô tả quy trình AI gợi ý nhân viên phù hợp. Hệ thống phân tích 4 tiêu chí: kỹ năng (35%), khối lượng công việc (25%), hiệu suất (25%), chấm công (15%). Có thể sử dụng OpenAI GPT hoặc thuật toán rule-based khi không có API key.
+Mô tả quy trình AI gợi ý nhân viên phù hợp. Backend thu thập dữ liệu thô của 3 tiêu chí (tiến độ task trước, thời gian hoàn thành, chấm công) rồi giao cho OpenAI GPT tự xếp hạng. Không còn rule-based fallback — không có API key thì trả 422.
 
 ![Use Case AI Gợi ý](diagrams/use-case-ai-goi-y.svg)
 
@@ -42,7 +42,7 @@ Mô tả quy trình AI gợi ý nhân viên phù hợp. Hệ thống phân tích
 
 ### 2.1. Sơ đồ lớp thực thể (Entity)
 
-Mô tả 7 thực thể chính của hệ thống và mối quan hệ giữa chúng. `NhanVien` liên kết với `NguoiDung` (ManyToOne), `CongViec` thuộc về `DuAn` và được phân công cho `NhanVien`. `ChamCong` và `KyNang` đều gắn với `NhanVien`. `GoiY` thuộc về `NguoiDung`.
+Mô tả 6 thực thể chính của hệ thống và mối quan hệ giữa chúng. `NhanVien` liên kết với `NguoiDung` (ManyToOne), `CongViec` thuộc về `DuAn` và được phân công cho `NhanVien`. `ChamCong` gắn với `NhanVien`. `GoiY` thuộc về `NguoiDung`.
 
 ![Class Diagram Thực thể](diagrams/class-diagram-thuc-the.svg)
 
@@ -76,7 +76,7 @@ Mô tả luồng check-in và check-out: xác thực JWT, kiểm tra trùng lặ
 
 ### 3.3. AI Gợi ý Nhân viên
 
-Mô tả luồng AI gợi ý dựa trên code thực tế của `AiSuggestionService`: 4 batch query song song (Employee, Skill, Task, Attendance), rồi phân nhánh OpenAI API (nếu có key) hoặc fallback rule-based (Kỹ năng 35% + Khối lượng 25% + Hiệu suất 25% + Chấm công 15%), trả về top 5.
+Mô tả luồng AI gợi ý dựa trên code thực tế của `AiSuggestionService`: 2 batch query song song (Task, Attendance), tổng hợp raw stats (tổng/hoàn thành/đang xử lý/đúng hạn/trễ ngày, ngày làm việc 30 ngày), build prompt tiếng Việt rồi gọi OpenAI Chat Completions. AI tự xếp hạng top 5 + reasoning. Không có API key → throw `BusinessException` (HTTP 422).
 
 ![Sequence AI Gợi ý](diagrams/sequence-ai-goi-y.svg)
 
@@ -84,7 +84,7 @@ Mô tả luồng AI gợi ý dựa trên code thực tế của `AiSuggestionSer
 
 ### 3.4. Quản lý Công việc (Tạo + Phân công)
 
-Mô tả luồng tạo công việc mới (POST /api/tasks, status = PENDING) và phân công nhân viên (PUT /api/tasks/{id}, cập nhật assigned_to). Cả hai luồng đều yêu cầu xác thực JWT với role ADMIN.
+Mô tả luồng tạo công việc mới (POST /api/tasks, status = PENDING) và phân công nhân viên (PUT /api/tasks/{id}, cập nhật assigned_to). Cả hai luồng yêu cầu role MANAGER hoặc ADMIN. Nhân viên chỉ được PATCH /api/tasks/{id}/status cho task của chính mình.
 
 ![Sequence Quản lý Công việc](diagrams/sequence-quan-ly-cong-viec.svg)
 
@@ -126,7 +126,7 @@ Mô tả 3 luồng: Chấm công vào (kiểm tra trùng → tạo bản ghi m�
 
 ### 4.5. AI Gợi ý Nhân viên
 
-Mô tả luồng AI đầy đủ: nhập yêu cầu → batch query 4 bảng → phân nhánh OpenAI/fallback → tính điểm 4 tiêu chí → lấy top 5 → trả kết quả kèm lý do. Công thức: Kỹ năng×35% + Khối lượng×25% + Hiệu suất×25% + Chấm công×15%.
+Mô tả luồng AI đầy đủ: nhập tiêu đề + mô tả task → batch query Task & Attendance → tổng hợp raw stats (tiến độ / thời gian hoàn thành / chấm công) → build prompt tiếng Việt → gọi OpenAI → parse JSON response → trả top 5 với rank + reasoning. Backend KHÔNG tự tính điểm.
 
 ![Activity AI Gợi ý](diagrams/activity-ai-goi-y.svg)
 

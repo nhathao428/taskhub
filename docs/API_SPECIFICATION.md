@@ -342,7 +342,7 @@ Phân tích và gợi ý top 5 nhân viên phù hợp nhất dựa trên mô t�
 ```json
 {
   "taskTitle": "Phát triển tính năng thanh toán online",
-  "requiredSkills": ["Java", "Spring Boot", "RESTful API"]
+  "taskDescription": "Tích hợp cổng thanh toán VNPay, viết REST API và unit test"
 }
 ```
 
@@ -351,12 +351,16 @@ Phân tích và gợi ý top 5 nhân viên phù hợp nhất dựa trên mô t�
 [
   {
     "employeeId": 3,
-    "employeeName": "Văn C Lê",
-    "score": 0.87,
-    "reasoning": "Kỹ năng phù hợp cao (Java, Spring Boot). Khối lượng công việc hiện tại thấp (2/5 task). Hiệu suất hoàn thành đúng hạn 92%. Tỷ lệ chấm công tháng vừa qua 95%."
+    "firstName": "Lê",
+    "lastName": "Văn C",
+    "department": "Kỹ thuật",
+    "rank": 1,
+    "reasoning": "Hoàn thành 9/10 task, đúng hạn 8/9, đi làm 21/22 ngày — phù hợp nhất cho task cần đảm bảo tiến độ."
   }
 ]
 ```
+
+> Lưu ý: AI ra quyết định hoàn toàn dựa trên 3 tiêu chí (tiến độ task trước, thời gian hoàn thành, chấm công). Backend KHÔNG tự tính điểm — không có `OPENAI_API_KEY` thì endpoint trả `422 Unprocessable Entity`.
 
 ---
 

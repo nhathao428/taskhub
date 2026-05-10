@@ -62,12 +62,12 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=false
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
-# Cấu hình JWT
-jwt.secret=your_super_secret_key_at_least_32_characters
-jwt.expiration=86400000
+# Cấu hình JWT (bắt buộc set qua env, không có default)
+app.jwt.secret=${JWT_SECRET}
+app.jwt.expiration=86400000
 
-# Cổng máy chủ (mặc định 8080)
-server.port=8080
+# Cổng máy chủ (project chạy trên 5000)
+server.port=5000
 ```
 
 ---
