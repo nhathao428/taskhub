@@ -97,6 +97,7 @@ class _TasksScreenState extends State<TasksScreen> {
   }
 
   Future<void> _changeStatus(Task task) async {
+    final dataProvider = context.read<DataProvider>();
     const statuses = ['pending', 'in_progress', 'completed'];
     final labels = {
       'pending': 'Chờ xử lý',
@@ -127,8 +128,7 @@ class _TasksScreenState extends State<TasksScreen> {
     );
 
     if (selected == null || selected == task.status) return;
-    final success =
-        await context.read<DataProvider>().updateTaskStatus(task.taskId, selected);
+    final success = await dataProvider.updateTask(task.taskId, {'status': selected});
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(

@@ -124,14 +124,42 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateTaskStatus(int taskId, String status) async {
+  /// Self-service: update status of a task assigned to the current employee.
+  Future<bool> updateMyTaskStatus(int taskId, String status) async {
     try {
-      final updated = await ApiService.updateTaskStatus(taskId, status);
+      final updated = await ApiService.updateMyTaskStatus(taskId, status);
       _tasks = _tasks.map((t) => t.taskId == taskId ? updated : t).toList();
       notifyListeners();
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// Manager-level full task update.
+  Future<bool> updateTask(int taskId, Map<String, dynamic> body) async {
+    try {
+      final updated = await ApiService.updateTask(taskId, body);
+      _tasks = _tasks.map((t) => t.taskId == taskId ? updated : t).toList();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Self-service: load tasks assigned to the current employee.
+  Future<void> fetchMyTasks() async {
+    _loadingTasks = true;
+    _tasksError = null;
+    notifyListeners();
+    try {
+      _tasks = await ApiService.getMyTasks();
+    } catch (e) {
+      _tasksError = e.toString();
+    } finally {
+      _loadingTasks = false;
+      notifyListeners();
     }
   }
 
@@ -175,12 +203,56 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  /// Self-service: load attendance history for the current employee.
+  Future<void> fetchMyAttendance() async {
+    _loadingAttendance = true;
+    _attendanceError = null;
+    notifyListeners();
+    try {
+      _attendance = await ApiService.getMyAttendance();
+    } catch (e) {
+      _attendanceError = e.toString();
+    } finally {
+      _loadingAttendance = false;
+      notifyListeners();
+    }
+  }
+
+  /// Self check-in (employeeId resolved server-side from JWT).
+  Future<Attendance?> checkInSelf() async {
+    try {
+      final record = await ApiService.checkInSelf();
+      _attendance = [..._attendance, record];
+      notifyListeners();
+      return record;
+    } catch (e) {
+      _attendanceError = e.toString();
+      notifyListeners();
+      return null;
+    }
+  }
+
+  /// Self check-out (closes today's open attendance).
+  Future<Attendance?> checkOutSelf() async {
+    try {
+      final updated = await ApiService.checkOutSelf();
+      _attendance = _attendance
+          .map((a) => a.attendanceId == updated.attendanceId ? updated : a)
+          .toList();
+      notifyListeners();
+      return updated;
+    } catch (e) {
+      _attendanceError = e.toString();
+      notifyListeners();
+      return null;
+    }
+  }
+
   // ─── AI Suggestions ──────────────────────────────────────────────────────────
 
   Future<void> fetchSuggestions({
     required String taskTitle,
     String? taskDescription,
-    List<String>? requiredSkills,
   }) async {
     _loadingSuggestions = true;
     _suggestionsError = null;
@@ -190,7 +262,6 @@ class DataProvider extends ChangeNotifier {
       _suggestions = await ApiService.recommendEmployees(
         taskTitle: taskTitle,
         taskDescription: taskDescription,
-        requiredSkills: requiredSkills,
       );
     } catch (e) {
       _suggestionsError = e.toString();

@@ -64,6 +64,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _checkOut() async {
+    final dataProvider = context.read<DataProvider>();
     if (_lastAttendanceId == null) {
       final attendanceIdText = await showDialog<String>(
         context: context,
@@ -93,8 +94,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     if (_lastAttendanceId == null) return;
 
     setState(() => _checkOutLoading = true);
-    final record =
-        await context.read<DataProvider>().checkOut(_lastAttendanceId!);
+    final record = await dataProvider.checkOut(_lastAttendanceId!);
     if (!mounted) return;
     setState(() {
       _checkOutLoading = false;

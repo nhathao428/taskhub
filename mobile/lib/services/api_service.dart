@@ -9,7 +9,7 @@ import '../models/employee_suggestion.dart';
 
 class ApiService {
   static const String _baseUrl =
-      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8080');
+      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:5000');
   static const String _tokenKey = 'jwt_token';
 
   // ─── Token management ───────────────────────────────────────────────────────
@@ -94,6 +94,15 @@ class ApiService {
     return Employee.fromJson(_unwrap(response) as Map<String, dynamic>);
   }
 
+  /// Returns the Employee profile of the currently authenticated user.
+  static Future<Employee> getMyProfile() async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/employees/me'),
+      headers: await _authHeaders(),
+    );
+    return Employee.fromJson(_unwrap(response) as Map<String, dynamic>);
+  }
+
   // ─── Projects ────────────────────────────────────────────────────────────────
 
   static Future<List<Project>> getProjects() async {
@@ -125,6 +134,16 @@ class ApiService {
     return data.map((e) => Task.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  /// Returns tasks assigned to the currently authenticated employee.
+  static Future<List<Task>> getMyTasks() async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/tasks/me'),
+      headers: await _authHeaders(),
+    );
+    final data = _unwrap(response) as List<dynamic>;
+    return data.map((e) => Task.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   static Future<Task> createTask(Map<String, dynamic> body) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/tasks'),
@@ -134,9 +153,20 @@ class ApiService {
     return Task.fromJson(_unwrap(response) as Map<String, dynamic>);
   }
 
-  static Future<Task> updateTaskStatus(int taskId, String status) async {
+  /// Manager-level: full task update (PUT).
+  static Future<Task> updateTask(int taskId, Map<String, dynamic> body) async {
     final response = await http.put(
       Uri.parse('$_baseUrl/api/tasks/$taskId'),
+      headers: await _authHeaders(),
+      body: jsonEncode(body),
+    );
+    return Task.fromJson(_unwrap(response) as Map<String, dynamic>);
+  }
+
+  /// Self-service: update status of a task assigned to the current employee (PATCH).
+  static Future<Task> updateMyTaskStatus(int taskId, String status) async {
+    final response = await http.patch(
+      Uri.parse('$_baseUrl/api/tasks/$taskId/status'),
       headers: await _authHeaders(),
       body: jsonEncode({'status': status}),
     );
@@ -154,6 +184,35 @@ class ApiService {
     return data.map((e) => Attendance.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  /// Returns attendance history for the currently authenticated employee.
+  static Future<List<Attendance>> getMyAttendance() async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/attendance/me'),
+      headers: await _authHeaders(),
+    );
+    final data = _unwrap(response) as List<dynamic>;
+    return data.map((e) => Attendance.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  /// Self check-in (employeeId resolved from JWT).
+  static Future<Attendance> checkInSelf() async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/api/attendance/me/checkin'),
+      headers: await _authHeaders(),
+    );
+    return Attendance.fromJson(_unwrap(response) as Map<String, dynamic>);
+  }
+
+  /// Self check-out (closes today's open attendance for current employee).
+  static Future<Attendance> checkOutSelf() async {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/api/attendance/me/checkout'),
+      headers: await _authHeaders(),
+    );
+    return Attendance.fromJson(_unwrap(response) as Map<String, dynamic>);
+  }
+
+  /// Manager-level: check in for an arbitrary employee.
   static Future<Attendance> checkIn(int employeeId) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/attendance/checkin'),
@@ -163,6 +222,7 @@ class ApiService {
     return Attendance.fromJson(_unwrap(response) as Map<String, dynamic>);
   }
 
+  /// Manager-level: close a specific attendance record.
   static Future<Attendance> checkOut(int attendanceId) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/attendance/checkout'),
@@ -177,7 +237,6 @@ class ApiService {
   static Future<List<EmployeeSuggestion>> recommendEmployees({
     required String taskTitle,
     String? taskDescription,
-    List<String>? requiredSkills,
   }) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/api/suggestions/recommend'),
@@ -185,7 +244,6 @@ class ApiService {
       body: jsonEncode({
         'taskTitle': taskTitle,
         if (taskDescription != null) 'taskDescription': taskDescription,
-        'requiredSkills': requiredSkills ?? [],
       }),
     );
     final data = _unwrap(response) as List<dynamic>;

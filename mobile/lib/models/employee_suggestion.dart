@@ -3,11 +3,7 @@ class EmployeeSuggestion {
   final String firstName;
   final String lastName;
   final String? department;
-  final double skillMatchScore;
-  final double workloadScore;
-  final double performanceScore;
-  final double attendanceScore;
-  final double overallScore;
+  final int rank;
   final String? reasoning;
 
   EmployeeSuggestion({
@@ -15,11 +11,7 @@ class EmployeeSuggestion {
     required this.firstName,
     required this.lastName,
     this.department,
-    required this.skillMatchScore,
-    required this.workloadScore,
-    required this.performanceScore,
-    required this.attendanceScore,
-    required this.overallScore,
+    required this.rank,
     this.reasoning,
   });
 
@@ -31,11 +23,7 @@ class EmployeeSuggestion {
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       department: json['department'] as String?,
-      skillMatchScore: (json['skillMatchScore'] as num).toDouble(),
-      workloadScore: (json['workloadScore'] as num).toDouble(),
-      performanceScore: (json['performanceScore'] as num).toDouble(),
-      attendanceScore: (json['attendanceScore'] as num).toDouble(),
-      overallScore: (json['overallScore'] as num).toDouble(),
+      rank: (json['rank'] as num?)?.toInt() ?? 0,
       reasoning: json['reasoning'] as String?,
     );
   }
