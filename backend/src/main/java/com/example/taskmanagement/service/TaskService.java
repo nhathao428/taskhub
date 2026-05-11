@@ -56,6 +56,7 @@ public class TaskService {
         Task task = new Task();
         task.setTitle(request.title());
         task.setDescription(request.description());
+        task.setRequiredSkills(request.requiredSkills());
         task.setDueDate(request.dueDate());
         task.setStatus(request.status() != null ? request.status() : "pending");
         if (request.projectId() != null) {
@@ -78,6 +79,7 @@ public class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Task", "id", id));
         if (request.title() != null) existing.setTitle(request.title());
         if (request.description() != null) existing.setDescription(request.description());
+        if (request.requiredSkills() != null) existing.setRequiredSkills(request.requiredSkills());
         if (request.dueDate() != null) existing.setDueDate(request.dueDate());
         if (request.status() != null) existing.setStatus(request.status());
         if (request.projectId() != null) {

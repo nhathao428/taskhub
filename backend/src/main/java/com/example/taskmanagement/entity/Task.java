@@ -44,6 +44,9 @@ public class Task implements Serializable {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "required_skills", columnDefinition = "TEXT")
+    private String requiredSkills;
+
     @Column(name = "due_date")
     private LocalDate dueDate;
 

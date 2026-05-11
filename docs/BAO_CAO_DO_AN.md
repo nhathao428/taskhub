@@ -104,7 +104,7 @@ Em xin chân thành cảm ơn!
   - [2.4. Flutter](#24-flutter)
   - [2.5. Thuật toán AI Gợi ý Nhân viên](#25-thuật-toán-ai-gợi-ý-nhân-viên)
   - [2.6. Docker](#26-docker)
-  - [2.7. MySQL](#27-mysql)
+  - [2.7. PostgreSQL](#27-postgresql)
 - [CHƯƠNG 3: PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG](#chương-3-phân-tích-và-thiết-kế-hệ-thống)
   - [3.1. Yêu cầu chức năng](#31-yêu-cầu-chức-năng)
   - [3.2. Yêu cầu phi chức năng](#32-yêu-cầu-phi-chức-năng)
@@ -127,6 +127,7 @@ Em xin chân thành cảm ơn!
   - [5.1. Kế hoạch kiểm thử](#51-kế-hoạch-kiểm-thử)
   - [5.2. Bảng test cases](#52-bảng-test-cases)
   - [5.3. Demo giao diện](#53-demo-giao-diện)
+    - [5.3.9. Demo giao diện từ góc nhìn Nhân viên](#539-demo-giao-diện-từ-góc-nhìn-nhân-viên)
 - [CHƯƠNG 6: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN](#chương-6-kết-luận-và-hướng-phát-triển)
   - [6.1. Kết quả đạt được](#61-kết-quả-đạt-được)
   - [6.2. Hạn chế](#62-hạn-chế)
@@ -164,7 +165,7 @@ Nhận thấy những vấn đề thực tế đó, đồ án này được th�
 
 **Mục tiêu kỹ thuật:**
 - Thiết kế RESTful API chuẩn với xác thực JWT (JSON Web Token).
-- Tối ưu hiệu năng truy vấn cơ sở dữ liệu MySQL.
+- Tối ưu hiệu năng truy vấn cơ sở dữ liệu PostgreSQL 16 kết hợp Redis cache.
 - Áp dụng Spring Cache để tăng tốc độ phản hồi của module AI.
 - Đảm bảo bảo mật thông tin người dùng theo tiêu chuẩn hiện đại.
 
@@ -174,7 +175,7 @@ Nhận thấy những vấn đề thực tế đó, đồ án này được th�
 
 | Chức năng | Mô tả |
 |-----------|-------|
-| Quản lý nhân viên | Thêm, sửa, xóa, xem danh sách nhân viên; quản lý kỹ năng (Skills) |
+| Quản lý nhân viên | Thêm, sửa, xóa, xem danh sách nhân viên kèm trường kỹ năng tự nhập |
 | Quản lý dự án | CRUD dự án, theo dõi trạng thái, phân công nhân viên vào dự án |
 | Quản lý công việc | CRUD task, gán nhân viên, theo dõi tiến độ, deadline |
 | Chấm công | Ghi nhận chấm công hằng ngày, xem lịch sử chấm công |
@@ -230,7 +231,7 @@ Kiến trúc Client-Server là mô hình phân tán trong đó các tác vụ v�
 
 Các thành phần chính được sử dụng:
 - **Spring MVC**: Xây dựng RESTful API với các annotation như `@RestController`, `@GetMapping`, `@PostMapping`.
-- **Spring Data JPA**: ORM (Object-Relational Mapping) để tương tác với MySQL thông qua các Repository interface.
+- **Spring Data JPA**: ORM (Object-Relational Mapping) để tương tác với PostgreSQL thông qua các Repository interface.
 - **Spring Security**: Framework bảo mật toàn diện, xử lý xác thực (Authentication) và phân quyền (Authorization).
 - **Spring Cache**: Cơ chế cache trong bộ nhớ để tăng tốc các API tốn nhiều tài nguyên tính toán.
 
@@ -271,60 +272,53 @@ Trong đề tài, ứng dụng Flutter đóng vai trò Client mobile, giao tiế
 
 ### 2.5. Thuật toán AI Gợi ý Nhân viên
 
-Module AI Gợi ý Nhân viên (AiSuggestionService) là tính năng đặc trưng của hệ thống, sử dụng thuật toán **Weighted Scoring** (Chấm điểm có trọng số) để xếp hạng nhân viên phù hợp nhất cho một công việc cụ thể.
+Module AI Gợi ý Nhân viên (`AiSuggestionService`) là tính năng đặc trưng của hệ thống. Thay vì dùng công thức chấm điểm có trọng số cố định, hệ thống tận dụng mô hình ngôn ngữ lớn (LLM) **OpenAI GPT‑4o‑mini** để xếp hạng nhân viên phù hợp nhất cho một công việc cụ thể. Backend đóng vai trò gom dữ liệu thô, còn AI chịu trách nhiệm so sánh định tính và giải thích lý do.
 
-#### Các tiêu chí đánh giá:
+#### 2.5.1. Cách tiếp cận
 
-**1. Skill Score — Điểm Kỹ năng (Trọng số: 35%)**
+Cách làm cũ (Weighted Scoring với trọng số 0,35–0,25–0,25–0,15) gặp hai hạn chế lớn: (a) skill là văn bản tự do do quản lý nhập, khó đối chiếu chính xác bằng tập hợp từ khoá, và (b) khi mô tả công việc chung chung, công thức không suy luận được người phù hợp từ chức danh/phòng ban. Do đó hệ thống chuyển sang để LLM thực hiện cả việc đối chiếu kỹ năng lẫn xếp hạng. Toàn bộ logic gọi LLM nằm trong `AiSuggestionService.recommendEmployees()`.
 
-Đo lường mức độ phù hợp kỹ năng của nhân viên so với yêu cầu công việc.
+#### 2.5.2. Dữ liệu đầu vào gửi cho AI
 
-```
-Skill Score = số_kỹ_năng_khớp / tổng_số_kỹ_năng_yêu_cầu
-```
+Với mỗi yêu cầu gợi ý, backend tổng hợp:
 
-*Ví dụ*: Công việc yêu cầu [Java, Spring Boot, MySQL]. Nhân viên có [Java, MySQL, Python]. Kỹ năng khớp = 2 → Skill Score = 2/3 ≈ 0.667.
+- **Thông tin task**: tiêu đề, mô tả, `requiredSkills` (do quản lý nhập tự do).
+- **Danh sách nhân viên**, với từng người gồm:
+  - Họ tên, chức danh (`position`), phòng ban (`department`).
+  - Trường `skills` (TEXT, do quản lý nhập).
+  - Lịch sử task: tổng số task được giao, số đang xử lý, số đã hoàn thành.
+  - Tỷ lệ đúng hạn: số task hoàn thành đúng hạn / số task hoàn thành có deadline, và số ngày trễ trung bình.
+  - Chấm công: số ngày có mặt trong 30 ngày gần nhất (so với 22 ngày làm việc chuẩn).
 
-**2. Workload Score — Điểm Khối lượng Công việc (Trọng số: 25%)**
+Backend KHÔNG tự tính điểm; mọi dữ liệu được đưa nguyên dạng vào prompt.
 
-Đo lường mức độ rảnh rỗi của nhân viên (càng ít task đang làm, điểm càng cao).
+#### 2.5.3. Hướng dẫn xếp hạng cho AI
 
-```
-Workload Score = 1.0 - (số_task_đang_làm / 5)
-```
+Prompt yêu cầu LLM trả về TOP 5 nhân viên phù hợp nhất, dựa trên các tiêu chí theo thứ tự ưu tiên:
 
-Giới hạn tối thiểu là 0 (nếu nhân viên có ≥5 task đang làm).
+1. **Kỹ năng & chuyên môn** — đối chiếu `requiredSkills` của task với `skills` của nhân viên, kết hợp chức danh và phòng ban. Khi mô tả task vắn tắt, AI suy luận từ tiêu đề + chức danh + phòng ban để chọn vị trí phù hợp (ví dụ task giao diện → Frontend/UI; CSDL → Backend/DBA; tuyển dụng → HR; báo cáo tài chính → Kế toán...).
+2. **Tiến độ task trước** — tỷ lệ hoàn thành cao, ít task tồn đọng.
+3. **Đúng hạn** — số task hoàn thành đúng hạn nhiều, ít trễ.
+4. **Chấm công** — đi làm đầy đủ.
 
-**3. Performance Score — Điểm Hiệu suất (Trọng số: 25%)**
+Prompt yêu cầu AI đánh giá ĐỊNH TÍNH, KHÔNG quy ra điểm số. Định dạng trả về là một mảng JSON đã sắp xếp theo độ phù hợp giảm dần:
 
-Đo lường tỷ lệ hoàn thành đúng hạn của nhân viên trong quá khứ.
-
-```
-Performance Score = số_task_hoàn_thành_đúng_hạn / tổng_số_task_có_deadline
-```
-
-Nếu nhân viên chưa có task nào có deadline, Performance Score mặc định = 1.0 (trung lập).
-
-**4. Attendance Score — Điểm Chuyên cần (Trọng số: 15%)**
-
-Đo lường tỷ lệ chấm công trong tháng hiện tại.
-
-```
-Attendance Score = số_ngày_chấm_công / 22
+```json
+[
+  { "employeeId": 12, "rank": 1, "reasoning": "<lý do ngắn gọn bằng tiếng Việt>" },
+  ...
+]
 ```
 
-22 là số ngày làm việc chuẩn trong một tháng. Giới hạn tối đa là 1.0.
+Phần `reasoning` bắt buộc nêu rõ (a) kỹ năng/chức danh/phòng ban của nhân viên khớp với task ra sao, và (b) tóm tắt tiến độ, đúng hạn, chấm công của họ.
 
-#### Công thức tổng hợp:
+#### 2.5.4. Tại sao chọn LLM thay vì công thức trọng số
 
-```
-Overall Score = Skill×0.35 + Workload×0.25 + Performance×0.25 + Attendance×0.15
-```
+- **Linh hoạt với skill tự do**: trường `skills` là text do quản lý nhập, không có vocabulary cố định. LLM có khả năng nhận diện đồng nghĩa (vd. "Spring Boot" ~ "Java backend") tốt hơn so sánh tập hợp từ khoá.
+- **Suy luận khi mô tả mơ hồ**: với yêu cầu chung chung, LLM dựa vào chức danh + phòng ban để gợi ý đúng người.
+- **Giải thích được**: thay vì chỉ trả về điểm số, AI cung cấp `reasoning` bằng ngôn ngữ tự nhiên, giúp quản lý ra quyết định nhanh hơn.
 
-#### Kết quả:
-- Hệ thống tính điểm cho tất cả nhân viên, sắp xếp giảm dần theo `overallScore`.
-- Trả về **top 5 nhân viên** có điểm cao nhất kèm theo điểm chi tiết từng tiêu chí.
-- Kết quả được cache bằng **Spring Cache** để tránh tính toán lại với cùng bộ kỹ năng.
+Kết quả được cache bằng **Spring Cache** (Redis) theo `taskId` (nếu là gợi ý cho task có sẵn) hoặc theo tiêu đề task (nếu là gợi ý ad-hoc), tránh gọi OpenAI lặp lại với cùng bộ dữ liệu.
 
 ### 2.6. Docker
 
@@ -333,15 +327,15 @@ Overall Score = Skill×0.35 + Workload×0.25 + Performance×0.25 + Attendance×0
 **Docker Compose** là công cụ định nghĩa và quản lý multi-container Docker applications. File `docker-compose.yml` mô tả tất cả services (backend, frontend, database) và cách chúng kết nối với nhau.
 
 Lợi ích trong đề tài:
-- Khởi động toàn bộ hệ thống (backend + frontend + MySQL) bằng một lệnh duy nhất: `docker-compose up`.
+- Khởi động toàn bộ hệ thống (backend + frontend + PostgreSQL + Redis) bằng một lệnh duy nhất: `docker-compose up`.
 - Đảm bảo môi trường nhất quán giữa máy phát triển và môi trường triển khai.
 - Dễ dàng cấu hình biến môi trường, volumes, và networks.
 
-### 2.7. MySQL
+### 2.7. PostgreSQL
 
-**MySQL** là hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) mã nguồn mở phổ biến nhất thế giới. MySQL sử dụng ngôn ngữ SQL (Structured Query Language) để truy vấn và quản lý dữ liệu.
+**PostgreSQL** là hệ quản trị cơ sở dữ liệu quan hệ–đối tượng (ORDBMS) mã nguồn mở, nổi bật về tính chuẩn SQL, hỗ trợ JSON/JSONB, full-text search và chỉ mục nâng cao.
 
-Trong đề tài, MySQL được sử dụng để lưu trữ toàn bộ dữ liệu của hệ thống. Spring Data JPA tự động tạo schema từ các Entity class Java và cung cấp các phương thức CRUD thông qua Repository interface, giảm thiểu tối đa việc viết SQL thủ công.
+Trong đề tài, PostgreSQL 16 được sử dụng để lưu trữ toàn bộ dữ liệu của hệ thống. Spring Data JPA tự động tạo và cập nhật schema từ các Entity class Java (chế độ `ddl-auto: update`) thông qua Hibernate, và cung cấp các phương thức CRUD qua Repository interface, giảm thiểu tối đa việc viết SQL thủ công. Trong môi trường phát triển, profile mặc định dùng H2 in-memory để chạy nhanh; profile `postgres` được kích hoạt qua biến môi trường `SPRING_PROFILES_ACTIVE=postgres` khi triển khai thật.
 
 ---
 
@@ -361,9 +355,9 @@ Trong đề tài, MySQL được sử dụng để lưu trữ toàn bộ dữ li
 | 8 | YC-08 | Quản lý dự án | CRUD dự án: tạo, xem, sửa, xóa dự án |
 | 9 | YC-09 | Quản lý công việc | CRUD task, gán nhân viên, theo dõi trạng thái |
 | 10 | YC-10 | Chấm công | Ghi nhận chấm công ngày, xem lịch sử |
-| 11 | YC-11 | AI Gợi ý nhân viên | Nhập kỹ năng yêu cầu → nhận top 5 nhân viên phù hợp |
-| 12 | YC-12 | Dashboard | Hiển thị thống kê tổng quan: số nhân viên, dự án, task |
-| 13 | YC-13 | Quản lý kỹ năng | Thêm/xóa kỹ năng cho nhân viên |
+| 11 | YC-11 | AI Gợi ý nhân viên | Nhập tiêu đề + mô tả + kỹ năng yêu cầu của task → AI trả top 5 nhân viên phù hợp kèm lý do |
+| 12 | YC-12 | Dashboard | Hiển thị thống kê tổng quan: số nhân viên, dự án, task; nhân viên xem dashboard cá nhân |
+| 13 | YC-13 | Self-service nhân viên | EMPLOYEE xem công việc được giao, cập nhật trạng thái, check-in/check-out chấm công bản thân |
 | 14 | YC-14 | Quản lý gợi ý | Xem lịch sử các gợi ý AI đã thực hiện |
 
 ### 3.2. Yêu cầu phi chức năng
@@ -399,11 +393,10 @@ graph TD
     Admin --> UC5[Quản lý nhân viên]
     Admin --> UC6[Quản lý dự án]
     Admin --> UC7[Quản lý công việc]
-    Admin --> UC8[Quản lý kỹ năng]
     Admin --> UC11
 
     UC5 --> UC5a[Thêm nhân viên]
-    UC5 --> UC5b[Sửa nhân viên]
+    UC5 --> UC5b[Sửa nhân viên kèm kỹ năng]
     UC5 --> UC5c[Xóa nhân viên]
 
     UC6 --> UC6a[Tạo dự án]
@@ -429,20 +422,15 @@ erDiagram
     }
 
     EMPLOYEE {
-        bigint id PK
-        varchar full_name
-        varchar email
-        varchar phone
-        varchar department
+        bigint employee_id PK
+        varchar first_name
+        varchar last_name
         varchar position
-        varchar status
+        varchar department
+        varchar employee_group
+        text skills
+        datetime hired_at
         bigint user_id FK
-    }
-
-    SKILL {
-        bigint id PK
-        varchar name
-        bigint employee_id FK
     }
 
     PROJECT {
@@ -455,15 +443,15 @@ erDiagram
     }
 
     TASK {
-        bigint id PK
+        bigint task_id PK
         varchar title
         text description
-        varchar status
-        varchar priority
+        text required_skills
         date due_date
+        varchar status
         datetime completed_at
         bigint project_id FK
-        bigint assigned_employee_id FK
+        bigint assigned_to FK
     }
 
     ATTENDANCE {
@@ -484,7 +472,6 @@ erDiagram
     }
 
     USER ||--o| EMPLOYEE : "có"
-    EMPLOYEE ||--o{ SKILL : "sở hữu"
     EMPLOYEE ||--o{ TASK : "được giao"
     EMPLOYEE ||--o{ ATTENDANCE : "chấm công"
     PROJECT ||--o{ TASK : "chứa"
@@ -501,29 +488,24 @@ erDiagram
 | username | VARCHAR(50) | NOT NULL, UNIQUE | Tên đăng nhập |
 | email | VARCHAR(100) | NOT NULL, UNIQUE | Địa chỉ email |
 | password | VARCHAR(255) | NOT NULL | Mật khẩu đã mã hóa BCrypt |
-| role | VARCHAR(20) | NOT NULL | Vai trò: ADMIN, USER |
+| role | VARCHAR(20) | NOT NULL | Vai trò: ADMIN, MANAGER, EMPLOYEE |
 | created_at | DATETIME | NOT NULL | Thời điểm tạo tài khoản |
 
 #### Bảng `employees`
 
 | Cột | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |-----|-------------|-----------|-------|
-| id | BIGINT | PK, AUTO_INCREMENT | Khóa chính |
-| full_name | VARCHAR(100) | NOT NULL | Họ và tên đầy đủ |
-| email | VARCHAR(100) | UNIQUE | Email nhân viên |
-| phone | VARCHAR(20) | | Số điện thoại |
-| department | VARCHAR(100) | | Phòng ban |
-| position | VARCHAR(100) | | Chức vụ |
-| status | VARCHAR(20) | | Trạng thái: ACTIVE, INACTIVE |
-| user_id | BIGINT | FK → users.id | Tài khoản liên kết |
+| employee_id | BIGINT | PK, AUTO_INCREMENT | Khóa chính |
+| first_name | VARCHAR(50) | NOT NULL | Họ |
+| last_name | VARCHAR(50) | NOT NULL | Tên |
+| position | VARCHAR(50) | | Chức danh |
+| department | VARCHAR(50) | | Phòng ban |
+| employee_group | VARCHAR(100) | | Nhóm/team trực thuộc |
+| skills | TEXT | | Kỹ năng (quản lý nhập tự do, ngăn cách bằng dấu phẩy) |
+| hired_at | DATETIME | | Ngày bắt đầu làm việc |
+| user_id | BIGINT | FK → users.id | Tài khoản liên kết (nullable) |
 
-#### Bảng `skills`
-
-| Cột | Kiểu dữ liệu | Ràng buộc | Mô tả |
-|-----|-------------|-----------|-------|
-| id | BIGINT | PK, AUTO_INCREMENT | Khóa chính |
-| name | VARCHAR(100) | NOT NULL | Tên kỹ năng |
-| employee_id | BIGINT | FK → employees.id | Nhân viên sở hữu kỹ năng |
+_(Lưu ý: hệ thống KHÔNG có bảng `skills` riêng. Kỹ năng nhân viên được lưu dưới dạng trường TEXT `skills` ngay trên bảng `employees`, do quản lý nhập tự do.)_
 
 #### Bảng `projects`
 
@@ -540,15 +522,15 @@ erDiagram
 
 | Cột | Kiểu dữ liệu | Ràng buộc | Mô tả |
 |-----|-------------|-----------|-------|
-| id | BIGINT | PK, AUTO_INCREMENT | Khóa chính |
-| title | VARCHAR(200) | NOT NULL | Tiêu đề công việc |
+| task_id | BIGINT | PK, AUTO_INCREMENT | Khóa chính |
+| title | VARCHAR(100) | NOT NULL | Tiêu đề công việc |
 | description | TEXT | | Mô tả chi tiết |
-| status | VARCHAR(20) | | TODO, IN_PROGRESS, DONE |
-| priority | VARCHAR(20) | | LOW, MEDIUM, HIGH |
+| required_skills | TEXT | | Kỹ năng yêu cầu (quản lý nhập tự do, dùng làm input cho AI gợi ý) |
+| status | VARCHAR(50) | | pending, in_progress, completed |
 | due_date | DATE | | Hạn hoàn thành |
 | completed_at | DATETIME | | Thời điểm hoàn thành thực tế |
 | project_id | BIGINT | FK → projects.id | Dự án chứa task |
-| assigned_employee_id | BIGINT | FK → employees.id | Nhân viên được giao |
+| assigned_to | BIGINT | FK → employees.employee_id | Nhân viên được giao |
 
 #### Bảng `attendances`
 
@@ -586,21 +568,15 @@ classDiagram
     }
 
     class Employee {
-        -Long id
-        -String fullName
-        -String email
-        -String phone
-        -String department
+        -Long employeeId
+        -String firstName
+        -String lastName
         -String position
-        -String status
+        -String department
+        -String group
+        -String skills
+        -LocalDateTime hiredAt
         -User user
-        -List~Skill~ skills
-    }
-
-    class Skill {
-        -Long id
-        -String name
-        -Employee employee
     }
 
     class Project {
@@ -614,15 +590,15 @@ classDiagram
     }
 
     class Task {
-        -Long id
+        -Long taskId
         -String title
         -String description
+        -String requiredSkills
         -String status
-        -String priority
         -LocalDate dueDate
         -LocalDateTime completedAt
         -Project project
-        -Employee assignedEmployee
+        -Employee assignedTo
     }
 
     class Attendance {
@@ -643,15 +619,14 @@ classDiagram
     }
 
     class AiSuggestionService {
-        +getSuggestions(List~String~ skills) List~EmployeeScoreDTO~
-        -calculateSkillScore(Employee, List) double
-        -calculateWorkloadScore(Employee) double
-        -calculatePerformanceScore(Employee) double
-        -calculateAttendanceScore(Employee) double
+        +recommendEmployees(SuggestionRequest) List~EmployeeSuggestionDTO~
+        +recommendEmployeesForTask(Long taskId) List~EmployeeSuggestionDTO~
+        -collectStats(List~Employee~) Map
+        -buildPrompt(SuggestionRequest, List, Map) String
+        -callOpenAi(String prompt) List~EmployeeSuggestionDTO~
     }
 
     User "1" --> "0..1" Employee : liên kết
-    Employee "1" --> "0..*" Skill : sở hữu
     Employee "1" --> "0..*" Task : được giao
     Employee "1" --> "0..*" Attendance : chấm công
     Project "1" --> "0..*" Task : chứa
@@ -691,30 +666,32 @@ sequenceDiagram
     actor Client
     participant SuggestionController
     participant AiSuggestionService
-    participant Cache
-    participant EmployeeRepository
-    participant TaskRepository
-    participant AttendanceRepository
+    participant Cache as RedisCache
+    participant EmployeeRepo
+    participant TaskRepo
+    participant AttendanceRepo
+    participant OpenAI as OpenAI API
 
-    Client->>SuggestionController: POST /api/suggestions {requiredSkills: ["Java","MySQL"]}
-    SuggestionController->>AiSuggestionService: getSuggestions(["Java","MySQL"])
-    AiSuggestionService->>Cache: check cache key "Java,MySQL"
+    Client->>SuggestionController: POST /api/suggestions/recommend {taskTitle, taskDescription, requiredSkills}
+    SuggestionController->>AiSuggestionService: recommendEmployees(request)
+    AiSuggestionService->>Cache: lookup(request.cacheKey)
     alt Cache hit
-        Cache-->>AiSuggestionService: cached result
+        Cache-->>AiSuggestionService: cached top-5 result
     else Cache miss
-        AiSuggestionService->>EmployeeRepository: findAllWithSkills()
-        EmployeeRepository-->>AiSuggestionService: List<Employee>
-        AiSuggestionService->>TaskRepository: findActiveTaskCounts()
-        TaskRepository-->>AiSuggestionService: Map<employeeId, count>
-        AiSuggestionService->>AttendanceRepository: findThisMonthCounts()
-        AttendanceRepository-->>AiSuggestionService: Map<employeeId, count>
-        AiSuggestionService->>AiSuggestionService: calculateScores() for each employee
-        AiSuggestionService->>AiSuggestionService: sort by overallScore, take top 5
-        AiSuggestionService->>Cache: store result
-        Cache-->>AiSuggestionService: stored
+        AiSuggestionService->>EmployeeRepo: findAll()
+        EmployeeRepo-->>AiSuggestionService: List<Employee> (kèm skills text)
+        AiSuggestionService->>TaskRepo: findByAssignedToEmployeeIdIn(ids)
+        TaskRepo-->>AiSuggestionService: List<Task>
+        AiSuggestionService->>AttendanceRepo: findByEmployeeIdInAndDateBetween(...)
+        AttendanceRepo-->>AiSuggestionService: List<Attendance>
+        AiSuggestionService->>AiSuggestionService: collectStats() — gộp lịch sử & chấm công
+        AiSuggestionService->>AiSuggestionService: buildPrompt(task + employees + stats)
+        AiSuggestionService->>OpenAI: POST /v1/chat/completions (gpt-4o-mini, prompt VN)
+        OpenAI-->>AiSuggestionService: JSON [{employeeId, rank, reasoning}]
+        AiSuggestionService->>Cache: store(result)
     end
-    AiSuggestionService-->>SuggestionController: List<EmployeeScoreDTO> top5
-    SuggestionController-->>Client: 200 OK [top5 employees with scores]
+    AiSuggestionService-->>SuggestionController: List<EmployeeSuggestionDTO> top-5
+    SuggestionController-->>Client: 200 OK {data: [top-5 with reasoning]}
 ```
 
 #### 3.7.3. Sơ đồ tuần tự: Tạo Task mới
@@ -773,10 +750,11 @@ sequenceDiagram
                                        │ JDBC
 ┌──────────────────────────────────────▼──────────────────────┐
 │                   DATABASE SERVER                           │
-│                MySQL 8.x (Port: 3306)                      │
-│   users | employees | skills | projects | tasks            │
-│   attendances | suggestions                                │
+│              PostgreSQL 16 (Port: 5432)                     │
+│   users | employees | projects | tasks                      │
+│   attendances | suggestions                                 │
 └─────────────────────────────────────────────────────────────┘
+   Redis 7 (Port: 6379) — cache cho Spring Cache
                  (Toàn bộ được đóng gói bằng Docker Compose)
 ```
 
@@ -801,33 +779,35 @@ task-management-system/
 │       │   ├── AiSuggestionService.java
 │       │   ├── EmployeeService.java
 │       │   └── ...
-│       ├── model/                  # JPA Entities
+│       ├── entity/                 # JPA Entities (package thực tế: entity)
 │       │   ├── User.java
-│       │   ├── Employee.java
-│       │   ├── Skill.java
+│       │   ├── Employee.java       # có trường skills (TEXT)
 │       │   ├── Project.java
-│       │   ├── Task.java
+│       │   ├── Task.java           # có trường requiredSkills (TEXT)
 │       │   ├── Attendance.java
 │       │   └── Suggestion.java
 │       ├── repository/             # Spring Data JPA Repos
 │       ├── dto/                    # Data Transfer Objects
 │       ├── security/               # JWT + Security Config
-│       │   ├── JwtUtil.java
+│       │   ├── JwtTokenProvider.java
 │       │   ├── JwtAuthenticationFilter.java
 │       │   └── SecurityConfig.java
 │       └── config/
-│           └── CacheConfig.java
+│           ├── RedisConfig.java
+│           └── OpenApiConfig.java
 ├── frontend/                       # React 18 + Vite
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── Login.jsx
 │   │   │   ├── Register.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Employees.jsx
+│   │   │   ├── Dashboard.jsx       # render khác theo role (Manager/Employee)
+│   │   │   ├── Employees.jsx       # manager-only
 │   │   │   ├── Projects.jsx
-│   │   │   ├── Tasks.jsx
-│   │   │   ├── Attendance.jsx
-│   │   │   └── AiSuggestions.jsx
+│   │   │   ├── Tasks.jsx           # manager-only, có field requiredSkills
+│   │   │   ├── Attendance.jsx      # manager-only
+│   │   │   ├── AiSuggestions.jsx   # manager-only
+│   │   │   ├── MyTasks.jsx         # nhân viên: xem & cập nhật task của mình
+│   │   │   └── MyAttendance.jsx    # nhân viên: check-in / check-out
 │   │   ├── components/             # Shared UI components
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx
@@ -857,11 +837,12 @@ task-management-system/
 
 | Phần mềm | Phiên bản | Mục đích |
 |----------|-----------|---------|
-| Java JDK | 17+ | Chạy Spring Boot backend |
+| Java JDK | 17+ | Chạy Spring Boot 3.5.0 backend |
 | Maven | 3.8+ | Build backend |
-| Node.js | 18+ | Chạy React frontend |
+| Node.js | 18+ | Chạy React 18 + Vite 5 frontend |
 | Flutter | 3.x | Build ứng dụng mobile |
-| MySQL | 8.x | Cơ sở dữ liệu |
+| PostgreSQL | 16 | Cơ sở dữ liệu chính (dev profile dùng H2 in-memory) |
+| Redis | 7 | Cache layer cho Spring Cache |
 | Docker | 24+ | Container hóa |
 | Docker Compose | 2.x | Orchestration |
 
@@ -880,19 +861,21 @@ docker-compose ps
 ```
 
 Sau khi khởi động:
-- Backend API: `http://localhost:8080`
+- Backend API: `http://localhost:5000`
 - Frontend Web: `http://localhost:5173`
-- MySQL: `localhost:3306`
+- PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
 
 **Cách 2: Chạy thủ công**
 
 ```bash
-# 1. Khởi động MySQL và tạo database
-mysql -u root -p
+# 1. Khởi động PostgreSQL và tạo database
+psql -U postgres
 CREATE DATABASE task_management;
 
-# 2. Chạy Backend
+# 2. Chạy Backend (mặc định dùng H2; muốn dùng PostgreSQL đặt biến môi trường)
 cd backend
+export SPRING_PROFILES_ACTIVE=postgres
 mvn spring-boot:run
 
 # 3. Chạy Frontend
@@ -1010,86 +993,85 @@ public class JwtUtil {
 
 ### 4.5. Backend - AiSuggestionService
 
-`AiSuggestionService.java` là trái tim của module AI, thực hiện tính điểm và xếp hạng nhân viên:
+`AiSuggestionService.java` là trái tim của module AI. Service không tự tính điểm: nó chỉ thu thập dữ liệu thô (lịch sử task, chấm công, kỹ năng) rồi xây prompt cho OpenAI GPT‑4o‑mini và trả về kết quả LLM xếp hạng. Đoạn code chính (rút gọn từ file thật `backend/src/main/java/com/example/taskmanagement/service/AiSuggestionService.java`):
 
 ```java
 @Service
 public class AiSuggestionService {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private static final int TOP_N = 5;
+    private static final int ATTENDANCE_WINDOW_DAYS = 30;
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final EmployeeRepository employeeRepository;
+    private final TaskRepository taskRepository;
+    private final AttendanceRepository attendanceRepository;
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private AttendanceRepository attendanceRepository;
+    @Value("${openai.api.key:}")  private String openAiApiKey;
+    @Value("${openai.api.model:gpt-4o-mini}") private String openAiModel;
 
-    /**
-     * Gợi ý top 5 nhân viên phù hợp nhất dựa trên kỹ năng yêu cầu.
-     * Kết quả được cache để tránh tính toán lại.
-     */
-    @Cacheable(value = "suggestions", key = "#requiredSkills.stream().sorted().collect(T(java.util.stream.Collectors).joining(','))")
-    public List<EmployeeScoreDTO> getSuggestions(List<String> requiredSkills) {
-        // Batch load toàn bộ dữ liệu cần thiết (tránh N+1 query)
-        List<Employee> employees = employeeRepository.findAllWithSkills();
-        Map<Long, Long> activeTaskCounts = taskRepository.findActiveTaskCountsByEmployee();
-        Map<Long, Long> attendanceCounts = attendanceRepository.findCurrentMonthCountsByEmployee();
-
-        return employees.stream()
-            .map(emp -> {
-                double skillScore = calculateSkillScore(emp, requiredSkills);
-                double workloadScore = calculateWorkloadScore(emp, activeTaskCounts);
-                double perfScore = calculatePerformanceScore(emp);
-                double attendScore = calculateAttendanceScore(emp, attendanceCounts);
-
-                double overall = skillScore * 0.35
-                               + workloadScore * 0.25
-                               + perfScore * 0.25
-                               + attendScore * 0.15;
-
-                return new EmployeeScoreDTO(emp, skillScore, workloadScore,
-                                            perfScore, attendScore, overall);
-            })
-            .sorted(Comparator.comparingDouble(EmployeeScoreDTO::getOverallScore).reversed())
-            .limit(5)
-            .collect(Collectors.toList());
+    /** Cache theo taskId nếu có, ngược lại cache theo tiêu đề task. */
+    @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
+    public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
+        List<Employee> employees = employeeRepository.findAll();
+        Map<Long, EmployeeStats> stats = collectStats(employees);
+        String prompt = buildPrompt(request, employees, stats);
+        return callOpenAi(prompt, employees);
     }
 
-    private double calculateSkillScore(Employee emp, List<String> required) {
-        if (required == null || required.isEmpty()) return 0.0;
-        long matched = emp.getSkills().stream()
-            .map(s -> s.getName().toLowerCase())
-            .filter(skillName -> required.stream()
-                .anyMatch(r -> skillName.contains(r.toLowerCase())))
-            .count();
-        return (double) matched / required.size();
+    /** Gom số liệu lịch sử cho từng nhân viên — KHÔNG tính điểm số. */
+    private Map<Long, EmployeeStats> collectStats(List<Employee> employees) {
+        // ... tính: tổng task, đang xử lý, đã hoàn thành,
+        //          số hoàn thành đúng hạn, ngày trễ TB,
+        //          số ngày có mặt trong 30 ngày qua
     }
 
-    private double calculateWorkloadScore(Employee emp, Map<Long, Long> activeTaskCounts) {
-        long activeTasks = activeTaskCounts.getOrDefault(emp.getId(), 0L);
-        return Math.max(0.0, 1.0 - (activeTasks / 5.0));
+    private String buildPrompt(SuggestionRequest req, List<Employee> emps,
+                               Map<Long, EmployeeStats> stats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Bạn là trợ lý AI giúp quản lý chọn nhân viên phù hợp...\n");
+        sb.append("=== TASK CẦN GIAO ===\n")
+          .append("- Tiêu đề: ").append(req.getTaskTitle()).append("\n")
+          .append("- Mô tả: ").append(req.getTaskDescription()).append("\n")
+          .append("- Kỹ năng yêu cầu: ").append(req.getRequiredSkills()).append("\n");
+        sb.append("\n=== DỮ LIỆU LỊCH SỬ ===\n");
+        for (Employee e : emps) {
+            EmployeeStats s = stats.get(e.getEmployeeId());
+            sb.append("• ID=").append(e.getEmployeeId())
+              .append(" | ").append(e.getFirstName()).append(" ").append(e.getLastName())
+              .append(" | ").append(e.getDepartment()).append(" | ").append(e.getPosition())
+              .append("\n");
+            sb.append("    - Kỹ năng: ").append(e.getSkills()).append("\n");
+            sb.append("    - Tiến độ: ").append(s.completedTasks).append("/").append(s.totalTasks).append("\n");
+            sb.append("    - Đúng hạn: ").append(s.completedOnTime).append("/").append(s.completedWithDueDate).append("\n");
+            sb.append("    - Chấm công 30 ngày: ").append(s.attendanceDays).append("/22\n");
+        }
+        sb.append("\nHãy gợi ý TOP ").append(TOP_N).append(" nhân viên, ưu tiên: ")
+          .append("(1) kỹ năng & chuyên môn; (2) tiến độ; (3) đúng hạn; (4) chấm công. ")
+          .append("KHÔNG tính điểm số. Trả về JSON [{employeeId, rank, reasoning}].");
+        return sb.toString();
     }
 
-    private double calculatePerformanceScore(Employee emp) {
-        List<Task> tasksWithDeadline = emp.getTasks().stream()
-            .filter(t -> t.getDueDate() != null)
-            .collect(Collectors.toList());
-        if (tasksWithDeadline.isEmpty()) return 1.0;
-
-        long onTime = tasksWithDeadline.stream()
-            .filter(t -> t.getCompletedAt() != null &&
-                         !t.getCompletedAt().toLocalDate().isAfter(t.getDueDate()))
-            .count();
-        return (double) onTime / tasksWithDeadline.size();
-    }
-
-    private double calculateAttendanceScore(Employee emp, Map<Long, Long> attendanceCounts) {
-        long records = attendanceCounts.getOrDefault(emp.getId(), 0L);
-        return Math.min(1.0, records / 22.0);
+    private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> emps) {
+        Map<String, Object> body = Map.of(
+            "model", openAiModel,
+            "messages", List.of(Map.of("role", "user", "content", prompt)),
+            "temperature", 0.3
+        );
+        String response = restClient.post()
+            .uri("/v1/chat/completions")
+            .header("Authorization", "Bearer " + openAiApiKey)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(body)
+            .retrieve()
+            .body(String.class);
+        return parseOpenAiResponse(response, emps);  // → JSON array → DTO
     }
 }
 ```
+
+Lưu ý: cách tiếp cận trên thay thế thiết kế ban đầu (Weighted Scoring với trọng số 0.35/0.25/0.25/0.15) — chi tiết lý do chuyển đổi đã trình bày ở mục 2.5.4.
 
 ### 4.6. Frontend - Routing & Auth
 
@@ -1192,38 +1174,50 @@ export default function App() {
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: task_mysql
+  postgres:
+    image: postgres:16
+    container_name: task_postgres
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: task_management
-      MYSQL_USER: taskuser
-      MYSQL_PASSWORD: taskpassword
+      POSTGRES_DB: task_management
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpassword
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - task_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d task_management"]
       timeout: 20s
       retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: task_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - task_network
 
   backend:
     build: ./backend
     container_name: task_backend
     ports:
-      - "8080:8080"
+      - "5000:5000"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/task_management
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task_management
       SPRING_DATASOURCE_USERNAME: taskuser
       SPRING_DATASOURCE_PASSWORD: taskpassword
+      SPRING_REDIS_HOST: redis
       JWT_SECRET: mySecretKey
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - task_network
 
@@ -1238,7 +1232,7 @@ services:
       - task_network
 
 volumes:
-  mysql_data:
+  postgres_data:
 
 networks:
   task_network:
@@ -1338,14 +1332,42 @@ Giao diện chấm công cho phép chọn nhân viên từ dropdown, chọn ngà
 
 Giao diện AI Gợi ý gồm hai phần chính:
 
-**Phần nhập liệu**: Ô nhập kỹ năng yêu cầu (ví dụ: "Java, Spring Boot, MySQL"), nút **Gợi ý ngay**. Người dùng có thể thêm nhiều kỹ năng dưới dạng tags.
+**Phần nhập liệu**: Quản lý nhập tiêu đề + mô tả + kỹ năng yêu cầu (ví dụ: "Java, Spring Boot, PostgreSQL"). Trường kỹ năng tự do dạng text, được gửi cho AI để đối chiếu với kỹ năng nhân viên.
 
 **Phần kết quả**: Hiển thị top 5 nhân viên phù hợp nhất dưới dạng thẻ, mỗi thẻ gồm:
 - Tên nhân viên, phòng ban, chức vụ.
-- **Điểm tổng** (Overall Score) được hiển thị nổi bật.
-- Thanh tiến trình (progress bar) cho từng tiêu chí: Kỹ năng, Khối lượng, Hiệu suất, Chuyên cần.
+- **Thứ hạng** (rank) do AI gán cho mỗi nhân viên trong top 5.
+- **Lý do** (reasoning) bằng tiếng Việt: AI nêu cụ thể kỹ năng/chức danh/phòng ban khớp với task ra sao, kèm tóm tắt tiến độ, đúng hạn và chấm công.
 
 > *[Chèn ảnh chụp màn hình trang AI Gợi ý Nhân viên tại đây]*
+
+#### 5.3.9. Demo giao diện từ góc nhìn Nhân viên
+
+Hệ thống phân quyền theo vai trò (role) gồm ba mức: **ADMIN**, **MANAGER**, **EMPLOYEE**. Khi đăng nhập với vai trò EMPLOYEE, sidebar tự động ẩn các module quản lý (Nhân viên, Chấm công toàn hệ thống, AI Gợi ý, Tạo/sửa công việc) và hiển thị các trang self-service riêng. Phân quyền được kiểm soát hai lớp: ở backend bằng `SecurityConfig` (`.hasAnyRole(...)`) và ở frontend bằng `ProtectedRoute` cùng nhánh điều hướng theo `user.role`.
+
+##### 5.3.9.1. Dashboard cá nhân
+
+Thay vì xem thống kê toàn hệ thống, nhân viên thấy dashboard cá nhân với: số task của mình theo trạng thái (Chờ xử lý / Đang thực hiện / Hoàn thành), tỷ lệ hoàn thành, số ngày chấm công trong tháng và danh sách công việc sắp đến hạn. Dữ liệu được lấy từ hai endpoint `GET /api/tasks/me` và `GET /api/attendance/me`.
+
+> *[Chèn ảnh chụp màn hình `docs/screenshots/10_emp_dashboard.png` tại đây]*
+
+##### 5.3.9.2. Công việc của tôi (My Tasks)
+
+Trang `/my-tasks` chỉ liệt kê các task đã được phân cho nhân viên đang đăng nhập (gọi `GET /api/tasks/me`). Mỗi dòng hiển thị tiêu đề, mô tả, kỹ năng yêu cầu của task, hạn chót và trạng thái. Nhân viên có thể cập nhật trạng thái trực tiếp qua dropdown (gọi `PATCH /api/tasks/{id}/status`) — backend kiểm tra ownership trong `TaskService.updateMyTaskStatus()`, từ chối nếu task không thuộc về người gọi.
+
+> *[Chèn ảnh chụp màn hình `docs/screenshots/11_emp_my_tasks.png` tại đây]*
+
+##### 5.3.9.3. Chấm công của tôi (My Attendance)
+
+Trang `/my-attendance` cho phép nhân viên tự bấm vào ca và tan ca thông qua hai nút **Check-in** và **Check-out** (gọi `POST /api/attendance/me/checkin` và `POST /api/attendance/me/checkout`). Bảng bên dưới hiển thị lịch sử chấm công của riêng họ trong khoảng thời gian gần nhất.
+
+> *[Chèn ảnh chụp màn hình `docs/screenshots/12_emp_my_attendance.png` tại đây]*
+
+##### 5.3.9.4. Danh sách dự án (chỉ đọc)
+
+Nhân viên có quyền xem danh sách dự án để biết bối cảnh công việc nhưng KHÔNG được tạo/sửa/xóa. `SecurityConfig` giới hạn các HTTP method ghi (POST/PUT/PATCH/DELETE) cho MANAGER/ADMIN; với EMPLOYEE, frontend cũng ẩn hoàn toàn nút "Thêm" và các nút thao tác trên hàng.
+
+> *[Chèn ảnh chụp màn hình `docs/screenshots/13_emp_projects.png` tại đây]*
 
 ---
 
@@ -1356,20 +1378,20 @@ Giao diện AI Gợi ý gồm hai phần chính:
 Sau quá trình nghiên cứu và triển khai, đề tài đã đạt được những kết quả sau:
 
 **Về mặt chức năng:**
-- ✅ Xây dựng thành công hệ thống quản lý công việc đầy đủ với 8 module chính: Xác thực, Nhân viên, Dự án, Công việc, Chấm công, AI Gợi ý, Dashboard và Kỹ năng.
-- ✅ Phát triển RESTful API với 21 endpoints, đầy đủ xác thực JWT và phân quyền.
-- ✅ Xây dựng giao diện web React responsive, thân thiện với người dùng.
+- ✅ Xây dựng thành công hệ thống quản lý công việc đầy đủ với 7 module chính: Xác thực & phân quyền, Nhân viên, Dự án, Công việc, Chấm công, AI Gợi ý và Dashboard.
+- ✅ Phát triển RESTful API với đầy đủ xác thực JWT và phân quyền theo 3 vai trò (ADMIN/MANAGER/EMPLOYEE).
+- ✅ Xây dựng giao diện web React responsive, có hai chế độ hiển thị: quản lý và nhân viên (self-service).
 - ✅ Phát triển ứng dụng mobile Flutter đa nền tảng (iOS/Android).
-- ✅ Triển khai thành công bằng Docker Compose với 3 service (backend, frontend, database).
+- ✅ Triển khai thành công bằng Docker Compose với 4 service (backend, frontend, PostgreSQL, Redis).
 
 **Về module AI Gợi ý:**
-- ✅ Thuật toán Weighted Scoring hoạt động chính xác với 4 tiêu chí đánh giá.
-- ✅ Spring Cache giảm thiểu thời gian phản hồi cho các request trùng lặp.
-- ✅ Trả về kết quả top 5 nhân viên với điểm chi tiết từng tiêu chí, minh bạch và giải thích được (Explainable AI).
+- ✅ Tích hợp OpenAI GPT‑4o‑mini xếp hạng nhân viên định tính dựa trên 4 nhóm tiêu chí (kỹ năng, tiến độ, đúng hạn, chấm công).
+- ✅ Spring Cache trên Redis giảm thiểu thời gian phản hồi cho các request trùng lặp và tiết kiệm chi phí gọi API.
+- ✅ Trả về top 5 nhân viên kèm `reasoning` bằng tiếng Việt — minh bạch và giải thích được lý do cho quản lý.
 
 **Về mặt kỹ thuật:**
-- ✅ Bảo mật tốt: BCrypt password hashing, JWT stateless authentication, CORS configuration.
-- ✅ Cơ sở dữ liệu thiết kế chuẩn hóa với 7 bảng, quan hệ rõ ràng.
+- ✅ Bảo mật tốt: BCrypt password hashing, JWT stateless authentication, CORS configuration, phân quyền hai lớp (backend `SecurityConfig` + frontend `ProtectedRoute`).
+- ✅ Cơ sở dữ liệu thiết kế chuẩn hóa với 6 bảng (users, employees, projects, tasks, attendances, suggestions); kỹ năng được lưu dạng TEXT trên `employees.skills` và `tasks.required_skills` để cho phép quản lý nhập tự do.
 - ✅ Code có cấu trúc tầng rõ ràng (Controller → Service → Repository), dễ bảo trì.
 - ✅ Kiểm thử 15 test cases, tất cả đều PASS.
 
@@ -1381,9 +1403,9 @@ Sau quá trình nghiên cứu và triển khai, đề tài đã đạt được 
 
 Mặc dù đạt được nhiều kết quả tốt, hệ thống vẫn còn một số hạn chế cần thừa nhận:
 
-1. **Thuật toán AI đơn giản**: Thuật toán Weighted Scoring là phương pháp heuristic đơn giản. Trong thực tế, các hệ thống gợi ý hiệu quả hơn cần dùng Machine Learning (Collaborative Filtering, Content-Based Filtering) với dữ liệu lịch sử phong phú.
+1. **Phụ thuộc LLM bên ngoài**: Module AI gợi ý dùng OpenAI GPT‑4o‑mini qua REST API. Khi mất mạng hoặc hết quota, tính năng không khả dụng. Hướng cải thiện: triển khai một mô hình LLM mã nguồn mở chạy on-premise (vd. Llama 3, Qwen) làm fallback.
 
-2. **Chưa có phân quyền chi tiết**: Hiện tại hệ thống chỉ phân biệt ADMIN và USER. Trong thực tế, doanh nghiệp cần phân quyền chi tiết hơn (quản lý phòng ban, trưởng nhóm, nhân viên).
+2. **Phân quyền chi tiết còn hạn chế**: Hệ thống đã phân ba role ADMIN / MANAGER / EMPLOYEE. Trong thực tế, doanh nghiệp lớn cần thêm các cấp như trưởng phòng, trưởng nhóm, role tùy chỉnh theo từng module.
 
 3. **Không có thông báo real-time**: Hệ thống chưa tích hợp WebSocket để thông báo real-time khi có task mới được giao hoặc sắp đến hạn.
 
@@ -1397,11 +1419,11 @@ Mặc dù đạt được nhiều kết quả tốt, hệ thống vẫn còn m�
 
 Dựa trên những hạn chế đã nhận diện, các hướng phát triển tiếp theo bao gồm:
 
-1. **Nâng cấp thuật toán AI**: Tích hợp Machine Learning (scikit-learn hoặc TensorFlow) để học từ dữ liệu lịch sử phân công và kết quả thực tế. Áp dụng Collaborative Filtering để gợi ý dựa trên hành vi tương tự của các quản lý khác.
+1. **Tinh chỉnh AI**: Bổ sung fine-tuning prompt hoặc retrieval-augmented generation (RAG) trên dữ liệu nội bộ; thử nghiệm các mô hình LLM khác (Claude, Gemini) và mô hình mã nguồn mở để giảm phụ thuộc nhà cung cấp đơn lẻ.
 
 2. **Thêm thông báo real-time**: Tích hợp WebSocket (Spring WebSocket + SockJS) để thông báo ngay lập tức khi có task mới, deadline sắp đến, hoặc cập nhật trạng thái dự án.
 
-3. **Phân quyền chi tiết**: Mở rộng hệ thống phân quyền với các role: SUPER_ADMIN, DEPARTMENT_MANAGER, TEAM_LEADER, EMPLOYEE với các quyền khác nhau trên từng module.
+3. **Phân quyền chi tiết hơn**: Mở rộng từ 3 role hiện tại lên ma trận phân quyền chi tiết theo module và phòng ban (SUPER_ADMIN, DEPARTMENT_MANAGER, TEAM_LEADER, EMPLOYEE).
 
 4. **Module báo cáo và analytics**: Thêm dashboard phân tích: biểu đồ hiệu suất nhân viên theo tháng, tỷ lệ hoàn thành task, phân tích bottleneck dự án. Hỗ trợ xuất PDF và Excel.
 
@@ -1433,7 +1455,7 @@ Dựa trên những hạn chế đã nhận diện, các hướng phát triển 
 
 [8] Google, *Flutter Documentation*, https://docs.flutter.dev, truy cập tháng 3/2025.
 
-[9] Oracle Corporation, *MySQL 8.0 Reference Manual*, https://dev.mysql.com/doc/refman/8.0/en/, truy cập tháng 2/2025.
+[9] The PostgreSQL Global Development Group, *PostgreSQL 16 Documentation*, https://www.postgresql.org/docs/16/, truy cập tháng 2/2026.
 
 [10] Docker Inc., *Docker Documentation*, https://docs.docker.com, truy cập tháng 3/2025.
 

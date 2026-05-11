@@ -18,8 +18,13 @@ import {
   MdTrendingUp,
   MdOutlinePieChart,
   MdOutlineBarChart,
+  MdAssignmentTurnedIn,
+  MdPlayArrow,
+  MdHourglassEmpty,
+  MdEventAvailable,
 } from 'react-icons/md'
 import api from '../api/axios'
+import { useAuth } from '../context/AuthContext'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
@@ -61,6 +66,15 @@ function ChartCard({ title, icon: Icon, children, empty }) {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth()
+  const role = user?.role || 'EMPLOYEE'
+  if (role === 'EMPLOYEE') {
+    return <EmployeeDashboard />
+  }
+  return <ManagerDashboard />
+}
+
+function ManagerDashboard() {
   const [stats, setStats] = useState({ employees: 0, projects: 0, tasks: 0, todayAttendance: 0 })
   const [tasks, setTasks] = useState([])
   const [employees, setEmployees] = useState([])
@@ -228,6 +242,119 @@ export default function Dashboard() {
           empty={Object.keys(deptMap).length === 0 ? 'Chưa có dữ liệu nhân viên' : null}
         >
           <Bar data={deptData} options={barOptions} />
+        </ChartCard>
+      </div>
+    </div>
+  )
+}
+
+function EmployeeDashboard() {
+  const { user } = useAuth()
+  const [tasks, setTasks] = useState([])
+  const [attendance, setAttendance] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tRes, aRes] = await Promise.all([
+          api.get('/api/tasks/me').catch(() => ({ data: { data: [] } })),
+          api.get('/api/attendance/me').catch(() => ({ data: { data: [] } })),
+        ])
+        setTasks(tRes.data?.data ?? tRes.data ?? [])
+        setAttendance(aRes.data?.data ?? aRes.data ?? [])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-100 border-t-indigo-600" />
+      </div>
+    )
+  }
+
+  const pendingCount = tasks.filter((t) => (t.status || '').toLowerCase() === 'pending').length
+  const inProgressCount = tasks.filter((t) => (t.status || '').toLowerCase() === 'in_progress').length
+  const completedCount = tasks.filter((t) => (t.status || '').toLowerCase() === 'completed').length
+  const completionRate = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0
+
+  const today = new Date().toISOString().split('T')[0]
+  const monthPrefix = today.substring(0, 7)
+  const attendanceThisMonth = attendance.filter((a) => (a.date || '').startsWith(monthPrefix)).length
+
+  const myTaskStatusData = {
+    labels: ['Chờ xử lý', 'Đang thực hiện', 'Hoàn thành'],
+    datasets: [
+      {
+        data: [pendingCount, inProgressCount, completedCount],
+        backgroundColor: ['#f59e0b', '#3b82f6', '#10b981'],
+        borderWidth: 0,
+        hoverOffset: 8,
+      },
+    ],
+  }
+
+  const upcoming = [...tasks]
+    .filter((t) => t.dueDate && (t.status || '').toLowerCase() !== 'completed')
+    .sort((a, b) => String(a.dueDate).localeCompare(String(b.dueDate)))
+    .slice(0, 5)
+
+  return (
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 p-6 text-white shadow-lg">
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        <div className="relative flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h2 className="text-xl font-bold">Xin chào, {user?.username}!</h2>
+            <p className="text-sm text-emerald-50 mt-1">
+              Bạn có {tasks.length} công việc được giao, {completedCount} đã hoàn thành.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5">
+            <MdTrendingUp className="text-2xl" />
+            <div>
+              <p className="text-xs text-emerald-50">Tỷ lệ hoàn thành</p>
+              <p className="text-2xl font-bold leading-tight">{completionRate}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={MdHourglassEmpty} label="Chờ xử lý" value={pendingCount} gradient="from-yellow-500 to-amber-500" accent="bg-yellow-400" />
+        <StatCard icon={MdPlayArrow} label="Đang thực hiện" value={inProgressCount} gradient="from-blue-500 to-indigo-500" accent="bg-blue-400" />
+        <StatCard icon={MdAssignmentTurnedIn} label="Đã hoàn thành" value={completedCount} gradient="from-emerald-500 to-green-500" accent="bg-emerald-400" />
+        <StatCard icon={MdEventAvailable} label="Chấm công tháng này" value={attendanceThisMonth} gradient="from-rose-500 to-pink-500" accent="bg-rose-400" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Công việc của tôi theo trạng thái" icon={MdOutlinePieChart} empty={tasks.length === 0 ? 'Bạn chưa có công việc nào' : null}>
+          <div className="flex justify-center">
+            <div style={{ maxWidth: '280px', width: '100%' }}>
+              <Pie data={myTaskStatusData} />
+            </div>
+          </div>
+        </ChartCard>
+
+        <ChartCard title="Công việc sắp đến hạn" icon={MdAccessTime} empty={upcoming.length === 0 ? 'Không có công việc nào sắp đến hạn' : null}>
+          <ul className="divide-y divide-gray-100">
+            {upcoming.map((t) => (
+              <li key={t.taskId ?? t.id} className="py-2 flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">{t.title}</p>
+                  <p className="text-xs text-gray-500 truncate">{t.requiredSkills || t.description || '—'}</p>
+                </div>
+                <span className="ml-3 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                  {String(t.dueDate).split('T')[0]}
+                </span>
+              </li>
+            ))}
+          </ul>
         </ChartCard>
       </div>
     </div>

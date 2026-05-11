@@ -12,6 +12,8 @@ public record CreateTaskRequest(
 
         String description,
 
+        String requiredSkills,
+
         LocalDate dueDate,
 
         @Size(max = 50, message = "Status must not exceed 50 characters")

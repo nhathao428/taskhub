@@ -90,6 +90,7 @@ public class AiSuggestionService {
         request.setTaskId(taskId);
         request.setTaskTitle(task.getTitle());
         request.setTaskDescription(task.getDescription());
+        request.setRequiredSkills(task.getRequiredSkills());
 
         return recommendEmployees(request);
     }
@@ -171,6 +172,9 @@ public class AiSuggestionService {
         if (request.getTaskDescription() != null && !request.getTaskDescription().isBlank()) {
             sb.append("- Mô tả: ").append(request.getTaskDescription()).append("\n");
         }
+        if (request.getRequiredSkills() != null && !request.getRequiredSkills().isBlank()) {
+            sb.append("- Kỹ năng yêu cầu: ").append(request.getRequiredSkills()).append("\n");
+        }
 
         sb.append("\n=== DỮ LIỆU LỊCH SỬ CỦA TỪNG NHÂN VIÊN ===\n");
         sb.append("(số liệu thô — KHÔNG được tính điểm/score, hãy đánh giá định tính)\n\n");
@@ -180,6 +184,9 @@ public class AiSuggestionService {
               .append(" | ").append(emp.getFirstName()).append(" ").append(emp.getLastName())
               .append(" | ").append(emp.getDepartment() != null ? emp.getDepartment() : "—")
               .append(" | ").append(emp.getPosition() != null ? emp.getPosition() : "—").append("\n");
+            if (emp.getSkills() != null && !emp.getSkills().isBlank()) {
+                sb.append("    - Kỹ năng: ").append(emp.getSkills()).append("\n");
+            }
             sb.append("    - Tiến độ task trước: ")
               .append(stats.completedTasks).append(" hoàn thành / ")
               .append(stats.totalTasks).append(" tổng task được giao")
@@ -201,11 +208,12 @@ public class AiSuggestionService {
 
         sb.append("\n=== HƯỚNG DẪN ===\n");
         sb.append("Hãy gợi ý TOP ").append(TOP_N).append(" nhân viên phù hợp nhất với task trên, dựa trên các tiêu chí (theo thứ tự ưu tiên):\n");
-        sb.append("  1. Mức độ phù hợp về CHUYÊN MÔN — chức danh (position) và phòng ban (department) khớp với nội dung task.\n");
-        sb.append("     • Nếu mô tả task chung chung/không chi tiết, hãy SUY LUẬN từ tiêu đề + chức danh + phòng ban ")
-          .append("để chọn vị trí phù hợp nhất (vd: task liên quan giao diện → ưu tiên Frontend/UI; task về CSDL → Backend/DBA; ")
-          .append("task về tuyển dụng → HR; task về báo cáo tài chính → Kế toán...).\n");
-        sb.append("     • Trong lý do PHẢI nêu rõ vì sao chức danh/phòng ban của họ phù hợp với task này.\n");
+        sb.append("  1. Mức độ phù hợp về KỸ NĂNG & CHUYÊN MÔN — đối chiếu kỹ năng yêu cầu của task ")
+          .append("với kỹ năng nhân viên đã liệt kê (nếu có), kết hợp chức danh (position) và phòng ban (department).\n");
+        sb.append("     • Nếu task không liệt kê kỹ năng yêu cầu hoặc mô tả chung chung, hãy SUY LUẬN từ tiêu đề + ")
+          .append("chức danh + phòng ban + kỹ năng employee để chọn vị trí phù hợp nhất (vd: task giao diện → Frontend/UI; ")
+          .append("CSDL → Backend/DBA; tuyển dụng → HR; báo cáo tài chính → Kế toán...).\n");
+        sb.append("     • Trong lý do PHẢI nêu rõ kỹ năng/chức danh/phòng ban của họ khớp với task ra sao.\n");
         sb.append("  2. Tiến độ task trước — tỷ lệ hoàn thành cao, ít task tồn đọng.\n");
         sb.append("  3. Thời gian hoàn thành task trước — hoàn thành đúng hạn nhiều, ít trễ.\n");
         sb.append("  4. Chấm công — đi làm đầy đủ.\n\n");
@@ -216,7 +224,7 @@ public class AiSuggestionService {
         sb.append("Trả về DUY NHẤT một mảng JSON hợp lệ (không kèm markdown, không text thừa), ")
           .append("đã sắp xếp theo độ phù hợp giảm dần:\n");
         sb.append("[{\"employeeId\":<số>,\"rank\":<1.." ).append(TOP_N).append(">,")
-          .append("\"reasoning\":\"<lý do ngắn gọn bằng tiếng Việt: nêu rõ (a) chức danh/phòng ban phù hợp với task ra sao, ")
+          .append("\"reasoning\":\"<lý do ngắn gọn bằng tiếng Việt: nêu rõ (a) kỹ năng/chức danh/phòng ban phù hợp với task ra sao, ")
           .append("(b) tiến độ, đúng hạn, chấm công của họ>\"}]");
 
         return sb.toString();

@@ -19,5 +19,7 @@ public record CreateEmployeeRequest(
         String department,
 
         @Size(max = 100, message = "Group must not exceed 100 characters")
-        String group
+        String group,
+
+        String skills
 ) {}

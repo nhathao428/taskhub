@@ -1,6 +1,11 @@
 """
 Khởi động frontend dev server (Vite), mock backend API bằng Playwright route intercept,
-chụp full-page screenshot 8 màn hình chính, lưu vào docs/screenshots/.
+chụp full-page screenshot cho 2 vai trò:
+  - MANAGER: 9 màn hình chính (login → register → dashboard → employees → projects →
+    tasks → attendance → ai_suggestions → ai_result)
+  - EMPLOYEE: 4 màn hình self-service (dashboard cá nhân → công việc của tôi →
+    chấm công của tôi → dự án)
+Tất cả ảnh lưu vào docs/screenshots/.
 """
 import json
 import os
@@ -194,12 +199,62 @@ def ok(data):
     return dict(success=True, message="OK", data=data)
 
 
+# EMPLOYEE_ID = 2 (Trần Thị Bình) đại diện cho user nhân viên trong flow demo
+EMPLOYEE_USER_ID = 2
+
+# Tasks gán cho employee 2 (Trần Thị Bình) — lọc từ TASKS theo assignedTo
+def my_tasks_for(emp_id):
+    out = []
+    for t in TASKS:
+        if t.get("assignedTo") and t["assignedTo"].get("employeeId") == emp_id:
+            out.append({
+                **t,
+                "taskId": t["id"],
+                "status": t["status"].lower(),
+                "requiredSkills": "Java, Spring Boot, PostgreSQL" if t["id"] % 2 else "React, Tailwind, REST API",
+            })
+    if not out:
+        # fallback: 3 task minh hoạ
+        out = [
+            dict(taskId=101, title="Triển khai trang giỏ hàng", description="Code component giỏ hàng + state.",
+                 requiredSkills="React, Tailwind", status="in_progress", dueDate="2026-05-18",
+                 project=proj_ref(1), assignedTo=emp_ref(emp_id)),
+            dict(taskId=102, title="Fix bug filter sản phẩm", description="Lỗi filter không hoạt động trên iOS.",
+                 requiredSkills="React, JavaScript", status="pending", dueDate="2026-05-15",
+                 project=proj_ref(1), assignedTo=emp_ref(emp_id)),
+            dict(taskId=103, title="Viết unit test cho module checkout", description="Coverage > 80%.",
+                 requiredSkills="Vitest, React Testing Library", status="completed", dueDate="2026-05-08",
+                 project=proj_ref(1), assignedTo=emp_ref(emp_id)),
+        ]
+    return out
+
+
+def my_attendance_for(emp_id):
+    return [a for a in ATTENDANCE if a.get("employee", {}).get("employeeId") == emp_id]
+
+
 def install_routes(page):
     """Mock toàn bộ API mà frontend gọi."""
     def handle(route):
         url = route.request.url
         method = route.request.method
         path = url.split("?")[0]
+        # Employee self-service endpoints — check BEFORE the broader rules
+        if path.endswith("/api/tasks/me") and method == "GET":
+            return route.fulfill(status=200, content_type="application/json",
+                                 body=json.dumps(ok(my_tasks_for(EMPLOYEE_USER_ID))))
+        if path.endswith("/api/attendance/me") and method == "GET":
+            return route.fulfill(status=200, content_type="application/json",
+                                 body=json.dumps(ok(my_attendance_for(EMPLOYEE_USER_ID))))
+        if path.endswith("/api/attendance/me/checkin") and method == "POST":
+            return route.fulfill(status=200, content_type="application/json",
+                                 body=json.dumps(ok({"message": "checked in"})))
+        if path.endswith("/api/attendance/me/checkout") and method == "POST":
+            return route.fulfill(status=200, content_type="application/json",
+                                 body=json.dumps(ok({"message": "checked out"})))
+        if "/api/tasks/" in path and "/status" in path and method == "PATCH":
+            return route.fulfill(status=200, content_type="application/json",
+                                 body=json.dumps(ok({"message": "status updated"})))
         if path.endswith("/api/employees") and method == "GET":
             return route.fulfill(status=200, content_type="application/json",
                                  body=json.dumps(ok(EMPLOYEES)))
@@ -258,13 +313,14 @@ def main():
                                        locale="vi-VN")
             # Inject token + user vào localStorage TRƯỚC khi React mount,
             # để ProtectedRoute không redirect về /login.
+            # KHÔNG ghi đè 'user' ở init_script (vì sẽ override mỗi lần goto,
+            # phá vỡ role-switch giữa MANAGER flow và EMPLOYEE flow).
+            # Chỉ đảm bảo có token sẵn để qua được auth guard.
             ctx.add_init_script("""
                 try {
-                    localStorage.setItem('token', 'demo.jwt.token.for.screenshot');
-                    localStorage.setItem('user', JSON.stringify({
-                        username: 'admin',
-                        email: 'admin@hutech.edu.vn'
-                    }));
+                    if (!localStorage.getItem('token')) {
+                        localStorage.setItem('token', 'demo.jwt.token.for.screenshot');
+                    }
                 } catch (e) { /* localStorage có thể chưa sẵn sàng */ }
             """)
             page = ctx.new_page()
@@ -294,12 +350,13 @@ def main():
             page.screenshot(path=str(OUT / "02_register.png"), full_page=True)
             print("    -> 02_register.png")
 
-            # Seed localStorage rồi tải các trang protected
+            # Seed localStorage rồi tải các trang protected (role = MANAGER)
             page.evaluate("""
                 () => {
                     localStorage.setItem('token', 'demo.jwt.token.for.screenshot');
                     localStorage.setItem('user', JSON.stringify({
-                        username: 'admin', email: 'admin@hutech.edu.vn'
+                        username: 'manager', email: 'manager@hutech.edu.vn',
+                        role: 'MANAGER'
                     }));
                 }
             """)
@@ -349,6 +406,27 @@ def main():
                 print("    -> 09_ai_result.png (kết quả AI)")
             except Exception as e:
                 print(f"    !! không capture được AI result: {e}")
+
+            # ===== EMPLOYEE FLOW =====
+            print("[3b/4] Chụp các trang nhân viên (role=EMPLOYEE)...")
+            page.evaluate("""
+                () => {
+                    localStorage.setItem('token', 'demo.jwt.token.for.screenshot');
+                    localStorage.setItem('user', JSON.stringify({
+                        username: 'binhtt', email: 'binh.tt@company.vn',
+                        role: 'EMPLOYEE'
+                    }));
+                }
+            """)
+            for path_url, fname, desc in [
+                ("/dashboard",     "10_emp_dashboard.png",     "Dashboard nhân viên"),
+                ("/my-tasks",      "11_emp_my_tasks.png",      "Công việc của tôi"),
+                ("/my-attendance", "12_emp_my_attendance.png", "Chấm công của tôi"),
+                ("/projects",      "13_emp_projects.png",      "Dự án (nhân viên xem)"),
+            ]:
+                goto_and_wait(base + path_url, wait_ms=3000)
+                page.screenshot(path=str(OUT / fname), full_page=True)
+                print(f"    -> {fname}  ({desc})")
 
             browser.close()
 

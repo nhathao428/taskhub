@@ -9,6 +9,7 @@ public class SuggestionRequest {
     @NotBlank(message = "Task title is required")
     private String taskTitle;
     private String taskDescription;
+    private String requiredSkills;
     private Long projectId;
 
     public String getCacheKey() {

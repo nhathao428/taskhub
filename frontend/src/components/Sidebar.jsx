@@ -7,11 +7,13 @@ import {
   MdCheckCircle,
   MdAccessTime,
   MdAutoAwesome,
+  MdAssignmentInd,
+  MdEventAvailable,
   MdLogout,
   MdWorkspaces,
 } from 'react-icons/md'
 
-const navItems = [
+const managerNav = [
   { to: '/dashboard', icon: MdDashboard, label: 'Bảng điều khiển' },
   { to: '/employees', icon: MdPeople, label: 'Nhân viên' },
   { to: '/projects', icon: MdFolder, label: 'Dự án' },
@@ -19,6 +21,19 @@ const navItems = [
   { to: '/attendance', icon: MdAccessTime, label: 'Chấm công' },
   { to: '/ai-suggestions', icon: MdAutoAwesome, label: 'AI Gợi ý' },
 ]
+
+const employeeNav = [
+  { to: '/dashboard', icon: MdDashboard, label: 'Bảng điều khiển' },
+  { to: '/projects', icon: MdFolder, label: 'Dự án' },
+  { to: '/my-tasks', icon: MdAssignmentInd, label: 'Công việc của tôi' },
+  { to: '/my-attendance', icon: MdEventAvailable, label: 'Chấm công của tôi' },
+]
+
+function roleLabel(role) {
+  if (role === 'MANAGER') return 'Quản lý'
+  if (role === 'ADMIN') return 'Quản trị viên'
+  return 'Nhân viên'
+}
 
 function getInitials(username = '') {
   const parts = username.trim().split(/\s+/)
@@ -30,6 +45,8 @@ function getInitials(username = '') {
 export default function Sidebar() {
   const { logout, user } = useAuth()
   const navigate = useNavigate()
+  const role = user?.role || 'EMPLOYEE'
+  const navItems = role === 'EMPLOYEE' ? employeeNav : managerNav
 
   const handleLogout = () => {
     logout()
@@ -89,7 +106,7 @@ export default function Sidebar() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.username}</p>
-              <p className="text-[11px] text-slate-400 truncate">Đã đăng nhập</p>
+              <p className="text-[11px] text-slate-400 truncate">{roleLabel(role)}</p>
             </div>
           </div>
         )}

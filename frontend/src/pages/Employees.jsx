@@ -3,7 +3,7 @@ import { MdAdd, MdEdit, MdDelete, MdSearch } from 'react-icons/md'
 import Modal from '../components/Modal'
 import { useEmployees } from '../hooks/useEmployees'
 
-const emptyForm = { firstName: '', lastName: '', position: '', department: '' }
+const emptyForm = { firstName: '', lastName: '', position: '', department: '', skills: '' }
 
 export default function Employees() {
   const { employees, loading, error: fetchError, createEmployee, updateEmployee, deleteEmployee } = useEmployees()
@@ -37,6 +37,7 @@ export default function Employees() {
       lastName: emp.lastName || '',
       position: emp.position || '',
       department: emp.department || '',
+      skills: emp.skills || '',
     })
     setError('')
     setModalOpen(true)
@@ -206,6 +207,17 @@ export default function Employees() {
               placeholder="VD: IT, Kế toán, Nhân sự"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kỹ năng</label>
+            <textarea
+              value={form.skills}
+              onChange={(e) => setForm({ ...form, skills: e.target.value })}
+              rows={2}
+              placeholder="VD: Java, Spring Boot, PostgreSQL, React"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">Quản lý nhập tự do, ngăn cách bởi dấu phẩy. AI sẽ dùng để đối chiếu khi gợi ý.</p>
           </div>
           <div className="flex gap-3 pt-2">
             <button

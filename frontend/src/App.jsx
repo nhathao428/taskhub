@@ -10,6 +10,10 @@ import Projects from './pages/Projects'
 import Tasks from './pages/Tasks'
 import Attendance from './pages/Attendance'
 import AiSuggestions from './pages/AiSuggestions'
+import MyTasks from './pages/MyTasks'
+import MyAttendance from './pages/MyAttendance'
+
+const MANAGER_ROLES = ['MANAGER', 'ADMIN']
 
 export default function App() {
   return (
@@ -30,7 +34,7 @@ export default function App() {
             <Route
               path="/employees"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <Employees />
                 </ProtectedRoute>
               }
@@ -46,7 +50,7 @@ export default function App() {
             <Route
               path="/tasks"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <Tasks />
                 </ProtectedRoute>
               }
@@ -54,7 +58,7 @@ export default function App() {
             <Route
               path="/attendance"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <Attendance />
                 </ProtectedRoute>
               }
@@ -62,8 +66,24 @@ export default function App() {
             <Route
               path="/ai-suggestions"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <AiSuggestions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-tasks"
+              element={
+                <ProtectedRoute>
+                  <MyTasks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-attendance"
+              element={
+                <ProtectedRoute>
+                  <MyAttendance />
                 </ProtectedRoute>
               }
             />

@@ -46,6 +46,7 @@ public class EmployeeService {
         employee.setPosition(request.position());
         employee.setDepartment(request.department());
         employee.setGroup(request.group());
+        employee.setSkills(request.skills());
         return employeeRepository.save(employee);
     }
 
@@ -59,6 +60,7 @@ public class EmployeeService {
         if (request.position() != null) existing.setPosition(request.position());
         if (request.department() != null) existing.setDepartment(request.department());
         if (request.group() != null) existing.setGroup(request.group());
+        if (request.skills() != null) existing.setSkills(request.skills());
         return employeeRepository.save(existing);
     }
 

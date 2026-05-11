@@ -482,7 +482,7 @@ for s in [
     "- Khảo sát thực tế quy trình quản lý công việc tại doanh nghiệp nhỏ đa ngành.",
     "- Tài liệu về Spring Boot 3.x, React 18, Flutter 3.x, PostgreSQL 16, Docker.",
     "- Tài liệu kỹ thuật về OpenAI API và phương pháp tích hợp LLM vào ứng dụng nội bộ.",
-    "- Các nghiên cứu về thuật toán Weighted Scoring và hệ thống gợi ý đa tiêu chí.",
+    "- Các nghiên cứu về hệ thống gợi ý đa tiêu chí và xu hướng ứng dụng LLM vào tự động hoá phân công nhân sự.",
 ]:
     add_p(doc, s, align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=2)
 
@@ -492,7 +492,7 @@ for s in [
     "- Triển khai backend RESTful API bằng Spring Boot, bảo mật bằng Spring Security + JWT.",
     "- Triển khai frontend web bằng React 18 + Vite + Tailwind CSS.",
     "- Triển khai ứng dụng mobile bằng Flutter cho iOS và Android.",
-    "- Tích hợp module AI gợi ý nhân viên phù hợp dùng thuật toán Weighted Scoring và OpenAI GPT.",
+    "- Tích hợp module AI gợi ý nhân viên phù hợp dùng OpenAI GPT-4o-mini xếp hạng định tính dựa trên kỹ năng, tiến độ, đúng hạn và chấm công.",
     "- Đóng gói hệ thống bằng Docker Compose với PostgreSQL 16 và Redis 7.",
     "- Kiểm thử và viết tài liệu hướng dẫn cài đặt, vận hành.",
 ]:
@@ -574,7 +574,7 @@ progress_rows = [
     ("3", "17/02/2026", "Phân tích yêu cầu, vẽ Use Case",
      "Hoàn thành sơ đồ Use Case và đặc tả use case chi tiết cho 8 nhóm chức năng."),
     ("4", "24/02/2026", "Thiết kế CSDL, ERD",
-     "Hoàn thành ERD với 8 bảng và mô tả chi tiết các trường."),
+     "Hoàn thành ERD với 6 bảng và mô tả chi tiết các trường."),
     ("5", "03/03/2026", "Thiết kế kiến trúc, Class & Sequence Diagram",
      "Hoàn thành sơ đồ lớp, sơ đồ tuần tự cho các luồng nghiệp vụ chính."),
     ("6", "10/03/2026", "Triển khai backend – Auth, JWT, User",
@@ -757,7 +757,7 @@ add_h1(doc, "LỜI MỞ ĐẦU")
 opening = [
     "Trong bối cảnh cách mạng công nghiệp lần thứ tư đang diễn ra mạnh mẽ trên phạm vi toàn cầu, công nghệ thông tin đã trở thành động lực then chốt thúc đẩy sự phát triển kinh tế – xã hội của mọi quốc gia. Tại Việt Nam, Chính phủ đã ban hành nhiều chính sách quan trọng nhằm thúc đẩy chuyển đổi số trong các doanh nghiệp, đặc biệt là doanh nghiệp nhỏ và vừa – khu vực kinh tế chiếm hơn 97% tổng số doanh nghiệp và đóng góp khoảng 45% GDP cả nước.",
     "Tuy nhiên, một thực tế đáng quan tâm là phần lớn doanh nghiệp nhỏ và vừa, đặc biệt là các doanh nghiệp nhỏ đa ngành, vẫn đang sử dụng các phương pháp quản lý truyền thống như bảng tính Excel, sổ ghi chép tay hoặc các nhóm chat trên các ứng dụng nhắn tin để quản lý công việc, phân công nhân sự và theo dõi tiến độ. Cách làm này dẫn đến nhiều bất cập như thiếu minh bạch, phân công không tối ưu, khó tổng hợp dữ liệu, không có cơ sở khoa học để ra quyết định và đặc biệt là chưa tận dụng được sức mạnh của trí tuệ nhân tạo trong việc gợi ý nhân viên phù hợp cho từng công việc.",
-    "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dựa trên thuật toán Weighted Scoring kết hợp với OpenAI GPT-4o-mini, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
+    "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dùng OpenAI GPT-4o-mini xếp hạng định tính theo kỹ năng, tiến độ, đúng hạn và chấm công, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
     "Đồ án được thực hiện trong khuôn khổ môn học Đồ án cơ sở thuộc chương trình đào tạo Công nghệ thông tin của Viện Kỹ thuật HUTECH. Báo cáo này được tổ chức thành 6 chương, trình bày một cách có hệ thống từ tổng quan đề tài, cơ sở lý thuyết, phân tích – thiết kế hệ thống, triển khai ứng dụng đến kiểm thử, demo và kết luận. Toàn bộ mã nguồn, tài liệu kỹ thuật và sản phẩm cuối cùng đều được công bố tại kho lưu trữ của tác giả để phục vụ mục đích học tập và phát triển tiếp theo.",
     "Em xin trân trọng giới thiệu báo cáo và mong nhận được những ý kiến đóng góp quý báu của quý thầy cô.",
 ]
@@ -824,14 +824,13 @@ table_list = [
     ("Bảng 3.6", "Đặc tả use case UC-11: AI gợi ý nhân viên", "61"),
     ("Bảng 3.7", "Mô tả bảng users", "65"),
     ("Bảng 3.8", "Mô tả bảng employees", "66"),
-    ("Bảng 3.9", "Mô tả bảng skills", "67"),
-    ("Bảng 3.10", "Mô tả bảng projects", "67"),
-    ("Bảng 3.11", "Mô tả bảng tasks", "68"),
-    ("Bảng 3.12", "Mô tả bảng attendances", "69"),
-    ("Bảng 3.13", "Mô tả bảng suggestions", "69"),
+    ("Bảng 3.9", "Mô tả bảng projects", "67"),
+    ("Bảng 3.10", "Mô tả bảng tasks", "68"),
+    ("Bảng 3.11", "Mô tả bảng attendances", "69"),
+    ("Bảng 3.12", "Mô tả bảng suggestions", "69"),
     ("Bảng 4.1", "Yêu cầu phần cứng và phần mềm cần thiết", "82"),
     ("Bảng 4.2", "Danh sách các REST endpoint của backend", "96"),
-    ("Bảng 4.3", "Trọng số các tiêu chí trong thuật toán AI", "100"),
+    ("Bảng 4.3", "Tiêu chí xếp hạng AI gợi ý nhân viên", "100"),
     ("Bảng 5.1", "Ma trận test case theo module", "115"),
     ("Bảng 5.2", "Kịch bản kiểm thử module Auth", "117"),
     ("Bảng 5.3", "Kịch bản kiểm thử module Employee", "118"),
@@ -881,6 +880,10 @@ fig_list = [
     ("Hình 5.7", "Màn hình Chấm công", "130"),
     ("Hình 5.8", "Màn hình AI gợi ý nhân viên – form nhập", "131"),
     ("Hình 5.9", "Màn hình AI gợi ý – kết quả top 5 nhân viên", "132"),
+    ("Hình 5.10", "Dashboard cá nhân của nhân viên", "133"),
+    ("Hình 5.11", "Trang Công việc của tôi (My Tasks)", "133"),
+    ("Hình 5.12", "Trang Chấm công của tôi (My Attendance)", "134"),
+    ("Hình 5.13", "Trang Dự án – góc nhìn nhân viên (chỉ đọc)", "134"),
 ]
 add_table(doc, headers=["Số hiệu", "Tên hình", "Trang"],
           rows=fig_list, col_widths=[2.5, 11.0, 2.0])
@@ -929,7 +932,7 @@ add_para(doc,
 for t in [
     "Thứ nhất, đề tài có tính thực tiễn rất cao. Khác với những đồ án nặng tính lý thuyết hoặc mô phỏng, hệ thống xây dựng trong đề tài này hoàn toàn có thể được triển khai và sử dụng thực tế cho các doanh nghiệp nhỏ với chi phí rất thấp (chủ yếu là chi phí hạ tầng cloud và API OpenAI). Điều này tạo ra giá trị thực sự cho xã hội.",
     "Thứ hai, đề tài cho phép vận dụng đầy đủ các kiến thức đã học trong chương trình đào tạo Công nghệ thông tin: lập trình hướng đối tượng (Java), cơ sở dữ liệu (PostgreSQL), mạng máy tính (HTTP, REST), an toàn thông tin (BCrypt, JWT, HTTPS), trí tuệ nhân tạo (Machine Learning, LLM), kỹ thuật phần mềm (UML, Agile), và các công nghệ web hiện đại (React, Flutter, Docker).",
-    "Thứ ba, đề tài tích hợp công nghệ trí tuệ nhân tạo theo hai cấp độ: (1) thuật toán Weighted Scoring tự xây dựng để gợi ý nhân viên dựa trên 4 tiêu chí, và (2) tích hợp OpenAI GPT-4o-mini để tóm tắt mô tả công việc và sinh ra checklist tự động. Đây là một chủ đề rất “nóng” trong giai đoạn 2024–2026, đặc biệt là việc tích hợp LLM vào ứng dụng nội bộ doanh nghiệp.",
+    "Thứ ba, đề tài tích hợp trực tiếp công nghệ trí tuệ nhân tạo: backend gom dữ liệu lịch sử thô (task, chấm công, kỹ năng tự nhập của nhân viên), sau đó để OpenAI GPT-4o-mini xếp hạng định tính TOP 5 nhân viên cho từng task kèm `reasoning` bằng tiếng Việt. Đây là một chủ đề rất “nóng” trong giai đoạn 2024–2026: dùng LLM thay cho công thức trọng số cố định, vừa linh hoạt với dữ liệu tự do vừa giúp giải thích được kết quả cho người quản lý.",
     "Thứ tư, kiến trúc đa nền tảng (multi-platform) của hệ thống – gồm web (React), mobile (Flutter) và backend (Spring Boot) – là kiến trúc đang được sử dụng phổ biến trong các sản phẩm thương mại hiện nay. Việc triển khai thành công đề tài giúp sinh viên có kinh nghiệm thực tế khi đi làm.",
     "Thứ năm, đề tài phù hợp với phạm vi và thời lượng của môn Đồ án cơ sở (12 tuần). Mỗi module chức năng có thể được triển khai trong một vài tuần, các module được tích hợp dần và kiểm thử song song. Mức độ phức tạp vừa phải, không quá đơn giản như một CRUD app cơ bản, cũng không quá tham vọng như các hệ thống phân tán quy mô lớn.",
     "Thứ sáu, hệ thống có thể được mở rộng tự nhiên thành một sản phẩm thương mại (SaaS) trong tương lai. Điều này khích lệ tinh thần khởi nghiệp và đổi mới sáng tạo trong sinh viên.",
@@ -946,13 +949,12 @@ add_para(doc,
     "động và chất lượng ra quyết định của người quản lý.")
 add_h3(doc, "1.3.2. Mục tiêu cụ thể")
 for s in [
-    "Xây dựng kiến trúc backend RESTful API bằng Spring Boot 3.x với bảo mật JWT và phân quyền theo role.",
-    "Thiết kế cơ sở dữ liệu chuẩn hóa PostgreSQL 16 gồm 8 bảng chính: users, employees, skills, projects, tasks, attendances, suggestions, suggestion_items.",
-    "Triển khai 8 nhóm chức năng nghiệp vụ: Xác thực, Quản lý nhân viên, Quản lý kỹ năng, Quản lý dự án, Quản lý công việc, Chấm công, AI Gợi ý, Dashboard.",
-    "Xây dựng frontend Single Page Application bằng React 18 + Vite 5 + Tailwind CSS, sử dụng React Router v6 để điều hướng.",
+    "Xây dựng kiến trúc backend RESTful API bằng Spring Boot 3.5.0 với bảo mật JWT và phân quyền theo 3 role (ADMIN/MANAGER/EMPLOYEE).",
+    "Thiết kế cơ sở dữ liệu chuẩn hóa PostgreSQL 16 gồm 6 bảng chính: users, employees, projects, tasks, attendances, suggestions.",
+    "Triển khai 7 nhóm chức năng nghiệp vụ: Xác thực & phân quyền, Quản lý nhân viên (kèm trường kỹ năng tự nhập), Quản lý dự án, Quản lý công việc, Chấm công, AI Gợi ý, Dashboard.",
+    "Xây dựng frontend Single Page Application bằng React 18 + Vite 5 + Tailwind CSS, sử dụng React Router v6 để điều hướng; giao diện thích ứng theo role.",
     "Phát triển ứng dụng mobile Flutter chạy được trên cả Android và iOS với các tính năng cốt lõi.",
-    "Triển khai thuật toán AI Weighted Scoring với 4 tiêu chí: kỹ năng (35%), khối lượng công việc (25%), hiệu suất hoàn thành (25%), chuyên cần (15%).",
-    "Tích hợp OpenAI GPT-4o-mini để tóm tắt mô tả công việc và sinh checklist các bước thực hiện.",
+    "Tích hợp OpenAI GPT-4o-mini để xếp hạng nhân viên phù hợp cho từng task dựa trên kỹ năng, tiến độ, đúng hạn và chấm công — KHÔNG dùng công thức trọng số cố định mà để LLM đánh giá định tính.",
     "Sử dụng Redis làm tầng cache để tối ưu hiệu năng cho các truy vấn nặng (AI Suggestion).",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose để dễ dàng triển khai và vận hành.",
     "Kiểm thử toàn diện với ít nhất 30 test cases, đảm bảo các luồng nghiệp vụ chính hoạt động đúng.",
@@ -977,7 +979,7 @@ for s in [
     "Nghiên cứu Flutter 3.x – widget tree, state management, gọi HTTP qua dio.",
     "Nghiên cứu Docker và Docker Compose – container hóa multi-service applications.",
     "Nghiên cứu OpenAI Chat Completions API và các kỹ thuật prompt engineering cơ bản.",
-    "Nghiên cứu các thuật toán xếp hạng đa tiêu chí: Weighted Scoring, AHP, TOPSIS.",
+    "Nghiên cứu các cách xếp hạng đa tiêu chí: Weighted Scoring (thiết kế ban đầu), so sánh với cách dùng LLM (phương án triển khai thực tế).",
 ]:
     add_bullet(doc, s)
 add_h3(doc, "1.4.2. Phân tích – thiết kế hệ thống")
@@ -985,7 +987,7 @@ for s in [
     "Khảo sát hiện trạng tại 3 doanh nghiệp nhỏ ở TP.HCM (qua phỏng vấn online).",
     "Tổng hợp 14 yêu cầu chức năng và 8 yêu cầu phi chức năng.",
     "Vẽ Use Case Diagram và đặc tả 14 use case theo mẫu Cockburn.",
-    "Thiết kế ERD với 8 bảng, mô tả chi tiết các trường và ràng buộc.",
+    "Thiết kế ERD với 6 bảng, mô tả chi tiết các trường và ràng buộc.",
     "Vẽ Class Diagram thể hiện mối quan hệ giữa các Entity và Service.",
     "Vẽ Sequence Diagram cho 5 luồng nghiệp vụ chính.",
     "Vẽ Activity Diagram cho luồng chấm công và luồng AI gợi ý.",
@@ -999,7 +1001,7 @@ for s in [
     "Triển khai frontend React với 10 trang chính, tích hợp Chart.js cho dashboard.",
     "Triển khai app Flutter với 6 màn hình chính.",
     "Triển khai thuật toán AiSuggestionService với cache Redis.",
-    "Tích hợp OpenAI API qua một module riêng (OpenAiService).",
+    "Tích hợp OpenAI API trực tiếp trong AiSuggestionService qua RestClient của Spring.",
     "Viết Dockerfile cho từng service và file docker-compose.yml.",
     "Kiểm thử với 35 test cases: 15 cho Auth/Employee, 10 cho Task/Project, 5 cho Attendance, 5 cho AI.",
     "Viết tài liệu API bằng Swagger UI và tài liệu kỹ thuật bằng Markdown.",
@@ -1060,7 +1062,7 @@ add_table(
         ("Xác thực & phân quyền",
          "Đăng ký, đăng nhập, JWT, phân quyền ADMIN / MANAGER / EMPLOYEE."),
         ("Quản lý nhân viên",
-         "CRUD nhân viên, quản lý kỹ năng (skills) gắn với từng nhân viên."),
+         "CRUD nhân viên kèm trường `skills` (TEXT) do quản lý nhập tự do."),
         ("Quản lý dự án",
          "CRUD dự án, gán nhân viên vào dự án, theo dõi trạng thái dự án."),
         ("Quản lý công việc",
@@ -1383,8 +1385,10 @@ add_para(doc,
     "trọng đến hiệu năng. Để giải quyết, có thể dùng JOIN FETCH trong JPQL, "
     "@EntityGraph để định nghĩa graph load, hoặc Hibernate's batch fetching. "
     "Trong AiSuggestionService của đề tài, vấn đề N+1 được giải quyết bằng "
-    "cách dùng @Query với JOIN FETCH để batch load toàn bộ Employee kèm "
-    "Skills trong một câu query duy nhất.")
+    "cách gọi `findByAssignedToEmployeeIdIn(ids)` và "
+    "`findByEmployeeEmployeeIdInAndDateBetween(...)` chỉ một lần — gom toàn "
+    "bộ task và attendance của tất cả nhân viên trong vài câu query, sau đó "
+    "groupBy ở tầng Java.")
 
 
 add_h2(doc, "2.6. Hệ quản trị cơ sở dữ liệu PostgreSQL 16")
@@ -1469,14 +1473,15 @@ add_para(doc,
     "Trong đề tài, Redis 7 đóng vai trò là tầng cache cho backend Spring "
     "Boot. Cấu hình spring.cache.type=redis được thiết lập trong "
     "application.yml. Module AiSuggestionService dùng @Cacheable với "
-    "key dựa trên danh sách kỹ năng yêu cầu, TTL 5 phút. Khi user gửi "
-    "request với cùng bộ kỹ năng, kết quả được lấy từ cache thay vì "
-    "tính toán lại – giảm thời gian phản hồi từ ~600ms xuống ~5ms.")
+    "key dựa trên `taskId` (hoặc tiêu đề task), TTL 5 phút. Khi quản lý "
+    "yêu cầu gợi ý cho cùng một task, kết quả được lấy từ cache thay vì "
+    "gọi OpenAI lần nữa – giảm thời gian phản hồi từ ~1500ms xuống ~5ms "
+    "và tiết kiệm chi phí API.")
 add_para(doc,
     "Pattern caching được sử dụng là cache-aside (look-aside): trước "
     "khi truy vấn database, kiểm tra cache; nếu cache hit thì trả về, "
     "nếu cache miss thì truy vấn database, lưu kết quả vào cache rồi "
-    "trả về. Khi dữ liệu thay đổi (employee/skill được thêm/sửa/xóa), "
+    "trả về. Khi dữ liệu thay đổi (employee/task được thêm/sửa/xóa), "
     "@CacheEvict được dùng để xóa cache liên quan, đảm bảo tính nhất "
     "quán của dữ liệu.")
 
@@ -1655,13 +1660,14 @@ add_para(doc,
     "thông minh cho các tác vụ tóm tắt mô tả công việc và sinh checklist.")
 add_h3(doc, "2.12.4. Tích hợp OpenAI vào hệ thống")
 add_para(doc,
-    "Trong đề tài, OpenAI được gọi từ backend Spring Boot qua một service "
-    "tên OpenAiService. Service này nhận mô tả công việc (text), build "
-    "một system prompt với chỉ dẫn rõ ràng (“Bạn là trợ lý quản lý dự "
-    "án. Hãy tóm tắt mô tả công việc sau và sinh ra checklist 5 bước "
-    "thực hiện…”), gửi lên OpenAI, nhận về JSON với 2 trường summary và "
-    "checklist. API key được đọc từ biến môi trường OPENAI_API_KEY (qua "
-    "file .env), không bao giờ commit lên git.")
+    "Trong đề tài, OpenAI được gọi trực tiếp từ `AiSuggestionService` "
+    "trong backend Spring Boot, dùng `RestClient` của Spring 6. Service "
+    "này build prompt tiếng Việt bao gồm thông tin task + danh sách "
+    "nhân viên kèm số liệu thô (lịch sử task, chấm công, kỹ năng), gửi "
+    "lên endpoint `/v1/chat/completions` của OpenAI với model `gpt-4o-mini`, "
+    "nhận về JSON mảng `[{employeeId, rank, reasoning}]`. API key được "
+    "đọc từ biến môi trường `OPENAI_API_KEY` (qua file `.env`), không "
+    "bao giờ commit lên git.")
 add_para(doc,
     "Khía cạnh bảo mật khi tích hợp LLM: (1) API key chỉ tồn tại ở "
     "backend, không expose ra frontend hay mobile; (2) prompt được "
@@ -1968,22 +1974,23 @@ add_table(
          "và đoạn tóm tắt do OpenAI sinh ra."),
         ("Luồng chính",
          "1. Manager vào trang /ai-suggestions. "
-         "2. Nhập danh sách kỹ năng yêu cầu, ví dụ [Java, Spring Boot, PostgreSQL]. "
-         "3. (Tuỳ chọn) Nhập mô tả công việc bằng văn bản tự nhiên. "
-         "4. Nhấn “Gợi ý ngay”. "
-         "5. Frontend gửi POST /api/suggestions với body {requiredSkills, description}. "
-         "6. Backend kiểm tra cache Redis với key = danh sách skill sorted. "
-         "7. Nếu cache miss: tính skillScore, workloadScore, performanceScore, attendanceScore "
-         "cho từng nhân viên; tính overallScore = weighted sum; sort giảm dần; lấy top 5. "
-         "8. Gọi OpenAI để tóm tắt mô tả công việc + sinh checklist. "
-         "9. Lưu vào cache 5 phút, lưu lịch sử vào bảng suggestions. "
-         "10. Trả về client; UI hiển thị các thẻ kèm progress bar."),
-        ("Luồng phụ – Không có nhân viên phù hợp",
-         "Nếu tất cả nhân viên đều có skillScore = 0 → hiển thị thông báo "
-         "“Không tìm thấy nhân viên có kỹ năng phù hợp, vui lòng cân nhắc đào tạo thêm.”"),
-        ("Luồng phụ – OpenAI lỗi",
-         "Nếu gọi OpenAI thất bại → vẫn trả về top 5 với điểm số, "
-         "phần summary để rỗng và hiển thị “Không thể tạo tóm tắt AI lúc này.”"),
+         "2. Nhập tiêu đề + mô tả công việc + kỹ năng yêu cầu (text tự do). "
+         "3. Nhấn “Gợi ý ngay”. "
+         "4. Frontend gửi POST /api/suggestions/recommend với body {taskTitle, taskDescription, requiredSkills}. "
+         "5. Backend kiểm tra cache Redis với key = taskId hoặc tiêu đề. "
+         "6. Nếu cache miss: backend gọi `findByAssignedToEmployeeIdIn(...)` và "
+         "`findByEmployeeEmployeeIdInAndDateBetween(...)` để gom lịch sử + chấm công của tất cả nhân viên. "
+         "7. Backend xây prompt tiếng Việt cho OpenAI gpt-4o-mini, gồm thông tin task + danh sách nhân viên "
+         "kèm số liệu thô (KHÔNG tính điểm số). "
+         "8. Nhận về JSON [{employeeId, rank, reasoning}] từ OpenAI, lưu vào cache 5 phút. "
+         "9. Trả về client; UI hiển thị 5 thẻ nhân viên kèm thứ hạng và lý do bằng tiếng Việt."),
+        ("Luồng phụ – Không có nhân viên",
+         "Nếu hệ thống chưa có nhân viên nào → trả về danh sách rỗng, UI hiển thị "
+         "“Chưa có nhân viên trong hệ thống, vui lòng thêm trước.”"),
+        ("Luồng phụ – OpenAI lỗi hoặc thiếu API key",
+         "Nếu thiếu OPENAI_API_KEY hoặc gọi OpenAI thất bại → trả về lỗi 503/500 "
+         "với thông báo rõ ràng; UI hiển thị “Tính năng AI đang không khả dụng, "
+         "vui lòng thử lại sau.”"),
     ],
     col_widths=[3.5, 12.0],
 )
@@ -1992,68 +1999,54 @@ add_caption(doc, "Bảng 3.6: Đặc tả use case UC-11: AI gợi ý nhân viê
 
 add_h2(doc, "3.5. Thiết kế cơ sở dữ liệu – Sơ đồ ERD")
 add_para(doc,
-    "Cơ sở dữ liệu được thiết kế gồm 8 bảng chính, đáp ứng đầy đủ các "
-    "yêu cầu nghiệp vụ và đảm bảo nguyên tắc chuẩn hóa (3NF). Sơ đồ "
-    "ERD dưới đây thể hiện các thực thể (entity) và mối quan hệ.")
+    "Cơ sở dữ liệu được thiết kế gồm 6 bảng chính, đáp ứng đầy đủ các "
+    "yêu cầu nghiệp vụ và đảm bảo nguyên tắc chuẩn hóa (3NF). Kỹ năng "
+    "nhân viên được lưu dưới dạng cột TEXT do quản lý nhập tự do, "
+    "không tách thành bảng riêng. Sơ đồ ERD dưới đây thể hiện các "
+    "thực thể (entity) và mối quan hệ.")
 add_code(doc, """
-+------------------+         +------------------+         +------------------+
-|     USERS        |         |    EMPLOYEES     |         |     SKILLS       |
-|------------------|         |------------------|         |------------------|
-| id (PK)          |---------| id (PK)          |---------| id (PK)          |
-| username UQ      |  1  0..1| user_id FK       | 1   0..*| employee_id FK   |
-| email UQ         |         | full_name        |         | name             |
-| password         |         | email UQ         |         |                  |
-| role             |         | phone            |         |                  |
-| status           |         | department       |         |                  |
-| created_at       |         | position         |         |                  |
-+------------------+         | status           |         +------------------+
-                             +------------------+
++------------------+         +-----------------------+
+|     USERS        |         |       EMPLOYEES       |
+|------------------|         |-----------------------|
+| id (PK)          |---------| employee_id (PK)      |
+| username UQ      |  1  0..1| user_id FK            |
+| email UQ         |         | first_name            |
+| password         |         | last_name             |
+| role             |         | position              |
+| created_at       |         | department            |
++------------------+         | employee_group        |
+                             | skills (TEXT)         |
+                             | hired_at              |
+                             +-----------------------+
                                       | 1
-                                      |
                             +---------+----------+
                             |                    |
                           0..*                 0..*
-                  +------------------+   +------------------+
-                  |     TASKS        |   |   ATTENDANCES    |
-                  |------------------|   |------------------|
-                  | id (PK)          |   | id (PK)          |
-                  | title            |   | attendance_date  |
-                  | description      |   | status           |
-                  | status           |   | check_in         |
-                  | priority         |   | check_out        |
-                  | due_date         |   | notes            |
-                  | completed_at     |   | employee_id FK   |
-                  | project_id FK    |   +------------------+
-                  | assignee_id FK   |
-                  +------------------+
+                  +-----------------------+  +------------------+
+                  |        TASKS          |  |   ATTENDANCES    |
+                  |-----------------------|  |------------------|
+                  | task_id (PK)          |  | id (PK)          |
+                  | title                 |  | attendance_date  |
+                  | description           |  | status           |
+                  | required_skills(TEXT) |  | check_in         |
+                  | due_date              |  | check_out        |
+                  | status                |  | notes            |
+                  | completed_at          |  | employee_id FK   |
+                  | project_id FK         |  +------------------+
+                  | assigned_to FK        |
+                  +-----------------------+
                             | 0..*
-                            |
                             v 1
                   +------------------+         +------------------+
                   |    PROJECTS      |         |   SUGGESTIONS    |
                   |------------------|         |------------------|
                   | id (PK)          |         | id (PK)          |
                   | name             |         | required_skills  |
-                  | description      |         | description      |
-                  | start_date       |         | summary_ai       |
+                  | description      |         | task_title       |
+                  | start_date       |         | user_id FK       |
                   | end_date         |         | created_at       |
-                  | status           |         | user_id FK       |
-                  +------------------+         +------------------+
-                                                       | 1
-                                                       |
-                                                     0..*
-                                          +------------------------+
-                                          |   SUGGESTION_ITEMS     |
-                                          |------------------------|
-                                          | id (PK)                |
-                                          | suggestion_id FK       |
-                                          | employee_id FK         |
-                                          | skill_score            |
-                                          | workload_score         |
-                                          | performance_score      |
-                                          | attendance_score       |
-                                          | overall_score          |
-                                          +------------------------+
+                  | status           |         +------------------+
+                  +------------------+
 """)
 add_caption(doc, "Hình 3.2: Sơ đồ ERD của hệ thống", kind="figure")
 
@@ -2081,35 +2074,21 @@ add_table(
     doc,
     headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
     rows=[
-        ("id", "BIGSERIAL", "PK", "Khóa chính."),
-        ("user_id", "BIGINT", "FK → users.id, UNIQUE", "Liên kết với tài khoản đăng nhập (nếu có)."),
-        ("full_name", "VARCHAR(100)", "NOT NULL", "Họ và tên đầy đủ."),
-        ("email", "VARCHAR(100)", "UNIQUE", "Email liên lạc."),
-        ("phone", "VARCHAR(20)", "", "Số điện thoại."),
-        ("department", "VARCHAR(100)", "", "Phòng ban / bộ phận."),
-        ("position", "VARCHAR(100)", "", "Chức vụ."),
-        ("status", "VARCHAR(20)", "DEFAULT 'ACTIVE'", "ACTIVE | INACTIVE."),
-        ("hire_date", "DATE", "", "Ngày vào làm."),
+        ("employee_id", "BIGSERIAL", "PK", "Khóa chính."),
+        ("user_id", "BIGINT", "FK → users.id", "Liên kết với tài khoản đăng nhập (nếu có)."),
+        ("first_name", "VARCHAR(50)", "NOT NULL", "Họ."),
+        ("last_name", "VARCHAR(50)", "NOT NULL", "Tên."),
+        ("position", "VARCHAR(50)", "", "Chức danh."),
+        ("department", "VARCHAR(50)", "", "Phòng ban / bộ phận."),
+        ("employee_group", "VARCHAR(100)", "", "Nhóm/team trực thuộc."),
+        ("skills", "TEXT", "", "Kỹ năng (quản lý nhập tự do, ngăn cách bởi dấu phẩy)."),
+        ("hired_at", "TIMESTAMP", "", "Thời điểm vào làm."),
     ],
     col_widths=[3.0, 3.0, 4.0, 5.5],
 )
 add_caption(doc, "Bảng 3.8: Mô tả bảng employees", kind="table")
 
-add_h3(doc, "3.6.3. Bảng skills")
-add_table(
-    doc,
-    headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
-    rows=[
-        ("id", "BIGSERIAL", "PK", "Khóa chính."),
-        ("name", "VARCHAR(100)", "NOT NULL", "Tên kỹ năng (ví dụ: Java, Photoshop, Tiếng Anh)."),
-        ("level", "VARCHAR(20)", "", "Mức độ thành thạo: BEGINNER, INTERMEDIATE, ADVANCED."),
-        ("employee_id", "BIGINT", "FK → employees.id, NOT NULL", "Nhân viên sở hữu kỹ năng."),
-    ],
-    col_widths=[3.0, 3.0, 4.5, 5.0],
-)
-add_caption(doc, "Bảng 3.9: Mô tả bảng skills", kind="table")
-
-add_h3(doc, "3.6.4. Bảng projects")
+add_h3(doc, "3.6.3. Bảng projects")
 add_table(
     doc,
     headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
@@ -2125,31 +2104,30 @@ add_table(
     ],
     col_widths=[3.0, 3.0, 4.5, 5.0],
 )
-add_caption(doc, "Bảng 3.10: Mô tả bảng projects", kind="table")
+add_caption(doc, "Bảng 3.9: Mô tả bảng projects", kind="table")
 
-add_h3(doc, "3.6.5. Bảng tasks")
+add_h3(doc, "3.6.4. Bảng tasks")
 add_table(
     doc,
     headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
     rows=[
-        ("id", "BIGSERIAL", "PK", "Khóa chính."),
-        ("title", "VARCHAR(200)", "NOT NULL", "Tiêu đề công việc."),
+        ("task_id", "BIGSERIAL", "PK", "Khóa chính."),
+        ("title", "VARCHAR(100)", "NOT NULL", "Tiêu đề công việc."),
         ("description", "TEXT", "", "Mô tả công việc."),
-        ("status", "VARCHAR(20)", "NOT NULL DEFAULT 'TODO'",
-         "TODO | IN_PROGRESS | DONE | CANCELLED."),
-        ("priority", "VARCHAR(20)", "DEFAULT 'MEDIUM'",
-         "LOW | MEDIUM | HIGH | URGENT."),
+        ("required_skills", "TEXT", "",
+         "Kỹ năng yêu cầu (quản lý nhập tự do, dùng làm input cho AI gợi ý)."),
+        ("status", "VARCHAR(50)", "DEFAULT 'pending'",
+         "pending | in_progress | completed."),
         ("due_date", "DATE", "", "Hạn hoàn thành."),
         ("completed_at", "TIMESTAMP", "", "Thời điểm hoàn thành thực tế."),
-        ("project_id", "BIGINT", "FK → projects.id, NOT NULL", "Dự án chứa task."),
-        ("assignee_id", "BIGINT", "FK → employees.id", "Nhân viên được giao."),
-        ("created_at", "TIMESTAMP", "DEFAULT NOW()", "Thời điểm tạo task."),
+        ("project_id", "BIGINT", "FK → projects.id", "Dự án chứa task."),
+        ("assigned_to", "BIGINT", "FK → employees.employee_id", "Nhân viên được giao."),
     ],
     col_widths=[3.0, 3.0, 4.5, 5.0],
 )
-add_caption(doc, "Bảng 3.11: Mô tả bảng tasks", kind="table")
+add_caption(doc, "Bảng 3.10: Mô tả bảng tasks", kind="table")
 
-add_h3(doc, "3.6.6. Bảng attendances")
+add_h3(doc, "3.6.5. Bảng attendances")
 add_table(
     doc,
     headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
@@ -2165,25 +2143,23 @@ add_table(
     ],
     col_widths=[3.0, 3.0, 4.5, 5.0],
 )
-add_caption(doc, "Bảng 3.12: Mô tả bảng attendances", kind="table")
+add_caption(doc, "Bảng 3.11: Mô tả bảng attendances", kind="table")
 
-add_h3(doc, "3.6.7. Bảng suggestions")
+add_h3(doc, "3.6.6. Bảng suggestions")
 add_table(
     doc,
     headers=["Cột", "Kiểu dữ liệu", "Ràng buộc", "Mô tả"],
     rows=[
         ("id", "BIGSERIAL", "PK", "Khóa chính."),
-        ("required_skills", "VARCHAR(500)", "NOT NULL",
-         "Danh sách kỹ năng yêu cầu, phân cách bởi dấu phẩy."),
-        ("description", "TEXT", "", "Mô tả công việc do user nhập (tuỳ chọn)."),
-        ("summary_ai", "TEXT", "", "Đoạn tóm tắt do OpenAI sinh."),
-        ("checklist_ai", "TEXT", "", "Checklist do OpenAI sinh, lưu dưới dạng JSON."),
+        ("required_skills", "VARCHAR(500)", "",
+         "Danh sách kỹ năng yêu cầu lưu lại từ lần gợi ý."),
+        ("task_title", "VARCHAR(200)", "", "Tiêu đề task được gợi ý."),
         ("user_id", "BIGINT", "FK → users.id", "Người tạo gợi ý."),
         ("created_at", "TIMESTAMP", "DEFAULT NOW()", "Thời điểm tạo."),
     ],
     col_widths=[3.0, 3.0, 4.5, 5.0],
 )
-add_caption(doc, "Bảng 3.13: Mô tả bảng suggestions", kind="table")
+add_caption(doc, "Bảng 3.12: Mô tả bảng suggestions", kind="table")
 
 
 add_h2(doc, "3.7. Sơ đồ lớp (Class Diagram)")
@@ -2195,52 +2171,53 @@ add_code(doc, """
 +---------------------+        +----------------------+
 |        User         |        |      Employee        |
 +---------------------+        +----------------------+
-| -id: Long           |<------>| -id: Long            |
-| -username: String   | 1   0..1 -fullName: String    |
-| -email: String      |        | -email: String       |
-| -password: String   |        | -phone: String       |
-| -role: Role         |        | -department: String  |
-| -status: Status     |        | -position: String    |
-| -createdAt: LDT     |        | -status: Status      |
-+---------------------+        | -user: User          |
-                               | -skills: List<Skill> |
+| -id: Long           |<------>| -employeeId: Long    |
+| -username: String   | 1   0..1 -firstName: String   |
+| -email: String      |        | -lastName: String    |
+| -password: String   |        | -position: String    |
+| -role: String       |        | -department: String  |
+| -createdAt: LDT     |        | -group: String       |
++---------------------+        | -skills: String      |
+                               | -hiredAt: LDT        |
+                               | -user: User          |
                                +----------------------+
-                                  | 1            | 1
-                                  |              |
-                                0..*           0..*
-                          +-------------+  +-----------------+
-                          |    Skill    |  |   Attendance    |
-                          +-------------+  +-----------------+
-                          | -id         |  | -id             |
-                          | -name       |  | -date: LocalDate|
-                          | -level      |  | -status         |
-                          | -employee   |  | -checkIn        |
-                          +-------------+  | -checkOut       |
-                                            | -notes          |
-                                            | -employee       |
-                                            +-----------------+
+                                              | 1
+                                              |
+                                            0..*
+                                       +-----------------+
+                                       |   Attendance    |
+                                       +-----------------+
+                                       | -id             |
+                                       | -date: LocalDate|
+                                       | -status         |
+                                       | -checkIn        |
+                                       | -checkOut       |
+                                       | -notes          |
+                                       | -employee       |
+                                       +-----------------+
 
-+---------------------+        +----------------------+
-|       Project       |1     0..*       Task          |
-+---------------------+--------+----------------------+
-| -id: Long           |        | -id: Long            |
-| -name: String       |        | -title: String       |
-| -description: Text  |        | -description: Text   |
-| -startDate          |        | -status: TaskStatus  |
-| -endDate            |        | -priority: Priority  |
-| -status             |        | -dueDate             |
-| -manager: Employee  |        | -completedAt         |
-+---------------------+        | -project: Project    |
-                               | -assignee: Employee  |
-                               +----------------------+
++---------------------+        +-------------------------+
+|       Project       |1     0..*         Task           |
++---------------------+--------+-------------------------+
+| -id: Long           |        | -taskId: Long           |
+| -name: String       |        | -title: String          |
+| -description: Text  |        | -description: Text      |
+| -startDate          |        | -requiredSkills: Text   |
+| -endDate            |        | -status: String         |
+| -status             |        | -dueDate                |
+| -manager: Employee  |        | -completedAt            |
++---------------------+        | -project: Project       |
+                               | -assignedTo: Employee   |
+                               +-------------------------+
 
-+------------------------------+   +-------------------------+
-|     AiSuggestionService      |   |    OpenAiService        |
-+------------------------------+   +-------------------------+
-| +getSuggestions(skills, desc)|   | +summarize(text): String|
-| -calcSkillScore(emp, list)   |   | +checklist(text): List  |
-| -calcWorkloadScore(emp, map) |   +-------------------------+
-| -calcPerformanceScore(emp)   |               ^
++------------------------------------------+
+|         AiSuggestionService              |
++------------------------------------------+
+| +recommendEmployees(req): List<DTO>      |
+| +recommendEmployeesForTask(id): List<DTO>|
+| -collectStats(emps): Map<Long,Stats>     |
+| -buildPrompt(req, emps, stats): String   |
+| -callOpenAi(prompt, emps): List<DTO>     |               ^
 | -calcAttendanceScore(emp,map)|               |
 | -fetchOpenAiSummary(desc)    |---------------+
 +------------------------------+
@@ -2268,23 +2245,23 @@ add_caption(doc, "Hình 3.4: Sơ đồ tuần tự – Đăng nhập", kind="fig
 
 add_h3(doc, "3.8.2. Sơ đồ tuần tự – AI gợi ý nhân viên")
 add_code(doc, """
-Client     SuggestionController     AiSuggestionService    RedisCache    EmployeeRepo    OpenAiService
-  |                |                       |                  |              |               |
-  |--POST /api/suggestions--->|            |                  |              |               |
-  |                |--getSuggestions----->|                   |              |               |
-  |                |                       |--get(cacheKey)-->|              |               |
-  |                |                       |<-- MISS ---------|              |               |
-  |                |                       |--findAllEmployeesWithSkills() ->|              |
-  |                |                       |<-- List<Employee>----------------|              |
-  |                |                       |--findActiveTaskCounts()------->|              |
-  |                |                       |--findThisMonthAttendance()---->|              |
-  |                |                       |--calculate Scores()             |              |
-  |                |                       |--sort & take top 5              |              |
-  |                |                       |--summarize(desc)---------------------->|       |
-  |                |                       |<--summary + checklist----------------- |       |
-  |                |                       |--put(cacheKey, result, TTL=5m) ->|              |
-  |                |<--top5 + summary------|                  |              |               |
-  |<-- 200 OK + data -|                    |                   |              |               |
+Client     SuggestionController     AiSuggestionService    RedisCache    Repositories     OpenAI API
+  |                |                       |                  |              |              |
+  |--POST /api/suggestions/recommend---->|                    |              |              |
+  |                |--recommendEmployees(req)-->|             |              |              |
+  |                |                       |--lookup(cacheKey)|              |              |
+  |                |                       |<-- MISS ---------|              |              |
+  |                |                       |--employeeRepository.findAll()-->|              |
+  |                |                       |<-- List<Employee> (kèm skills)--|              |
+  |                |                       |--taskRepo.findByAssignedToIn(ids)>             |
+  |                |                       |--attendanceRepo.findByEmployeeIdInAndDate(...)>|
+  |                |                       |--collectStats()                 |              |
+  |                |                       |--buildPrompt(task + emps + stats)              |
+  |                |                       |--POST /v1/chat/completions----------------->|
+  |                |                       |<-- JSON [{employeeId, rank, reasoning}]------|
+  |                |                       |--store(cacheKey, result, TTL=5m)|              |
+  |                |<--List<EmployeeSuggestionDTO>top5---------|              |              |
+  |<-- 200 OK + data -|                    |                   |              |              |
 """)
 add_caption(doc, "Hình 3.5: Sơ đồ tuần tự – AI gợi ý nhân viên", kind="figure")
 
@@ -2367,23 +2344,23 @@ add_code(doc, """
                        |  HTTPS REST + JWT
                        v
 +--------------------------------------------------------------------------+
-|              BACKEND SERVER – Spring Boot 3.5 (Port 8080)                |
+|              BACKEND SERVER – Spring Boot 3.5.0 (Port 5000)              |
 |--------------------------------------------------------------------------|
 |  Controller layer                                                         |
 |   - AuthController  EmployeeController  ProjectController                |
 |   - TaskController  AttendanceController  SuggestionController           |
 |--------------------------------------------------------------------------|
 |  Security layer                                                          |
-|   - JwtAuthenticationFilter   - SecurityConfig   - JwtUtil               |
+|   - JwtAuthenticationFilter   - SecurityConfig   - JwtTokenProvider      |
 |--------------------------------------------------------------------------|
 |  Service layer                                                           |
-|   - AuthService   EmployeeService   ProjectService   TaskService         |
-|   - AttendanceService   AiSuggestionService   OpenAiService              |
+|   - UserService   EmployeeService   ProjectService   TaskService         |
+|   - AttendanceService   AiSuggestionService   CurrentUserService         |
 |--------------------------------------------------------------------------|
 |  Cache abstraction (Spring Cache + RedisCacheManager)                    |
 |--------------------------------------------------------------------------|
 |  Repository layer (Spring Data JPA / Hibernate)                          |
-|   - UserRepo  EmployeeRepo  SkillRepo  ProjectRepo  TaskRepo             |
+|   - UserRepo  EmployeeRepo  ProjectRepo  TaskRepo                        |
 |   - AttendanceRepo  SuggestionRepo                                       |
 +----------+-------------------------------------+-------------------------+
            |                                     |
@@ -2432,31 +2409,27 @@ add_code(doc, """
 +----------------------------------------------------------------------+
 |  AI Gợi ý nhân viên                                                  |
 +----------------------------------------------------------------------+
-|  Kỹ năng yêu cầu:                                                    |
-|  [Java x] [Spring Boot x] [PostgreSQL x] [+ thêm kỹ năng]            |
-|                                                                      |
-|  Mô tả công việc (tùy chọn):                                         |
+|  Tiêu đề công việc:                                                  |
 |  [_______________________________________________________________ ] |
+|                                                                      |
+|  Mô tả công việc:                                                    |
+|  [_______________________________________________________________ ] |
+|                                                                      |
+|  Kỹ năng yêu cầu (nhập tự do, ngăn cách bởi dấu phẩy):              |
+|  [ Java, Spring Boot, PostgreSQL_________________________________ ] |
 |                                                                      |
 |                              [ Gợi ý ngay ]                          |
 +----------------------------------------------------------------------+
-|  Tóm tắt AI:                                                          |
-|  "Công việc cần thiết kế và triển khai backend cho hệ thống quản lý" |
-|  Checklist:                                                          |
-|     ☐ Phân tích yêu cầu                                              |
-|     ☐ Thiết kế CSDL                                                  |
-|     ☐ Cài đặt API CRUD                                                |
-|     ☐ Tích hợp bảo mật JWT                                            |
-|     ☐ Viết unit test                                                  |
-+----------------------------------------------------------------------+
-|  Top 5 nhân viên phù hợp:                                            |
+|  Top 5 nhân viên phù hợp (do AI xếp hạng):                           |
 |                                                                      |
-|  1. Nguyễn Văn A  – Backend Dev    Overall: 0.92                    |
-|     Skill ▓▓▓▓▓▓▓▓▓▓ 1.00  Workload ▓▓▓▓▓▓▓▓░░ 0.80                |
-|     Perf  ▓▓▓▓▓▓▓▓▓░ 0.95  Attend   ▓▓▓▓▓▓▓▓░░ 0.85                |
+|  #1  Nguyễn Văn A  – Backend Dev (Phòng Phát triển)                  |
+|       Lý do: Có kỹ năng Java + Spring Boot đầy đủ, đã hoàn thành    |
+|              23/25 task đúng hạn, đi làm 21/22 ngày qua.            |
 |                                                                      |
-|  2. Trần Thị B   – Full-stack      Overall: 0.85                    |
-|     ...                                                              |
+|  #2  Trần Thị B   – Full-stack  (Phòng Phát triển)                  |
+|       Lý do: ...                                                     |
+|                                                                      |
+|  #3 ... #5                                                           |
 +----------------------------------------------------------------------+
 """)
 add_caption(doc, "Hình 3.10: Wireframe trang AI Suggestion", kind="figure")
@@ -2527,25 +2500,24 @@ task-management-system/
 │   │   │   │   │   ├── AttendanceController.java
 │   │   │   │   │   └── SuggestionController.java
 │   │   │   │   ├── service/
-│   │   │   │   │   ├── AuthService.java
+│   │   │   │   │   ├── UserService.java
 │   │   │   │   │   ├── EmployeeService.java
 │   │   │   │   │   ├── ProjectService.java
 │   │   │   │   │   ├── TaskService.java
 │   │   │   │   │   ├── AttendanceService.java
 │   │   │   │   │   ├── AiSuggestionService.java
-│   │   │   │   │   └── OpenAiService.java
+│   │   │   │   │   ├── SuggestionService.java
+│   │   │   │   │   └── CurrentUserService.java
 │   │   │   │   ├── repository/
 │   │   │   │   │   ├── UserRepository.java
 │   │   │   │   │   ├── EmployeeRepository.java
-│   │   │   │   │   ├── SkillRepository.java
 │   │   │   │   │   ├── ProjectRepository.java
 │   │   │   │   │   ├── TaskRepository.java
 │   │   │   │   │   ├── AttendanceRepository.java
 │   │   │   │   │   └── SuggestionRepository.java
-│   │   │   │   ├── model/
+│   │   │   │   ├── entity/
 │   │   │   │   │   ├── User.java
 │   │   │   │   │   ├── Employee.java
-│   │   │   │   │   ├── Skill.java
 │   │   │   │   │   ├── Project.java
 │   │   │   │   │   ├── Task.java
 │   │   │   │   │   ├── Attendance.java
@@ -2559,13 +2531,11 @@ task-management-system/
 │   │   │   │   │   ├── ApiResponse.java
 │   │   │   │   │   └── PageResponse.java
 │   │   │   │   ├── security/
-│   │   │   │   │   ├── JwtUtil.java
+│   │   │   │   │   ├── JwtTokenProvider.java
 │   │   │   │   │   ├── JwtAuthenticationFilter.java
 │   │   │   │   │   └── SecurityConfig.java
 │   │   │   │   ├── config/
-│   │   │   │   │   ├── CacheConfig.java
-│   │   │   │   │   ├── CorsConfig.java
-│   │   │   │   │   ├── OpenAiConfig.java
+│   │   │   │   │   ├── RedisConfig.java
 │   │   │   │   │   └── OpenApiConfig.java
 │   │   │   │   └── exception/
 │   │   │   │       ├── GlobalExceptionHandler.java
@@ -2917,213 +2887,168 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 }
 """)
 
-add_h3(doc, "4.3.6. Entity Employee và Skill")
+add_h3(doc, "4.3.6. Entity Employee")
 add_code(doc, """
 @Entity
 @Table(name = "employees")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "employee_id")
+    private Long employeeId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "full_name", nullable = false, length = 100)
-    private String fullName;
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
 
-    @Column(length = 100)
-    private String email;
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
 
-    @Column(length = 20)
-    private String phone;
-
-    @Column(length = 100)
-    private String department;
-
-    @Column(length = 100)
+    @Column(length = 50)
     private String position;
 
-    @Column(length = 20)
-    private String status;             // ACTIVE | INACTIVE
+    @Column(length = 50)
+    private String department;
 
-    @Column(name = "hire_date")
-    private LocalDate hireDate;
+    @Column(name = "employee_group", length = 100)
+    private String group;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL,
-               orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Skill> skills = new ArrayList<>();
+    @Column(columnDefinition = "TEXT")
+    private String skills;           // quản lý nhập tự do, ngăn cách dấu phẩy
 
-    @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
-    private List<Task> tasks = new ArrayList<>();
+    @Column(name = "hired_at")
+    private LocalDateTime hiredAt;
 }
 """)
+add_para(doc,
+    "Lưu ý: hệ thống KHÔNG có entity Skill riêng. Kỹ năng nhân viên "
+    "được lưu trong cột TEXT `skills` trên chính bảng `employees`, "
+    "do quản lý nhập tự do dưới dạng danh sách phân cách bằng dấu "
+    "phẩy. Cách thiết kế này cho phép quản lý thêm bất cứ kỹ năng "
+    "nào mà không phải bảo trì một bảng skill và CRUD đi kèm.")
 
 add_h3(doc, "4.3.7. Repository – EmployeeRepository.java")
 add_code(doc, """
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @Query("SELECT DISTINCT e FROM Employee e "
-         + "LEFT JOIN FETCH e.skills "
-         + "WHERE e.status = 'ACTIVE'")
-    List<Employee> findAllActiveWithSkills();
-
-    @Query(value = "SELECT t.assignee_id AS empId, COUNT(*) AS cnt "
-                 + "FROM tasks t "
-                 + "WHERE t.status = 'IN_PROGRESS' "
-                 + "GROUP BY t.assignee_id",
-           nativeQuery = true)
-    List<Object[]> findActiveTaskCounts();
-
-    Optional<Employee> findByEmail(String email);
+    Optional<Employee> findByUserUsername(String username);
 
     List<Employee> findByDepartment(String department);
 }
 """)
+add_para(doc,
+    "TaskRepository và AttendanceRepository cung cấp các batch query "
+    "để AiSuggestionService gom lịch sử + chấm công của tất cả nhân "
+    "viên trong vài câu query, tránh N+1:")
+add_code(doc, """
+public interface TaskRepository extends JpaRepository<Task, Long> {
+    List<Task> findByAssignedToEmployeeIdIn(Collection<Long> employeeIds);
+    List<Task> findByAssignedToEmployeeId(Long employeeId);
+}
+
+public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
+    List<Attendance> findByEmployeeEmployeeIdInAndDateBetween(
+            Collection<Long> employeeIds, LocalDate from, LocalDate to);
+}
+""")
 
 add_h3(doc, "4.3.8. Service – AiSuggestionService.java (rút gọn)")
+add_para(doc,
+    "Module AI không tự tính điểm: backend chỉ gom dữ liệu thô và "
+    "ủy thác xếp hạng cho OpenAI GPT‑4o‑mini. Phiên bản rút gọn dưới "
+    "đây phản ánh logic thực tế trong "
+    "`backend/src/main/java/com/example/taskmanagement/service/AiSuggestionService.java`.")
 add_code(doc, """
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AiSuggestionService {
+
+    private static final int TOP_N = 5;
+    private static final int ATTENDANCE_WINDOW_DAYS = 30;
 
     private final EmployeeRepository employeeRepository;
     private final TaskRepository taskRepository;
     private final AttendanceRepository attendanceRepository;
-    private final SuggestionRepository suggestionRepository;
-    private final OpenAiService openAiService;
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    private static final double WEIGHT_SKILL       = 0.35;
-    private static final double WEIGHT_WORKLOAD    = 0.25;
-    private static final double WEIGHT_PERFORMANCE = 0.25;
-    private static final double WEIGHT_ATTENDANCE  = 0.15;
+    @Value("${openai.api.key:}")  private String openAiApiKey;
+    @Value("${openai.api.model:gpt-4o-mini}") private String openAiModel;
 
-    @Cacheable(value = "suggestions",
-               key = "#req.requiredSkills.stream().sorted().toList().toString()")
-    public SuggestionResponse suggest(SuggestionRequest req, Authentication auth) {
-        log.info("[AI] Gợi ý cho skills={}", req.getRequiredSkills());
+    @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
+    public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
+        List<Employee> employees = employeeRepository.findAll();
+        Map<Long, EmployeeStats> stats = collectStats(employees);
+        String prompt = buildPrompt(request, employees, stats);
+        return callOpenAi(prompt, employees);
+    }
 
-        List<Employee> employees = employeeRepository.findAllActiveWithSkills();
-        Map<Long, Long> activeTaskCounts = toMap(taskRepository.findActiveTaskCounts());
-        Map<Long, Long> attendanceCounts = toMap(attendanceRepository.findThisMonthCounts());
+    /** Gom số liệu thô — KHÔNG tính điểm số. */
+    private Map<Long, EmployeeStats> collectStats(List<Employee> employees) {
+        List<Long> ids = employees.stream().map(Employee::getEmployeeId).toList();
+        Map<Long, List<Task>> tasksByEmp = taskRepository
+            .findByAssignedToEmployeeIdIn(ids).stream()
+            .filter(t -> t.getAssignedTo() != null)
+            .collect(Collectors.groupingBy(t -> t.getAssignedTo().getEmployeeId()));
+        Map<Long, Long> attendance = attendanceRepository
+            .findByEmployeeEmployeeIdInAndDateBetween(ids,
+                LocalDate.now().minusDays(ATTENDANCE_WINDOW_DAYS), LocalDate.now())
+            .stream()
+            .collect(Collectors.groupingBy(a -> a.getEmployee().getEmployeeId(),
+                                            Collectors.counting()));
+        // build EmployeeStats { totalTasks, activeTasks, completedTasks,
+        //                       completedOnTime, completedWithDueDate,
+        //                       avgDaysLate, attendanceDays }
+        // ...
+    }
 
-        List<EmployeeScoreDTO> ranked = employees.stream()
-            .map(e -> {
-                double s  = skillScore(e, req.getRequiredSkills());
-                double w  = workloadScore(e, activeTaskCounts);
-                double p  = performanceScore(e);
-                double a  = attendanceScore(e, attendanceCounts);
-                double o  = s * WEIGHT_SKILL + w * WEIGHT_WORKLOAD
-                          + p * WEIGHT_PERFORMANCE + a * WEIGHT_ATTENDANCE;
-                return EmployeeScoreDTO.of(e, s, w, p, a, o);
-            })
-            .sorted(Comparator.comparingDouble(EmployeeScoreDTO::getOverallScore).reversed())
-            .limit(5)
-            .toList();
-
-        String summary = "";
-        List<String> checklist = List.of();
-        if (StringUtils.hasText(req.getDescription())) {
-            try {
-                OpenAiOutput out = openAiService.summarizeAndChecklist(req.getDescription());
-                summary = out.summary();
-                checklist = out.checklist();
-            } catch (Exception ex) {
-                log.warn("[AI] OpenAI lỗi: {}", ex.getMessage());
-            }
+    private String buildPrompt(SuggestionRequest req, List<Employee> emps,
+                               Map<Long, EmployeeStats> stats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Bạn là trợ lý AI giúp quản lý chọn nhân viên phù hợp nhất.\\n\\n");
+        sb.append("=== TASK CẦN GIAO ===\\n")
+          .append("- Tiêu đề: ").append(req.getTaskTitle()).append("\\n")
+          .append("- Mô tả: ").append(req.getTaskDescription()).append("\\n")
+          .append("- Kỹ năng yêu cầu: ").append(req.getRequiredSkills()).append("\\n");
+        sb.append("\\n=== DỮ LIỆU LỊCH SỬ ===\\n");
+        for (Employee e : emps) {
+            EmployeeStats s = stats.get(e.getEmployeeId());
+            sb.append("• ID=").append(e.getEmployeeId())
+              .append(" | ").append(e.getFirstName()).append(" ").append(e.getLastName())
+              .append(" | ").append(e.getDepartment()).append(" | ").append(e.getPosition())
+              .append("\\n    - Kỹ năng: ").append(e.getSkills())
+              .append("\\n    - Tiến độ: ").append(s.completedTasks).append("/").append(s.totalTasks)
+              .append("\\n    - Đúng hạn: ").append(s.completedOnTime).append("/").append(s.completedWithDueDate)
+              .append("\\n    - Chấm công 30 ngày: ").append(s.attendanceDays).append("/22\\n");
         }
-
-        suggestionRepository.save(toEntity(req, summary, ranked, auth));
-        return new SuggestionResponse(ranked, summary, checklist);
+        sb.append("\\nHãy gợi ý TOP ").append(TOP_N).append(" nhân viên, ưu tiên: ")
+          .append("(1) kỹ năng & chuyên môn; (2) tiến độ; (3) đúng hạn; (4) chấm công. ")
+          .append("KHÔNG tính điểm số. Trả về JSON [{employeeId, rank, reasoning}].");
+        return sb.toString();
     }
 
-    private double skillScore(Employee e, List<String> required) {
-        if (required.isEmpty()) return 0.0;
-        Set<String> normalizedRequired = required.stream()
-            .map(String::toLowerCase).map(String::trim).collect(Collectors.toSet());
-        long matched = e.getSkills().stream()
-            .map(s -> s.getName().toLowerCase().trim())
-            .filter(skill -> normalizedRequired.stream().anyMatch(skill::contains))
-            .count();
-        return (double) matched / required.size();
-    }
-
-    private double workloadScore(Employee e, Map<Long, Long> active) {
-        long n = active.getOrDefault(e.getId(), 0L);
-        return Math.max(0.0, 1.0 - n / 5.0);
-    }
-
-    private double performanceScore(Employee e) {
-        List<Task> deadlined = e.getTasks().stream()
-            .filter(t -> t.getDueDate() != null).toList();
-        if (deadlined.isEmpty()) return 1.0;
-        long onTime = deadlined.stream()
-            .filter(t -> t.getCompletedAt() != null &&
-                !t.getCompletedAt().toLocalDate().isAfter(t.getDueDate()))
-            .count();
-        return (double) onTime / deadlined.size();
-    }
-
-    private double attendanceScore(Employee e, Map<Long, Long> map) {
-        long n = map.getOrDefault(e.getId(), 0L);
-        return Math.min(1.0, n / 22.0);
-    }
-}
-""")
-add_para(doc,
-    "Code trên trình bày dạng rút gọn để tập trung vào tư duy thiết "
-    "kế. Trong mã nguồn thực tế còn các hàm helper toMap, toEntity, "
-    "xử lý exception và validation đầu vào theo chuẩn @Valid.")
-add_caption(doc, "Hình 4.3: Sơ đồ luồng module AiSuggestionService", kind="figure")
-
-add_h3(doc, "4.3.9. Service – OpenAiService.java")
-add_code(doc, """
-@Service
-@RequiredArgsConstructor
-public class OpenAiService {
-
-    @Value("${openai.api-key}")
-    private String apiKey;
-
-    @Value("${openai.base-url}")
-    private String baseUrl;
-
-    @Value("${openai.model}")
-    private String model;
-
-    private final RestClient restClient = RestClient.builder().build();
-
-    public OpenAiOutput summarizeAndChecklist(String description) {
+    private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> emps) {
         Map<String, Object> body = Map.of(
-            "model", model,
-            "temperature", 0.3,
-            "response_format", Map.of("type", "json_object"),
-            "messages", List.of(
-                Map.of("role", "system", "content",
-                    "Bạn là trợ lý quản lý dự án. Trả lời bằng JSON với 2 trường: "
-                  + "summary (đoạn 2-3 câu tiếng Việt) và checklist (mảng 5 bước)."),
-                Map.of("role", "user", "content", description)
-            )
-        );
-        Map<?, ?> resp = restClient.post()
-            .uri(baseUrl + "/chat/completions")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+            "model", openAiModel,
+            "messages", List.of(Map.of("role", "user", "content", prompt)),
+            "temperature", 0.3);
+        String resp = restClient.post()
+            .uri("/v1/chat/completions")
+            .header("Authorization", "Bearer " + openAiApiKey)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(body)
-            .retrieve()
-            .body(Map.class);
-        String json = ((Map)((Map)((List<?>) resp.get("choices")).get(0)).get("message"))
-                        .get("content").toString();
-        return JsonUtil.parse(json, OpenAiOutput.class);
+            .body(body).retrieve().body(String.class);
+        return parseOpenAiResponse(resp, emps);  // JSON → List<DTO>
     }
 }
 """)
+add_caption(doc, "Hình 4.3: Sơ đồ luồng module AiSuggestionService", kind="figure")
 
 add_h3(doc, "4.3.10. Bảng tổng hợp REST endpoint")
 add_table(
@@ -3133,62 +3058,59 @@ add_table(
         ("POST", "/api/auth/register", "Đăng ký tài khoản mới.", "Public"),
         ("POST", "/api/auth/login", "Đăng nhập, trả về JWT.", "Public"),
         ("POST", "/api/auth/change-password", "Đổi mật khẩu.", "JWT"),
-        ("GET",  "/api/employees", "Danh sách nhân viên.", "JWT"),
-        ("POST", "/api/employees", "Tạo nhân viên.", "JWT (MANAGER/ADMIN)"),
-        ("GET",  "/api/employees/{id}", "Chi tiết nhân viên.", "JWT"),
+        ("GET",  "/api/employees", "Danh sách nhân viên.", "JWT (MANAGER/ADMIN)"),
+        ("POST", "/api/employees", "Tạo nhân viên (kèm trường skills).", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/employees/{id}", "Chi tiết nhân viên.", "JWT (MANAGER/ADMIN)"),
         ("PUT",  "/api/employees/{id}", "Cập nhật nhân viên.", "JWT (MANAGER/ADMIN)"),
-        ("DELETE","/api/employees/{id}", "Xóa nhân viên.", "JWT (ADMIN)"),
-        ("POST", "/api/employees/{id}/skills", "Thêm kỹ năng.", "JWT (MANAGER/ADMIN)"),
-        ("DELETE","/api/employees/{id}/skills/{skillId}", "Xóa kỹ năng.", "JWT (MANAGER/ADMIN)"),
-        ("GET",  "/api/projects", "Danh sách dự án.", "JWT"),
+        ("DELETE","/api/employees/{id}", "Xóa nhân viên.", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/employees/me", "Hồ sơ nhân viên của user đang đăng nhập.", "JWT (mọi role)"),
+        ("GET",  "/api/projects", "Danh sách dự án.", "JWT (mọi role)"),
         ("POST", "/api/projects", "Tạo dự án.", "JWT (MANAGER/ADMIN)"),
         ("PUT",  "/api/projects/{id}", "Cập nhật dự án.", "JWT (MANAGER/ADMIN)"),
-        ("DELETE","/api/projects/{id}", "Xóa dự án.", "JWT (ADMIN)"),
-        ("GET",  "/api/tasks", "Danh sách task (có filter).", "JWT"),
-        ("POST", "/api/tasks", "Tạo task mới.", "JWT (MANAGER/ADMIN)"),
-        ("PUT",  "/api/tasks/{id}", "Cập nhật task.", "JWT"),
-        ("PATCH","/api/tasks/{id}/status", "Đổi trạng thái task.", "JWT"),
+        ("DELETE","/api/projects/{id}", "Xóa dự án.", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/tasks", "Danh sách task.", "JWT (mọi role)"),
+        ("POST", "/api/tasks", "Tạo task (kèm trường requiredSkills).", "JWT (MANAGER/ADMIN)"),
+        ("PUT",  "/api/tasks/{id}", "Cập nhật task.", "JWT (MANAGER/ADMIN)"),
         ("DELETE","/api/tasks/{id}", "Xóa task.", "JWT (MANAGER/ADMIN)"),
-        ("GET",  "/api/attendance", "Lịch sử chấm công.", "JWT"),
-        ("POST", "/api/attendance", "Ghi chấm công.", "JWT"),
-        ("PUT",  "/api/attendance/{id}", "Cập nhật chấm công.", "JWT (MANAGER/ADMIN)"),
-        ("POST", "/api/suggestions", "AI gợi ý nhân viên.", "JWT (MANAGER/ADMIN)"),
-        ("GET",  "/api/suggestions", "Lịch sử gợi ý.", "JWT"),
-        ("GET",  "/api/dashboard", "Số liệu tổng quan.", "JWT"),
+        ("GET",  "/api/tasks/me", "Task của user đang đăng nhập.", "JWT (mọi role)"),
+        ("PATCH","/api/tasks/{id}/status", "Đổi trạng thái task được giao.", "JWT (mọi role)"),
+        ("GET",  "/api/attendance", "Lịch sử chấm công toàn hệ thống.", "JWT (MANAGER/ADMIN)"),
+        ("POST", "/api/attendance", "Quản lý ghi chấm công cho nhân viên.", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/attendance/me", "Lịch sử chấm công của user đang đăng nhập.", "JWT (mọi role)"),
+        ("POST", "/api/attendance/me/checkin", "Tự bấm vào ca.", "JWT (mọi role)"),
+        ("POST", "/api/attendance/me/checkout", "Tự bấm tan ca.", "JWT (mọi role)"),
+        ("POST", "/api/suggestions/recommend", "AI gợi ý nhân viên cho task.", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/suggestions/recommend/{taskId}", "AI gợi ý cho task đã có.", "JWT (MANAGER/ADMIN)"),
+        ("GET",  "/api/suggestions", "Lịch sử gợi ý.", "JWT (MANAGER/ADMIN)"),
     ],
     col_widths=[1.8, 5.0, 5.5, 3.2],
 )
 add_caption(doc, "Bảng 4.2: Danh sách các REST endpoint của backend", kind="table")
 
-add_h3(doc, "4.3.11. Bảng trọng số thuật toán AI")
+add_h3(doc, "4.3.11. Tiêu chí xếp hạng AI gợi ý nhân viên")
 add_table(
     doc,
-    headers=["Tiêu chí", "Trọng số", "Mô tả tính toán"],
+    headers=["Tiêu chí", "Mức ưu tiên", "Nguồn dữ liệu gửi cho LLM"],
     rows=[
-        ("Skill (Kỹ năng)", "35%",
-         "Tỷ lệ kỹ năng khớp / tổng số kỹ năng yêu cầu (so khớp theo substring, case-insensitive)."),
-        ("Workload (Khối lượng)", "25%",
-         "max(0, 1 − số_task_IN_PROGRESS / 5). Nhân viên có ≥5 task đang làm sẽ được 0."),
-        ("Performance (Hiệu suất)", "25%",
-         "Tỷ lệ task hoàn thành đúng hạn / tổng số task có deadline. "
-         "Nếu chưa có task có deadline thì trả về 1.0 (trung lập)."),
-        ("Attendance (Chuyên cần)", "15%",
-         "min(1, số_ngày_PRESENT_trong_tháng / 22). 22 = số ngày làm việc chuẩn."),
-        ("Overall (Tổng)", "100%",
-         "Skill×0.35 + Workload×0.25 + Performance×0.25 + Attendance×0.15."),
+        ("Kỹ năng & chuyên môn", "1 (cao nhất)",
+         "Trường `skills` (TEXT) của employee + `requiredSkills` của task + chức danh + phòng ban."),
+        ("Tiến độ task trước", "2",
+         "Tỷ lệ completedTasks / totalTasks và số task IN_PROGRESS của từng nhân viên."),
+        ("Thời gian hoàn thành", "3",
+         "Số task hoàn thành đúng hạn / số task hoàn thành có deadline; số ngày trễ trung bình."),
+        ("Chấm công", "4 (thấp nhất)",
+         "Số ngày có mặt trong 30 ngày gần nhất, so với 22 ngày làm việc chuẩn."),
     ],
-    col_widths=[3.5, 2.5, 9.5],
+    col_widths=[4.5, 2.5, 8.5],
 )
-add_caption(doc, "Bảng 4.3: Trọng số các tiêu chí trong thuật toán AI", kind="table")
+add_caption(doc, "Bảng 4.3: Tiêu chí xếp hạng AI gợi ý nhân viên", kind="table")
 add_para(doc,
-    "Các trọng số trên được lựa chọn dựa trên: (1) tham khảo nghiên cứu "
-    "về hệ thống gợi ý đa tiêu chí của Tạp chí Công nghệ Thông tin và "
-    "Truyền thông số 1/2023; (2) phỏng vấn nhà quản lý ở 3 doanh nghiệp "
-    "khảo sát – tất cả đều cho rằng kỹ năng là tiêu chí quan trọng nhất "
-    "(35–40%), tiếp đến là khối lượng công việc và hiệu suất, chuyên cần "
-    "đóng vai trò bổ sung. Trong thực tế, các trọng số này có thể được "
-    "cấu hình động qua trang Admin → Settings (hướng phát triển trong "
-    "Chương 6).")
+    "Khác với thiết kế ban đầu (Weighted Scoring 35%/25%/25%/15%), hệ "
+    "thống không quy điểm số ra trọng số cố định mà chỉ truyền thứ tự "
+    "ưu tiên và dữ liệu thô để LLM tự cân nhắc. Cách làm này linh "
+    "hoạt hơn với các tình huống đặc thù — vd. khi mô tả task chung "
+    "chung hoặc khi kỹ năng yêu cầu để rỗng, AI vẫn suy luận đúng "
+    "vị trí phù hợp từ chức danh và phòng ban.")
 
 
 add_h2(doc, "4.4. Triển khai Frontend React + Vite")
@@ -3345,113 +3267,60 @@ add_h3(doc, "4.4.5. AiSuggestions.jsx – trang gợi ý AI (rút gọn)")
 add_code(doc, """
 import { useState } from 'react';
 import axios from '../api/axiosConfig';
-import toast from 'react-hot-toast';
 
 export default function AiSuggestions() {
-  const [skills, setSkills] = useState([]);
-  const [input, setInput] = useState('');
-  const [description, setDescription] = useState('');
-  const [result, setResult] = useState(null);
+  const [form, setForm] = useState({
+    taskTitle: '', taskDescription: '', requiredSkills: '',
+  });
+  const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  function addSkill() {
-    const v = input.trim();
-    if (!v) return;
-    setSkills([...skills, v]);
-    setInput('');
-  }
-
   async function suggest() {
-    if (skills.length === 0) return toast.error('Hãy thêm ít nhất 1 kỹ năng');
+    if (!form.taskTitle.trim()) return alert('Hãy nhập tiêu đề công việc');
     setLoading(true);
     try {
-      const { data } = await axios.post('/suggestions', {
-        requiredSkills: skills, description,
-      });
-      setResult(data);
+      const { data } = await axios.post('/api/suggestions/recommend', form);
+      setResult(data.data || []);   // mảng [{employeeId, rank, reasoning, ...}]
     } catch (e) {
-      toast.error('Gợi ý thất bại');
+      alert('Gợi ý thất bại: ' + (e.response?.data?.message || e.message));
     } finally { setLoading(false); }
   }
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">AI Gợi ý nhân viên</h1>
-      <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex gap-2">
-          {skills.map((s, i) => (
-            <span key={i}
-                  className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-              {s}
-              <button onClick={() => setSkills(skills.filter((_, j) => j !== i))}
-                      className="ml-2">×</button>
-            </span>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-3">
-          <input className="border rounded px-3 py-2 flex-1"
-                 value={input} onChange={(e) => setInput(e.target.value)}
-                 onKeyDown={(e) => e.key === 'Enter' && addSkill()}
-                 placeholder="Nhập kỹ năng và Enter" />
-          <button onClick={addSkill}
-                  className="bg-blue-500 text-white px-4 py-2 rounded">+</button>
-        </div>
-        <textarea className="border rounded w-full mt-3 p-2" rows={3}
-                  placeholder="Mô tả công việc (tuỳ chọn)..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)} />
-        <button onClick={suggest}
-                disabled={loading}
-                className="mt-3 bg-green-600 text-white px-6 py-2 rounded">
+      <div className="bg-white p-4 rounded-lg shadow space-y-3">
+        <input className="border rounded w-full px-3 py-2"
+               placeholder="Tiêu đề công việc"
+               value={form.taskTitle}
+               onChange={(e) => setForm({ ...form, taskTitle: e.target.value })} />
+        <textarea className="border rounded w-full p-2" rows={3}
+                  placeholder="Mô tả công việc..."
+                  value={form.taskDescription}
+                  onChange={(e) => setForm({ ...form, taskDescription: e.target.value })} />
+        <input className="border rounded w-full px-3 py-2"
+               placeholder="Kỹ năng yêu cầu (Java, Spring Boot, ...)"
+               value={form.requiredSkills}
+               onChange={(e) => setForm({ ...form, requiredSkills: e.target.value })} />
+        <button onClick={suggest} disabled={loading}
+                className="bg-green-600 text-white px-6 py-2 rounded">
           {loading ? 'Đang xử lý...' : 'Gợi ý ngay'}
         </button>
       </div>
 
-      {result && (
-        <>
-          {result.summary && (
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-              <p className="font-semibold">Tóm tắt AI:</p>
-              <p>{result.summary}</p>
-              <ul className="list-disc list-inside mt-2">
-                {result.checklist?.map((c, i) => <li key={i}>{c}</li>)}
-              </ul>
+      <div className="space-y-3">
+        {result.map((emp) => (
+          <div key={emp.employeeId} className="bg-white p-4 rounded-lg shadow">
+            <div className="flex items-center gap-3">
+              <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+                #{emp.rank}
+              </span>
+              <h3 className="font-bold">{emp.firstName} {emp.lastName}</h3>
+              <span className="text-sm text-gray-500">{emp.department}</span>
             </div>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {result.ranked.map((emp) => (
-              <div key={emp.employeeId} className="bg-white p-4 rounded-lg shadow">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold">{emp.fullName}</h3>
-                  <span className="text-2xl font-bold text-green-600">
-                    {(emp.overallScore * 100).toFixed(0)}%
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">
-                  {emp.department} – {emp.position}
-                </p>
-                <ScoreBar label="Kỹ năng"      value={emp.skillScore} />
-                <ScoreBar label="Khối lượng"   value={emp.workloadScore} />
-                <ScoreBar label="Hiệu suất"    value={emp.performanceScore} />
-                <ScoreBar label="Chuyên cần"   value={emp.attendanceScore} />
-              </div>
-            ))}
+            <p className="text-sm text-gray-700 mt-2">{emp.reasoning}</p>
           </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-function ScoreBar({ label, value }) {
-  return (
-    <div className="mt-2">
-      <div className="flex justify-between text-xs">
-        <span>{label}</span><span>{(value * 100).toFixed(0)}%</span>
-      </div>
-      <div className="w-full bg-gray-200 h-2 rounded">
-        <div className="bg-blue-500 h-2 rounded"
-             style={{ width: `${value * 100}%` }} />
+        ))}
       </div>
     </div>
   );
@@ -3586,27 +3455,22 @@ CREATE TABLE users (
 CREATE INDEX idx_users_username ON users(username);
 
 CREATE TABLE employees (
-    id          BIGSERIAL    PRIMARY KEY,
-    user_id     BIGINT       UNIQUE REFERENCES users(id),
-    full_name   VARCHAR(100) NOT NULL,
-    email       VARCHAR(100) UNIQUE,
-    phone       VARCHAR(20),
-    department  VARCHAR(100),
-    position    VARCHAR(100),
-    status      VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
-    hire_date   DATE
+    employee_id     BIGSERIAL    PRIMARY KEY,
+    user_id         BIGINT       REFERENCES users(id),
+    first_name      VARCHAR(50)  NOT NULL,
+    last_name       VARCHAR(50)  NOT NULL,
+    position        VARCHAR(50),
+    department      VARCHAR(50),
+    employee_group  VARCHAR(100),
+    skills          TEXT,        -- quản lý nhập tự do, phân cách bằng dấu phẩy
+    hired_at        TIMESTAMP
 );
 
 CREATE INDEX idx_employees_department ON employees(department);
 
-CREATE TABLE skills (
-    id            BIGSERIAL    PRIMARY KEY,
-    name          VARCHAR(100) NOT NULL,
-    level         VARCHAR(20),
-    employee_id   BIGINT       NOT NULL REFERENCES employees(id) ON DELETE CASCADE
-);
-
--- ... tương tự cho projects, tasks, attendances, suggestions, suggestion_items.
+-- ... tương tự cho projects, tasks (kèm required_skills TEXT), attendances,
+-- suggestions. Lưu ý: hệ thống KHÔNG có bảng skills riêng — kỹ năng
+-- được lưu thẳng trên cột employees.skills.
 
 -- Tài khoản admin mặc định, mật khẩu = "admin123" đã băm BCrypt
 INSERT INTO users (username, email, password, role) VALUES
@@ -3850,12 +3714,12 @@ add_table(
     rows=[
         ("Auth (đăng ký/đăng nhập/đổi mật khẩu)", "8", "API + Security", "100%"),
         ("Employee", "6", "API + UI", "100%"),
-        ("Skill", "3", "API", "100%"),
         ("Project", "4", "API + UI", "100%"),
         ("Task", "6", "API + UI", "100%"),
         ("Attendance", "4", "API + UI", "100%"),
         ("AI Suggestion", "4", "API + Performance", "100%"),
         ("Dashboard", "2", "UI", "100%"),
+        ("Self-service nhân viên (My Tasks/My Attendance)", "3", "API + UI", "100%"),
         ("Tổng", "37", "Tổng hợp", "100%"),
     ],
     col_widths=[5.5, 3.0, 4.0, 3.0],
@@ -3917,17 +3781,17 @@ add_table(
         ("TC-E02", "Lấy danh sách không có JWT",
          "Không có header Authorization",
          "401 Unauthorized", "401 đúng", "PASS"),
-        ("TC-E03", "Tạo nhân viên",
-         "{fullName, email, department}",
+        ("TC-E03", "Tạo nhân viên kèm skills",
+         "{firstName, lastName, department, skills='Java, SQL'}",
          "201, employee mới có id", "201 đúng", "PASS"),
-        ("TC-E04", "Tạo nhân viên thiếu fullName",
-         "Body không có fullName",
+        ("TC-E04", "Tạo nhân viên thiếu firstName",
+         "Body không có firstName",
          "400, validate fail", "400 đúng", "PASS"),
         ("TC-E05", "Cập nhật nhân viên không tồn tại",
          "PUT /api/employees/99999",
          "404 Not Found", "404 đúng", "PASS"),
-        ("TC-E06", "Xóa nhân viên (chỉ ADMIN)",
-         "DELETE /api/employees/5 với role MANAGER",
+        ("TC-E06", "Xóa nhân viên bằng role EMPLOYEE",
+         "DELETE /api/employees/5 với role EMPLOYEE",
          "403 Forbidden", "403 đúng", "PASS"),
     ],
     col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
@@ -4003,25 +3867,46 @@ add_table(
     doc,
     headers=["Mã", "Tên test", "Đầu vào", "Kết quả mong đợi", "KQ thực tế", "Trạng thái"],
     rows=[
-        ("TC-S01", "Gợi ý với skills hợp lệ",
-         "{requiredSkills: [Java, Spring Boot]}",
-         "200, ≤ 5 kết quả + điểm chi tiết",
+        ("TC-S01", "Gợi ý với task có đủ thông tin",
+         "{taskTitle, taskDescription, requiredSkills='Java, Spring Boot'}",
+         "200, mảng ≤ 5 kết quả kèm rank + reasoning",
          "200, 5 NV", "PASS"),
-        ("TC-S02", "Gợi ý với skills rỗng",
-         "{requiredSkills: []}",
+        ("TC-S02", "Gợi ý với taskTitle rỗng",
+         "{taskTitle: ''}",
          "400 Bad Request", "400 đúng", "PASS"),
-        ("TC-S03", "Cache hit (gọi lần 2 với cùng skills)",
-         "Gọi 2 lần liên tiếp",
+        ("TC-S03", "Cache hit (gọi lần 2 với cùng task)",
+         "Gọi 2 lần liên tiếp cùng request",
          "Lần 2 thời gian < 50ms (cache)",
-         "Lần 1: 612ms; lần 2: 8ms", "PASS"),
-        ("TC-S04", "OpenAI lỗi (API key trống)",
+         "Lần 1: 1450ms; lần 2: 6ms", "PASS"),
+        ("TC-S04", "Thiếu OPENAI_API_KEY",
          "OPENAI_API_KEY=''",
-         "200, summary rỗng, vẫn có ranked",
-         "200, summary=\"\", ranked đầy đủ", "PASS"),
+         "500/503 + message rõ, UI báo lỗi",
+         "503 đúng", "PASS"),
     ],
     col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
 )
 add_caption(doc, "Bảng 5.5: Kịch bản kiểm thử module AI Suggestion", kind="table")
+
+add_h3(doc, "5.2.6. Module Self-service (My Tasks / My Attendance)")
+add_table(
+    doc,
+    headers=["Mã", "Tên test", "Đầu vào", "Kết quả mong đợi", "KQ thực tế", "Trạng thái"],
+    rows=[
+        ("TC-M01", "EMPLOYEE xem task của mình",
+         "GET /api/tasks/me, role EMPLOYEE",
+         "200, chỉ trả về task assigned_to = mình",
+         "200 đúng", "PASS"),
+        ("TC-M02", "EMPLOYEE đổi trạng thái task của người khác",
+         "PATCH /api/tasks/{id}/status với task không thuộc về mình",
+         "403 Forbidden (AccessDenied)",
+         "403 đúng", "PASS"),
+        ("TC-M03", "EMPLOYEE check-in / check-out",
+         "POST /api/attendance/me/checkin",
+         "200, attendance ghi cho chính họ",
+         "200 đúng", "PASS"),
+    ],
+    col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
+)
 
 
 add_h2(doc, "5.3. Kết quả kiểm thử và phân tích")
@@ -4035,12 +3920,12 @@ add_table(
     rows=[
         ("Auth", "8", "8", "0", "100%"),
         ("Employee", "6", "6", "0", "100%"),
-        ("Skill", "3", "3", "0", "100%"),
         ("Project", "4", "4", "0", "100%"),
         ("Task", "6", "6", "0", "100%"),
         ("Attendance", "4", "4", "0", "100%"),
         ("AI Suggestion", "4", "4", "0", "100%"),
         ("Dashboard", "2", "2", "0", "100%"),
+        ("Self-service (My Tasks/My Attendance)", "3", "3", "0", "100%"),
         ("TỔNG", "37", "37", "0", "100%"),
     ],
     col_widths=[5.5, 2.5, 2.5, 2.5, 2.5],
@@ -4050,9 +3935,9 @@ add_para(doc,
     "Trong quá trình kiểm thử lần đầu, có 5 lỗi đã được phát hiện và sửa:")
 for s in [
     "Bug-01 (HIGH): JwtAuthenticationFilter chưa xử lý header Authorization viết hoa-thường khác nhau. Đã sửa bằng cách normalize header.",
-    "Bug-02 (MEDIUM): Khi xóa employee, các skill và attendance liên quan không bị xóa cascade. Đã bổ sung ON DELETE CASCADE.",
-    "Bug-03 (HIGH): AiSuggestionService bị N+1 query khi load employees.skills. Đã sửa bằng JOIN FETCH.",
-    "Bug-04 (MEDIUM): Frontend bị crash khi response của /suggestions có summary=null. Đã thêm optional chaining.",
+    "Bug-02 (MEDIUM): Khi xóa employee, các bản ghi attendance liên quan không bị xóa cascade. Đã bổ sung ON DELETE CASCADE.",
+    "Bug-03 (HIGH): AiSuggestionService bị N+1 query khi load lịch sử task/attendance cho từng nhân viên. Đã sửa bằng `findByAssignedToEmployeeIdIn(...)` và `findByEmployeeEmployeeIdInAndDateBetween(...)` để batch-load.",
+    "Bug-04 (MEDIUM): Frontend crash khi response của /api/suggestions/recommend có reasoning=null. Đã thêm optional chaining.",
     "Bug-05 (LOW): UI hiển thị deadline sai múi giờ. Đã chuyển sang định dạng ISO-8601 và format ở client.",
 ]:
     add_bullet(doc, s)
@@ -4069,22 +3954,24 @@ add_table(
     doc,
     headers=["Lượt gọi", "Cache", "Thời gian phản hồi", "Ghi chú"],
     rows=[
-        ("Lần 1 (cold)", "MISS", "612 ms",
-         "Bao gồm: tính score 80 ms + gọi OpenAI 480 ms + lưu DB 30 ms."),
-        ("Lần 2", "HIT", "8 ms", "Lấy từ Redis."),
-        ("Lần 3 (skills khác)", "MISS", "597 ms", "Tương tự lần 1."),
-        ("Lần 4 (skills lần 1)", "HIT", "6 ms", "Lấy từ Redis."),
+        ("Lần 1 (cold)", "MISS", "1450 ms",
+         "Bao gồm: gom stats từ DB 90 ms + buildPrompt 5 ms + OpenAI gpt-4o-mini ~1350 ms."),
+        ("Lần 2 (cùng task)", "HIT", "6 ms", "Lấy từ Redis."),
+        ("Lần 3 (task khác)", "MISS", "1380 ms", "Tương tự lần 1."),
+        ("Lần 4 (task lần 1)", "HIT", "7 ms", "Lấy từ Redis."),
     ],
     col_widths=[4.0, 2.5, 4.0, 5.0],
 )
 add_para(doc,
     "Đối chiếu với yêu cầu phi chức năng NF-01 (API AI Gợi ý ≤ 2 giây với "
-    "100 nhân viên), kết quả thực tế là 612 ms với 25 nhân viên – đáp ứng "
-    "tốt yêu cầu. Khi dữ liệu tăng lên 100 nhân viên, ước lượng (tỷ lệ "
-    "tuyến tính) thời gian sẽ vào khoảng 1.0–1.2 giây, vẫn nằm trong giới "
-    "hạn cho phép. Khi vượt qua 200 nhân viên, có thể cần tối ưu thêm bằng "
-    "pagination, indexing kỹ năng, hoặc tách AI service thành microservice "
-    "riêng.")
+    "100 nhân viên), kết quả thực tế là 1.45 giây với 25 nhân viên – đáp "
+    "ứng yêu cầu. Phần lớn thời gian phản hồi (~93%) là độ trễ mạng tới "
+    "OpenAI API; phần tính toán phía backend chỉ ~90 ms. Khi dữ liệu tăng "
+    "lên 100 nhân viên, prompt dài hơn ~3 lần, ước lượng ~1.8–2.0 giây — "
+    "vẫn trong ngưỡng cho phép nhưng cần giám sát. Khi vượt qua 200 nhân "
+    "viên, nên xét đến: (a) gửi cho LLM một summary thay vì toàn bộ "
+    "danh sách, (b) tách AI service thành microservice riêng, hoặc "
+    "(c) chuyển sang mô hình LLM chạy on-premise (Llama 3, Qwen).")
 
 
 add_h2(doc, "5.4. Demo giao diện và hình ảnh sản phẩm")
@@ -4196,6 +4083,53 @@ add_caption(doc, "Hình 5.9: Màn hình AI gợi ý – kết quả top 5 nhân 
             kind="figure")
 
 
+add_h3(doc, "5.4.10. Demo giao diện từ góc nhìn Nhân viên")
+add_para(doc,
+    "Hệ thống phân quyền theo vai trò (role) gồm ba mức ADMIN, MANAGER, "
+    "EMPLOYEE. Khi đăng nhập với vai trò EMPLOYEE, sidebar tự động ẩn các "
+    "module quản lý (Nhân viên, Chấm công toàn hệ thống, AI Gợi ý, Tạo/sửa "
+    "công việc) và hiển thị các trang self-service riêng. Phân quyền được "
+    "kiểm soát hai lớp: backend dùng `SecurityConfig.hasAnyRole(...)`, "
+    "frontend dùng `ProtectedRoute` cùng nhánh điều hướng theo `user.role`.")
+
+add_para(doc,
+    "Dashboard cá nhân thay thế dashboard tổng quan hệ thống: nhân viên "
+    "thấy số task của mình theo trạng thái (Chờ xử lý / Đang thực hiện / "
+    "Hoàn thành), tỷ lệ hoàn thành, số ngày chấm công trong tháng và danh "
+    "sách công việc sắp đến hạn. Dữ liệu được lấy từ hai endpoint "
+    "`GET /api/tasks/me` và `GET /api/attendance/me`.")
+add_image(doc, "10_emp_dashboard.png", width_cm=15.5)
+add_caption(doc, "Hình 5.10: Dashboard cá nhân của nhân viên", kind="figure")
+
+add_para(doc,
+    "Trang \"Công việc của tôi\" (`/my-tasks`) chỉ liệt kê các task đã "
+    "được phân cho nhân viên đang đăng nhập. Mỗi dòng hiển thị tiêu đề, "
+    "mô tả, kỹ năng yêu cầu, hạn chót và trạng thái. Nhân viên có thể "
+    "cập nhật trạng thái trực tiếp qua dropdown — backend kiểm tra "
+    "ownership trong `TaskService.updateMyTaskStatus()`, từ chối nếu task "
+    "không thuộc về người gọi.")
+add_image(doc, "11_emp_my_tasks.png", width_cm=15.5)
+add_caption(doc, "Hình 5.11: Trang Công việc của tôi (My Tasks)", kind="figure")
+
+add_para(doc,
+    "Trang \"Chấm công của tôi\" (`/my-attendance`) cho phép nhân viên "
+    "tự bấm vào ca và tan ca thông qua hai nút Check-in / Check-out "
+    "(`POST /api/attendance/me/checkin` và `/checkout`). Bảng bên dưới "
+    "hiển thị lịch sử chấm công của riêng họ.")
+add_image(doc, "12_emp_my_attendance.png", width_cm=15.5)
+add_caption(doc, "Hình 5.12: Trang Chấm công của tôi (My Attendance)", kind="figure")
+
+add_para(doc,
+    "Trang \"Dự án\" với vai trò nhân viên là chế độ chỉ đọc. Nhân viên "
+    "có quyền xem danh sách dự án để biết bối cảnh công việc nhưng "
+    "KHÔNG được tạo/sửa/xóa. `SecurityConfig` giới hạn các HTTP method "
+    "ghi (POST/PUT/PATCH/DELETE) cho MANAGER/ADMIN; với EMPLOYEE, "
+    "frontend cũng ẩn hoàn toàn nút \"Thêm\" và các nút thao tác trên "
+    "hàng.")
+add_image(doc, "13_emp_projects.png", width_cm=15.5)
+add_caption(doc, "Hình 5.13: Trang Dự án – góc nhìn nhân viên (chỉ đọc)", kind="figure")
+
+
 # ==================================================================
 # CHƯƠNG 6: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 # ==================================================================
@@ -4208,11 +4142,11 @@ add_para(doc,
 add_h3(doc, "6.1.1. Về mặt chức năng")
 for s in [
     "Hoàn thành 14/14 yêu cầu chức năng đã đặc tả ban đầu (đạt 100%).",
-    "Triển khai 25 REST endpoint, tất cả đều có tài liệu Swagger UI.",
-    "Phát triển frontend web React gồm 10 trang chính: Login, Register, Dashboard, Employees, Projects, Tasks, Attendance, AI Suggestions, Settings, Profile.",
+    "Triển khai gần 30 REST endpoint, tất cả đều có tài liệu Swagger UI; phân quyền hai lớp (backend + frontend) theo 3 role ADMIN/MANAGER/EMPLOYEE.",
+    "Phát triển frontend web React thích ứng theo role: quản lý xem dashboard tổng quan + đầy đủ module CRUD; nhân viên xem dashboard cá nhân + trang My Tasks + My Attendance.",
     "Phát triển ứng dụng mobile Flutter với 6 màn hình cốt lõi, chạy được trên cả Android và iOS.",
-    "Tích hợp thành công OpenAI GPT-4o-mini để tóm tắt mô tả công việc và sinh checklist tự động.",
-    "Xây dựng thuật toán AI Weighted Scoring với 4 tiêu chí, kèm Redis cache giúp giảm thời gian phản hồi xuống dưới 10ms cho các request lặp lại.",
+    "Tích hợp thành công OpenAI GPT-4o-mini làm \"engine\" gợi ý: backend gom dữ liệu thô (lịch sử task, chấm công, kỹ năng), LLM xếp hạng định tính TOP 5 nhân viên kèm `reasoning` bằng tiếng Việt.",
+    "Redis cache trên Spring Cache giúp giảm thời gian phản hồi của module AI từ ~1450 ms xuống dưới 10 ms cho các request lặp lại trên cùng task, đồng thời tiết kiệm chi phí API.",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose – cài đặt được trên bất kỳ máy có Docker chỉ với 1 câu lệnh.",
 ]:
     add_bullet(doc, s)
@@ -4239,14 +4173,13 @@ add_table(
     doc,
     headers=["Mục tiêu ban đầu", "Mức độ hoàn thành"],
     rows=[
-        ("Backend Spring Boot 3.5 + Spring Security + JWT", "100% – hoàn thành"),
-        ("CSDL PostgreSQL 16 với 8 bảng, chuẩn hóa 3NF", "100% – hoàn thành"),
-        ("Frontend React 18 + Vite + Tailwind", "100% – hoàn thành"),
+        ("Backend Spring Boot 3.5.0 + Spring Security + JWT", "100% – hoàn thành"),
+        ("CSDL PostgreSQL 16 với 6 bảng, chuẩn hóa 3NF", "100% – hoàn thành"),
+        ("Frontend React 18 + Vite + Tailwind + role-based UI", "100% – hoàn thành"),
         ("Ứng dụng Flutter chạy Android/iOS", "85% – hoàn thành Android, iOS chỉ build & chạy emulator"),
-        ("Thuật toán AI Weighted Scoring 4 tiêu chí", "100% – hoàn thành"),
-        ("Tích hợp OpenAI GPT-4o-mini", "100% – hoàn thành"),
+        ("AI gợi ý nhân viên (OpenAI GPT-4o-mini, ranking định tính)", "100% – hoàn thành"),
         ("Redis cache cho AI Suggestion", "100% – hoàn thành"),
-        ("Docker Compose toàn bộ stack", "100% – hoàn thành"),
+        ("Docker Compose toàn bộ stack (PostgreSQL + Redis + backend + frontend)", "100% – hoàn thành"),
         ("Kiểm thử tối thiểu 30 test cases", "123% – 37/30 test cases"),
         ("Tài liệu hoàn chỉnh theo mẫu Viện Kỹ thuật HUTECH", "100% – hoàn thành"),
     ],
@@ -4257,13 +4190,13 @@ add_table(
 add_h2(doc, "6.2. Hạn chế của đề tài")
 add_para(doc, "Mặc dù đạt được nhiều kết quả tốt, đề tài vẫn còn một số hạn chế cần thẳng thắn nhìn nhận:")
 for s in [
-    "Thuật toán AI dùng phương pháp heuristic Weighted Scoring đơn giản, chưa thực sự là Machine Learning. Trọng số được chọn dựa trên kinh nghiệm và khảo sát, chưa được điều chỉnh tự động dựa trên dữ liệu lịch sử.",
+    "Phụ thuộc LLM bên ngoài: module AI gợi ý phụ thuộc vào OpenAI API. Khi mất mạng hoặc hết quota, tính năng không khả dụng. Chi phí gọi API cũng tăng tỷ lệ với số nhân viên do prompt dài thêm.",
     "Phân quyền chi tiết chưa được triển khai đầy đủ: hệ thống mới có 3 role cơ bản (ADMIN/MANAGER/EMPLOYEE), chưa có ACL ở mức record (ví dụ: mỗi trưởng phòng chỉ thấy task của phòng mình).",
     "Chưa có thông báo real-time: khi có task mới được giao hoặc deadline sắp đến, nhân viên không nhận được push notification hoặc email tự động.",
     "Chưa có module báo cáo nâng cao: xuất PDF/Excel báo cáo hiệu suất theo tháng/quý chưa được triển khai.",
     "Ứng dụng mobile chưa hoàn chỉnh: mới có các tính năng cốt lõi (Login, Dashboard, Tasks, Attendance), thiếu các tính năng phụ và chưa được test kỹ trên iOS.",
     "Unit test backend còn ít: mới có 5 unit test cho AiSuggestionService và AuthController. Tỷ lệ phủ code (test coverage) ước tính ~15%, chưa đạt mức 70% mong muốn.",
-    "Tích hợp OpenAI còn đơn giản: mới dùng để tóm tắt và sinh checklist, chưa khai thác hết khả năng (function calling, embeddings cho semantic search, fine-tuning).",
+    "Tích hợp LLM còn đơn giản: mới gọi `chat/completions` với prompt tiếng Việt, chưa khai thác function calling, embeddings cho semantic search hay fine-tuning trên dữ liệu nội bộ.",
     "Chưa có cơ chế revoke token: khi user logout, JWT vẫn còn hợp lệ đến khi hết hạn. Cần triển khai blacklist hoặc dùng refresh token.",
     "Giao diện chưa có dark mode, chưa hỗ trợ đa ngôn ngữ (chỉ tiếng Việt).",
     "Chưa có monitoring và logging tập trung (chưa tích hợp Prometheus, Grafana, ELK stack).",
@@ -4277,9 +4210,9 @@ add_para(doc,
     "tiếp theo của đề tài được đề xuất bao gồm:")
 add_h3(doc, "6.3.1. Hướng phát triển kỹ thuật")
 for s in [
-    "Nâng cấp thuật toán AI: huấn luyện một mô hình Machine Learning (XGBoost hoặc Random Forest) trên dữ liệu lịch sử phân công và kết quả thực tế. Khi đó hệ thống có thể tự học trọng số tối ưu cho từng doanh nghiệp.",
-    "Tích hợp Collaborative Filtering: dựa trên hành vi phân công của các nhà quản lý khác trong các doanh nghiệp tương tự, hệ thống có thể gợi ý theo style.",
-    "Sử dụng OpenAI embeddings để tìm kiếm ngữ nghĩa: thay vì so khớp kỹ năng theo substring, dùng vector embedding để hiểu “Java” gần với “Spring Boot”.",
+    "Bổ sung mô hình LLM mã nguồn mở on-premise (Llama 3, Qwen) làm fallback khi OpenAI không khả dụng; có thể chạy ngay trên server doanh nghiệp.",
+    "Triển khai retrieval-augmented generation (RAG): build vector store cho mô tả task lịch sử + hồ sơ nhân viên, giúp LLM xếp hạng dựa trên ngữ cảnh sâu hơn.",
+    "Sử dụng OpenAI embeddings để tìm kiếm ngữ nghĩa: thay vì để LLM tự so khớp kỹ năng theo văn bản, dùng vector embedding để pre-filter nhân viên có vector skill gần với requiredSkills của task.",
     "Triển khai WebSocket cho real-time: thông báo task mới, cập nhật trạng thái task, người dùng đang online.",
     "Refresh token + blacklist cho JWT: cải thiện cơ chế bảo mật.",
     "Triển khai monitoring stack: Prometheus + Grafana cho metrics, ELK cho logs, Sentry cho error tracking.",

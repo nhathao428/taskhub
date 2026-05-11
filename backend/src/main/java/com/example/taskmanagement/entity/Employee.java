@@ -50,6 +50,9 @@ public class Employee implements Serializable {
     @Column(name = "employee_group", length = 100)
     private String group;
 
+    @Column(name = "skills", columnDefinition = "TEXT")
+    private String skills;
+
     @PrePersist
     protected void onCreate() {
         if (hiredAt == null) {

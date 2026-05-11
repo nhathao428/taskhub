@@ -54,7 +54,7 @@ public class UserService implements UserDetailsService {
         String token = jwtTokenProvider.generateToken(authentication);
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new AuthResponse(token, user.getUsername(), user.getEmail());
+        return new AuthResponse(token, user.getUsername(), user.getEmail(), user.getRole());
     }
 
     @Transactional
@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("EMPLOYEE");
         userRepository.save(user);
-        return new AuthResponse(null, user.getUsername(), user.getEmail());
+        return new AuthResponse(null, user.getUsername(), user.getEmail(), user.getRole());
     }
 
     public List<User> getAllUsers() {

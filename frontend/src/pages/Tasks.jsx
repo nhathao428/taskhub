@@ -8,6 +8,7 @@ import { useEmployees } from '../hooks/useEmployees'
 const emptyForm = {
   title: '',
   description: '',
+  requiredSkills: '',
   dueDate: '',
   status: 'PENDING',
   project: null,
@@ -59,6 +60,7 @@ export default function Tasks() {
     setForm({
       title: task.title || '',
       description: task.description || '',
+      requiredSkills: task.requiredSkills || '',
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       status: task.status || 'PENDING',
       project: getTaskProjectId(task),
@@ -85,6 +87,7 @@ export default function Tasks() {
     const payload = {
       title: form.title,
       description: form.description || null,
+      requiredSkills: form.requiredSkills || null,
       dueDate: form.dueDate || null,
       status: form.status,
       projectId: form.project ? Number(form.project) : null,
@@ -207,6 +210,17 @@ export default function Tasks() {
               placeholder="Mô tả công việc"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kỹ năng yêu cầu</label>
+            <input
+              type="text"
+              value={form.requiredSkills}
+              onChange={(e) => setForm({ ...form, requiredSkills: e.target.value })}
+              placeholder="VD: Java, Spring Boot, PostgreSQL"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p className="text-xs text-gray-500 mt-1">Quản lý nhập tự do, AI sẽ đối chiếu với kỹ năng của nhân viên khi gợi ý.</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
