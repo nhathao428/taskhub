@@ -200,18 +200,24 @@ public class AiSuggestionService {
         }
 
         sb.append("\n=== HƯỚNG DẪN ===\n");
-        sb.append("Hãy gợi ý TOP ").append(TOP_N).append(" nhân viên phù hợp nhất với task trên, dựa trên 3 tiêu chí (theo thứ tự ưu tiên):\n");
-        sb.append("  1. Tiến độ task trước — tỷ lệ hoàn thành cao, ít task tồn đọng.\n");
-        sb.append("  2. Thời gian hoàn thành task trước — hoàn thành đúng hạn nhiều, ít trễ.\n");
-        sb.append("  3. Chấm công — đi làm đầy đủ.\n\n");
+        sb.append("Hãy gợi ý TOP ").append(TOP_N).append(" nhân viên phù hợp nhất với task trên, dựa trên các tiêu chí (theo thứ tự ưu tiên):\n");
+        sb.append("  1. Mức độ phù hợp về CHUYÊN MÔN — chức danh (position) và phòng ban (department) khớp với nội dung task.\n");
+        sb.append("     • Nếu mô tả task chung chung/không chi tiết, hãy SUY LUẬN từ tiêu đề + chức danh + phòng ban ")
+          .append("để chọn vị trí phù hợp nhất (vd: task liên quan giao diện → ưu tiên Frontend/UI; task về CSDL → Backend/DBA; ")
+          .append("task về tuyển dụng → HR; task về báo cáo tài chính → Kế toán...).\n");
+        sb.append("     • Trong lý do PHẢI nêu rõ vì sao chức danh/phòng ban của họ phù hợp với task này.\n");
+        sb.append("  2. Tiến độ task trước — tỷ lệ hoàn thành cao, ít task tồn đọng.\n");
+        sb.append("  3. Thời gian hoàn thành task trước — hoàn thành đúng hạn nhiều, ít trễ.\n");
+        sb.append("  4. Chấm công — đi làm đầy đủ.\n\n");
         sb.append("KHÔNG cần tính điểm số. Hãy đánh giá định tính, so sánh giữa các nhân viên dựa trên dữ liệu trên ")
-          .append("rồi xếp hạng. Nhân viên chưa có lịch sử thì xét workload hiện tại + chấm công.\n\n");
+          .append("rồi xếp hạng. Nhân viên chưa có lịch sử thì xét chuyên môn + workload hiện tại + chấm công.\n\n");
 
         sb.append("=== ĐỊNH DẠNG TRẢ VỀ ===\n");
         sb.append("Trả về DUY NHẤT một mảng JSON hợp lệ (không kèm markdown, không text thừa), ")
           .append("đã sắp xếp theo độ phù hợp giảm dần:\n");
         sb.append("[{\"employeeId\":<số>,\"rank\":<1.." ).append(TOP_N).append(">,")
-          .append("\"reasoning\":\"<lý do ngắn gọn bằng tiếng Việt: nêu cụ thể tiến độ, đúng hạn, chấm công của họ>\"}]");
+          .append("\"reasoning\":\"<lý do ngắn gọn bằng tiếng Việt: nêu rõ (a) chức danh/phòng ban phù hợp với task ra sao, ")
+          .append("(b) tiến độ, đúng hạn, chấm công của họ>\"}]");
 
         return sb.toString();
     }
