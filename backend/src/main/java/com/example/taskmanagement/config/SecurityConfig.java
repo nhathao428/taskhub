@@ -82,6 +82,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkin").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkout").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
 
+                // Office locations: mọi user xem được (cần để hiển thị bản đồ check-in);
+                // chỉ MANAGER/ADMIN sửa.
+                .requestMatchers(HttpMethod.GET, "/api/office-locations/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/office-locations/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/office-locations/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/office-locations/**").hasAnyRole("MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/office-locations/**").hasAnyRole("MANAGER", "ADMIN")
+
+                // Manager review pending attendance
+                .requestMatchers(HttpMethod.PATCH, "/api/attendance/*/review").hasAnyRole("MANAGER", "ADMIN")
+
                 // EMPLOYEE: read-only on projects and tasks; everything else requires higher role
                 .requestMatchers(HttpMethod.GET, "/api/projects/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/tasks/**").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")

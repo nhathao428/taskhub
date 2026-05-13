@@ -6,6 +6,7 @@ import '../models/project.dart';
 import '../models/task.dart';
 import '../models/attendance.dart';
 import '../models/employee_suggestion.dart';
+import '../models/office_location.dart';
 
 class ApiService {
   static const String _baseUrl =
@@ -194,22 +195,50 @@ class ApiService {
     return data.map((e) => Attendance.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  /// Self check-in (employeeId resolved from JWT).
-  static Future<Attendance> checkInSelf() async {
+  /// Self check-in (employeeId resolved from JWT) – có gửi kèm vị trí GPS.
+  static Future<Attendance> checkInSelf({
+    double? latitude,
+    double? longitude,
+    bool? isMocked,
+  }) async {
+    final body = <String, dynamic>{};
+    if (latitude != null) body['latitude'] = latitude;
+    if (longitude != null) body['longitude'] = longitude;
+    if (isMocked != null) body['isMocked'] = isMocked;
     final response = await http.post(
       Uri.parse('$_baseUrl/api/attendance/me/checkin'),
       headers: await _authHeaders(),
+      body: jsonEncode(body),
     );
     return Attendance.fromJson(_unwrap(response) as Map<String, dynamic>);
   }
 
   /// Self check-out (closes today's open attendance for current employee).
-  static Future<Attendance> checkOutSelf() async {
+  static Future<Attendance> checkOutSelf({
+    double? latitude,
+    double? longitude,
+    bool? isMocked,
+  }) async {
+    final body = <String, dynamic>{};
+    if (latitude != null) body['latitude'] = latitude;
+    if (longitude != null) body['longitude'] = longitude;
+    if (isMocked != null) body['isMocked'] = isMocked;
     final response = await http.post(
       Uri.parse('$_baseUrl/api/attendance/me/checkout'),
       headers: await _authHeaders(),
+      body: jsonEncode(body),
     );
     return Attendance.fromJson(_unwrap(response) as Map<String, dynamic>);
+  }
+
+  /// Lấy danh sách văn phòng (offices) – cần để hiển thị bản đồ & geofence.
+  static Future<List<OfficeLocation>> getOfficeLocations({bool activeOnly = true}) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/office-locations?activeOnly=$activeOnly'),
+      headers: await _authHeaders(),
+    );
+    final data = _unwrap(response) as List<dynamic>;
+    return data.map((e) => OfficeLocation.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   /// Manager-level: check in for an arbitrary employee.

@@ -11,6 +11,7 @@ import {
   MdEventAvailable,
   MdLogout,
   MdWorkspaces,
+  MdLocationOn,
 } from 'react-icons/md'
 
 const managerNav = [
@@ -19,6 +20,7 @@ const managerNav = [
   { to: '/projects', icon: MdFolder, label: 'Dự án' },
   { to: '/tasks', icon: MdCheckCircle, label: 'Công việc' },
   { to: '/attendance', icon: MdAccessTime, label: 'Chấm công' },
+  { to: '/office-locations', icon: MdLocationOn, label: 'Văn phòng' },
   { to: '/ai-suggestions', icon: MdAutoAwesome, label: 'AI Gợi ý' },
 ]
 

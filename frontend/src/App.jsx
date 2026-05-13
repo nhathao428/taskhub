@@ -12,6 +12,7 @@ import Attendance from './pages/Attendance'
 import AiSuggestions from './pages/AiSuggestions'
 import MyTasks from './pages/MyTasks'
 import MyAttendance from './pages/MyAttendance'
+import OfficeLocations from './pages/OfficeLocations'
 
 const MANAGER_ROLES = ['MANAGER', 'ADMIN']
 
@@ -60,6 +61,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <Attendance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/office-locations"
+              element={
+                <ProtectedRoute allowedRoles={MANAGER_ROLES}>
+                  <OfficeLocations />
                 </ProtectedRoute>
               }
             />

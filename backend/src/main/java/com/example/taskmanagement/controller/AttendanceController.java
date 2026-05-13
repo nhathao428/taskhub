@@ -1,9 +1,11 @@
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.ApiResponse;
+import com.example.taskmanagement.dto.CheckInLocationRequest;
 import com.example.taskmanagement.dto.CheckInRequest;
 import com.example.taskmanagement.dto.CheckOutRequest;
 import com.example.taskmanagement.dto.CreateAttendanceRequest;
+import com.example.taskmanagement.dto.ReviewAttendanceRequest;
 import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.service.AttendanceService;
 import jakarta.validation.Valid;
@@ -59,13 +61,31 @@ public class AttendanceController {
         return ResponseEntity.ok(ApiResponse.ok(attendanceService.getMyAttendance(auth)));
     }
 
+    /**
+     * Self check-in: body chứa lat/lng + isMocked tuỳ chọn.
+     * Backward-compatible – body có thể null/empty.
+     */
     @PostMapping("/me/checkin")
-    public ResponseEntity<ApiResponse<Attendance>> checkInSelf(Authentication auth) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(attendanceService.checkInSelf(auth)));
+    public ResponseEntity<ApiResponse<Attendance>> checkInSelf(
+            Authentication auth,
+            @RequestBody(required = false) @Valid CheckInLocationRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(attendanceService.checkInSelf(auth, req)));
     }
 
     @PostMapping("/me/checkout")
-    public ResponseEntity<ApiResponse<Attendance>> checkOutSelf(Authentication auth) {
-        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOutSelf(auth)));
+    public ResponseEntity<ApiResponse<Attendance>> checkOutSelf(
+            Authentication auth,
+            @RequestBody(required = false) @Valid CheckInLocationRequest req) {
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.checkOutSelf(auth, req)));
+    }
+
+    /** Manager duyệt / từ chối bản ghi PENDING_REVIEW. */
+    @PatchMapping("/{id}/review")
+    public ResponseEntity<ApiResponse<Attendance>> review(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewAttendanceRequest req) {
+        Attendance.ReviewStatus status = Attendance.ReviewStatus.valueOf(req.status());
+        return ResponseEntity.ok(ApiResponse.ok(attendanceService.review(id, status)));
     }
 }

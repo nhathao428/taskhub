@@ -1,5 +1,6 @@
 package com.example.taskmanagement.service;
 
+import com.example.taskmanagement.dto.CheckInLocationRequest;
 import com.example.taskmanagement.dto.CreateAttendanceRequest;
 import com.example.taskmanagement.entity.Attendance;
 import com.example.taskmanagement.entity.Employee;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceService {
@@ -22,13 +24,16 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final EmployeeRepository employeeRepository;
     private final CurrentUserService currentUserService;
+    private final GeofenceService geofenceService;
 
     public AttendanceService(AttendanceRepository attendanceRepository,
                              EmployeeRepository employeeRepository,
-                             CurrentUserService currentUserService) {
+                             CurrentUserService currentUserService,
+                             GeofenceService geofenceService) {
         this.attendanceRepository = attendanceRepository;
         this.employeeRepository = employeeRepository;
         this.currentUserService = currentUserService;
+        this.geofenceService = geofenceService;
     }
 
     @Cacheable("attendance")
@@ -54,6 +59,8 @@ public class AttendanceService {
         attendance.setDate(request.date());
         attendance.setCheckIn(request.checkIn());
         attendance.setCheckOut(request.checkOut());
+        // Bản ghi do quản lý nhập tay coi như APPROVED.
+        attendance.setReviewStatus(Attendance.ReviewStatus.APPROVED);
         return attendanceRepository.save(attendance);
     }
 
@@ -63,6 +70,10 @@ public class AttendanceService {
         return attendanceRepository.findByEmployeeEmployeeId(employeeId);
     }
 
+    /**
+     * Check-in cho 1 employee bất kỳ (manager nhập tay).
+     * KHÔNG kiểm geofence – coi như đã được manager xác minh.
+     */
     @Transactional
     @CacheEvict(value = "attendance", allEntries = true)
     public Attendance checkIn(Long employeeId) {
@@ -73,6 +84,7 @@ public class AttendanceService {
         attendance.setEmployee(employee);
         attendance.setDate(java.time.LocalDate.now());
         attendance.setCheckIn(java.time.LocalTime.now());
+        attendance.setReviewStatus(Attendance.ReviewStatus.APPROVED);
         return attendanceRepository.save(attendance);
     }
 
@@ -85,10 +97,17 @@ public class AttendanceService {
         return attendanceRepository.save(attendance);
     }
 
-    /** Self check-in for the currently authenticated employee. */
+    /**
+     * Self check-in với GPS:
+     * - Có lat/lng: tìm office gần nhất, lưu khoảng cách + office gắn được.
+     *     • Nằm trong radius -> APPROVED.
+     *     • Nằm ngoài radius (hoặc không có office active) -> PENDING_REVIEW.
+     *     • Client báo isMocked=true -> PENDING_REVIEW (bất kể vị trí).
+     * - Không có lat/lng (web không cấp quyền GPS): cho phép nhưng PENDING_REVIEW.
+     */
     @Transactional
     @CacheEvict(value = "attendance", allEntries = true)
-    public Attendance checkInSelf(Authentication auth) {
+    public Attendance checkInSelf(Authentication auth, CheckInLocationRequest loc) {
         Employee me = currentUserService.getCurrentEmployee(auth);
         LocalDate today = LocalDate.now();
         attendanceRepository
@@ -96,20 +115,81 @@ public class AttendanceService {
                 .ifPresent(a -> {
                     throw new BusinessException("Already checked in today and not yet checked out");
                 });
-        return checkIn(me.getEmployeeId());
+
+        Attendance a = new Attendance();
+        a.setEmployee(me);
+        a.setDate(LocalDate.now());
+        a.setCheckIn(java.time.LocalTime.now());
+        applyLocation(a, loc);
+        return attendanceRepository.save(a);
     }
 
     /** Self check-out: closes today's open check-in for the authenticated employee. */
     @Transactional
     @CacheEvict(value = "attendance", allEntries = true)
-    public Attendance checkOutSelf(Authentication auth) {
+    public Attendance checkOutSelf(Authentication auth, CheckInLocationRequest loc) {
         Employee me = currentUserService.getCurrentEmployee(auth);
         LocalDate today = LocalDate.now();
         Attendance open = attendanceRepository
                 .findFirstByEmployeeEmployeeIdAndDateAndCheckOutIsNullOrderByCheckInDesc(me.getEmployeeId(), today)
                 .orElseThrow(() -> new BusinessException("No open check-in for today"));
         open.setCheckOut(java.time.LocalTime.now());
+
+        // Lưu vị trí check-out (không thay đổi reviewStatus đã có lúc check-in).
+        if (loc != null) {
+            open.setCheckOutLat(loc.latitude());
+            open.setCheckOutLng(loc.longitude());
+            if (Boolean.TRUE.equals(loc.isMocked())) {
+                open.setIsMocked(true);
+                open.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+            }
+        }
         return attendanceRepository.save(open);
+    }
+
+    /** Gán thông tin vị trí + reviewStatus cho bản ghi check-in mới. */
+    private void applyLocation(Attendance a, CheckInLocationRequest loc) {
+        if (loc == null || loc.latitude() == null || loc.longitude() == null) {
+            // Không có GPS -> đẩy lên review.
+            a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+            return;
+        }
+        a.setCheckInLat(loc.latitude());
+        a.setCheckInLng(loc.longitude());
+        a.setIsMocked(Boolean.TRUE.equals(loc.isMocked()));
+
+        // Mock location => bắt buộc review.
+        if (Boolean.TRUE.equals(loc.isMocked())) {
+            a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+            return;
+        }
+
+        Optional<GeofenceService.Match> match = geofenceService
+                .findNearestActive(loc.latitude(), loc.longitude());
+        if (match.isEmpty()) {
+            // Chưa có office nào active -> review.
+            a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+            return;
+        }
+        GeofenceService.Match m = match.get();
+        a.setCheckInOffice(m.office());
+        a.setCheckInDistanceMeters((int) Math.round(m.distanceMeters()));
+        a.setReviewStatus(m.withinRadius()
+                ? Attendance.ReviewStatus.APPROVED
+                : Attendance.ReviewStatus.PENDING_REVIEW);
+    }
+
+    /** Manager duyệt hoặc từ chối 1 bản ghi đang PENDING_REVIEW. */
+    @Transactional
+    @CacheEvict(value = "attendance", allEntries = true)
+    public Attendance review(Long attendanceId, Attendance.ReviewStatus newStatus) {
+        Attendance a = attendanceRepository.findById(attendanceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Attendance", "id", attendanceId));
+        if (a.getReviewStatus() != Attendance.ReviewStatus.PENDING_REVIEW) {
+            throw new BusinessException("Bản ghi không ở trạng thái PENDING_REVIEW");
+        }
+        a.setReviewStatus(newStatus);
+        return attendanceRepository.save(a);
     }
 
     /** Returns attendance history for the currently authenticated employee. */

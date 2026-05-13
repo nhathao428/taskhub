@@ -1,8 +1,22 @@
 import { useState } from 'react'
-import { MdAdd } from 'react-icons/md'
+import { MdAdd, MdCheck, MdClose, MdWarning } from 'react-icons/md'
 import Modal from '../components/Modal'
+import api from '../api/axios'
 import { useAttendance } from '../hooks/useAttendance'
 import { useEmployees } from '../hooks/useEmployees'
+
+function reviewBadge(status) {
+  if (status === 'APPROVED') {
+    return <span className="px-2 py-0.5 text-[11px] rounded-full bg-emerald-100 text-emerald-700 font-medium">Đã duyệt</span>
+  }
+  if (status === 'PENDING_REVIEW') {
+    return <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] rounded-full bg-amber-100 text-amber-700 font-medium"><MdWarning /> Chờ duyệt</span>
+  }
+  if (status === 'REJECTED') {
+    return <span className="px-2 py-0.5 text-[11px] rounded-full bg-rose-100 text-rose-700 font-medium">Từ chối</span>
+  }
+  return <span className="text-gray-400 text-xs">-</span>
+}
 
 const emptyForm = { employee: '', date: '', checkIn: '', checkOut: '' }
 
@@ -98,12 +112,16 @@ export default function Attendance() {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ vào</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ ra</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Văn phòng</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Khoảng cách</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Hành động</th>
               </tr>
             </thead>
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-400">Chưa có dữ liệu chấm công.</td>
+                  <td colSpan={8} className="text-center py-8 text-gray-400">Chưa có dữ liệu chấm công.</td>
                 </tr>
               ) : (
                 records.map((rec, idx) => (
@@ -112,6 +130,33 @@ export default function Attendance() {
                     <td className="px-6 py-4 text-gray-600">{rec.date ? rec.date.split('T')[0] : '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{rec.checkIn || '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{rec.checkOut || '-'}</td>
+                    <td className="px-6 py-4 text-gray-600">{rec.checkInOffice?.name || '-'}</td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {rec.checkInDistanceMeters != null ? `${rec.checkInDistanceMeters}m` : '-'}
+                    </td>
+                    <td className="px-6 py-4">{reviewBadge(rec.reviewStatus)}</td>
+                    <td className="px-6 py-4">
+                      {rec.reviewStatus === 'PENDING_REVIEW' ? (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={async () => {
+                              await api.patch(`/api/attendance/${rec.attendanceId}/review`, { status: 'APPROVED' })
+                              refetch(filterEmpId)
+                            }}
+                            title="Duyệt"
+                            className="p-1.5 rounded-md bg-emerald-100 hover:bg-emerald-200 text-emerald-700"
+                          ><MdCheck /></button>
+                          <button
+                            onClick={async () => {
+                              await api.patch(`/api/attendance/${rec.attendanceId}/review`, { status: 'REJECTED' })
+                              refetch(filterEmpId)
+                            }}
+                            title="Từ chối"
+                            className="p-1.5 rounded-md bg-rose-100 hover:bg-rose-200 text-rose-700"
+                          ><MdClose /></button>
+                        </div>
+                      ) : <span className="text-gray-300 text-xs">—</span>}
+                    </td>
                   </tr>
                 ))
               )}
