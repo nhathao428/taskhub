@@ -1,5 +1,5 @@
 """
-Sinh file Word báo cáo ĐỒ ÁN CƠ SỞ theo mẫu HUTECH.
+Sinh file Word báo cáo ĐỒ ÁN CƠ SỞ theo mẫu Khoa Công nghệ Thông tin.
 Format: Times New Roman 13, line 1.5, lề T2 B2 L3 R2 cm.
 Page numbering: La Mã từ Mục lục → Danh mục; Ả Rập từ Chương 1 → hết.
 """
@@ -86,7 +86,7 @@ def _style_set_font(style, size, bold=False, italic=False, color=None, upper=Fal
 
 
 def configure_heading_styles(doc):
-    """Cấu hình built-in Heading 1/2/3 theo mẫu HUTECH để TOC tự lấy được."""
+    """Cấu hình built-in Heading 1/2/3 theo mẫu Khoa CNTT để TOC tự lấy được."""
     # Heading 1: CHƯƠNG – in hoa, đậm, size 14, căn giữa
     h1 = doc.styles["Heading 1"]
     _style_set_font(h1, size=SIZE_H1, bold=True)
@@ -530,7 +530,7 @@ add_h1(doc, "LỜI CẢM ƠN")
 
 paragraphs_thanks = [
     "Lời đầu tiên, em xin gửi lời cảm ơn chân thành và sâu sắc nhất đến ThS. Dương Thành Phết – giảng viên hướng dẫn đồ án môn Đồ án cơ sở. Trong suốt quá trình thực hiện đề tài, thầy đã tận tình hướng dẫn, định hướng giải pháp, giải đáp thắc mắc, cung cấp tài liệu tham khảo có giá trị và đưa ra những góp ý sắc bén giúp em hoàn thành đồ án một cách tốt nhất. Sự hướng dẫn tận tâm, kiên nhẫn của thầy là nguồn động lực lớn giúp em vượt qua những khó khăn trong quá trình nghiên cứu và triển khai hệ thống.",
-    "Em xin gửi lời cảm ơn đến Ban Giám hiệu Trường Đại học Công nghệ TP.HCM (HUTECH) và Khoa Công nghệ Thông tin đã tạo điều kiện thuận lợi, cung cấp cơ sở vật chất, phòng thực hành, thư viện và môi trường học tập hiện đại trong suốt quá trình học tập tại trường. Chương trình đào tạo bài bản và các môn học chuyên ngành của Khoa đã trang bị cho em nền tảng kiến thức vững chắc để thực hiện đề tài này.",
+    "Em xin gửi lời cảm ơn đến Ban Giám hiệu Trường Đại học Công nghệ TP.HCM và Khoa Công nghệ Thông tin đã tạo điều kiện thuận lợi, cung cấp cơ sở vật chất, phòng thực hành, thư viện và môi trường học tập hiện đại trong suốt quá trình học tập tại trường. Chương trình đào tạo bài bản và các môn học chuyên ngành của Khoa đã trang bị cho em nền tảng kiến thức vững chắc để thực hiện đề tài này.",
     "Em cũng xin gửi lời cảm ơn đến toàn thể quý thầy cô trong Khoa Công nghệ Thông tin đã truyền đạt kiến thức trong suốt những năm học vừa qua. Những kiến thức về Lập trình hướng đối tượng, Cấu trúc dữ liệu và giải thuật, Cơ sở dữ liệu, Mạng máy tính, Kỹ thuật phần mềm, Lập trình Web, An toàn thông tin và Trí tuệ nhân tạo mà quý thầy cô đã giảng dạy là nền tảng trực tiếp để em xây dựng hệ thống trong đồ án này.",
     "Em xin chân thành cảm ơn các anh chị khóa trên, bạn bè cùng lớp đã chia sẻ tài liệu, kinh nghiệm và hỗ trợ kỹ thuật trong quá trình em thực hiện đồ án. Sự trao đổi cởi mở trong các nhóm học tập đã giúp em có cái nhìn đa chiều và giải quyết nhiều vấn đề phát sinh trong quá trình phát triển hệ thống.",
     "Cuối cùng, em xin bày tỏ lòng biết ơn sâu sắc đến gia đình đã luôn động viên, ủng hộ và tạo mọi điều kiện tốt nhất để em học tập và hoàn thành đồ án. Sự quan tâm và khích lệ của gia đình là nguồn sức mạnh tinh thần vô giá giúp em vượt qua mọi khó khăn trong suốt quá trình học tập và thực hiện đề tài.",
