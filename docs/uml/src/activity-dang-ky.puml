@@ -1,0 +1,33 @@
+@startuml activity-dang-ky
+!include _style.puml
+title Activity Diagram — Đăng ký tài khoản
+
+start
+:User mở /register;
+:Nhập username, email, password;
+:Frontend validate form\n(định dạng email, độ dài pwd);
+if (form hợp lệ?) then (No)
+  :Hiển thị inline error;
+  stop
+endif
+
+:POST /api/auth/register;
+
+if (username đã tồn tại?) then (Yes)
+  :Trả 409\n"Username đã được dùng";
+  stop
+endif
+
+if (email đã tồn tại?) then (Yes)
+  :Trả 409\n"Email đã được dùng";
+  stop
+endif
+
+:BCrypt.encode(password);
+:Tạo User\n(role=EMPLOYEE, status=ACTIVE);
+:INSERT vào users;
+:Trả 201 Created\n+ DTO không kèm password;
+:Hiển thị toast thành công;
+:Điều hướng tới /login;
+stop
+@enduml

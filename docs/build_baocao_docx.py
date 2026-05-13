@@ -14,6 +14,7 @@ from docx.enum.style import WD_STYLE_TYPE
 import os as _os
 OUTPUT = r"C:\Users\Admin\task-management-system\docs\BAO_CAO_DO_AN_CO_SO.docx"
 SHOTS_DIR = r"C:\Users\Admin\task-management-system\docs\screenshots"
+UML_DIR = r"C:\Users\Admin\task-management-system\docs\uml\png"
 
 FONT = "Times New Roman"
 SIZE_BODY = 13
@@ -212,6 +213,22 @@ def add_image(doc, filename, width_cm=15.5):
     path = _os.path.join(SHOTS_DIR, filename)
     if not _os.path.exists(path):
         add_p(doc, f"[Không tìm thấy ảnh: {filename}]",
+              align=WD_ALIGN_PARAGRAPH.CENTER, italic=True)
+        return
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(2)
+    run = p.add_run()
+    run.add_picture(path, width=Cm(width_cm))
+    return p
+
+
+def add_uml_image(doc, filename, width_cm=15.5):
+    """Chèn sơ đồ UML (PNG do PlantUML sinh) từ docs/uml/png/."""
+    path = _os.path.join(UML_DIR, filename)
+    if not _os.path.exists(path):
+        add_p(doc, f"[Không tìm thấy sơ đồ UML: {filename}]",
               align=WD_ALIGN_PARAGRAPH.CENTER, italic=True)
         return
     p = doc.add_paragraph()
@@ -1650,32 +1667,7 @@ add_para(doc,
     "ở giữa, các use case là các ellipse bên trong khung. Các mũi tên "
     "thể hiện quan hệ giữa actor và use case (association), hoặc giữa "
     "các use case với nhau (include, extend).")
-add_code(doc, """
-+------------------+         +-----------------------------------------------+
-|                  |         |  HỆ THỐNG QUẢN LÝ CÔNG VIỆC                    |
-|     USER         |---------|  ( • Đăng ký   • Đăng nhập   • Đổi mật khẩu   |
-|   (Employee)     |         |    • Xem dashboard                              |
-|                  |---------|    • Chấm công ngày                            |
-+------------------+         |    • Xem lịch sử chấm công của mình            |
-                             |    • Xem task được giao                         |
-                             |    • Cập nhật trạng thái task                  |
-                             |  )                                              |
-+------------------+         |                                                 |
-|                  |---------|  ( • Quản lý nhân viên (CRUD)                  |
-|    MANAGER       |         |    • Quản lý kỹ năng                           |
-|                  |---------|    • Quản lý dự án (CRUD)                      |
-+------------------+         |    • Quản lý công việc (CRUD)                  |
-                             |    • Phê duyệt chấm công                       |
-                             |    • AI gợi ý nhân viên                         |
-                             |    • Xem báo cáo, dashboard                    |
-                             |  )                                              |
-+------------------+         |                                                 |
-|                  |---------|  ( • Quản trị tài khoản                         |
-|     ADMIN        |         |    • Phân quyền                                |
-|                  |---------|    • Xem logs hệ thống                         |
-+------------------+         |  )                                              |
-                             +-----------------------------------------------+
-""")
+add_uml_image(doc, "use-case-tong-the.png", width_cm=12.0)
 add_caption(doc, "Hình 3.1: Sơ đồ Use Case tổng thể của hệ thống", kind="figure")
 add_h3(doc, "3.4.2. Đặc tả use case UC-01: Đăng nhập")
 add_table(
@@ -1785,50 +1777,7 @@ add_para(doc,
     "nhân viên được lưu dưới dạng cột TEXT do quản lý nhập tự do, "
     "không tách thành bảng riêng. Sơ đồ ERD dưới đây thể hiện các "
     "thực thể (entity) và mối quan hệ.")
-add_code(doc, """
-+------------------+         +-----------------------+
-|     USERS        |         |       EMPLOYEES       |
-|------------------|         |-----------------------|
-| id (PK)          |---------| employee_id (PK)      |
-| username UQ      |  1  0..1| user_id FK            |
-| email UQ         |         | first_name            |
-| password         |         | last_name             |
-| role             |         | position              |
-| created_at       |         | department            |
-+------------------+         | employee_group        |
-                             | skills (TEXT)         |
-                             | hired_at              |
-                             +-----------------------+
-                                      | 1
-                            +---------+----------+
-                            |                    |
-                          0..*                 0..*
-                  +-----------------------+  +------------------+
-                  |        TASKS          |  |   ATTENDANCES    |
-                  |-----------------------|  |------------------|
-                  | task_id (PK)          |  | id (PK)          |
-                  | title                 |  | attendance_date  |
-                  | description           |  | status           |
-                  | required_skills(TEXT) |  | check_in         |
-                  | due_date              |  | check_out        |
-                  | status                |  | notes            |
-                  | completed_at          |  | employee_id FK   |
-                  | project_id FK         |  +------------------+
-                  | assigned_to FK        |
-                  +-----------------------+
-                            | 0..*
-                            v 1
-                  +------------------+         +------------------+
-                  |    PROJECTS      |         |   SUGGESTIONS    |
-                  |------------------|         |------------------|
-                  | id (PK)          |         | id (PK)          |
-                  | name             |         | required_skills  |
-                  | description      |         | task_title       |
-                  | start_date       |         | user_id FK       |
-                  | end_date         |         | created_at       |
-                  | status           |         +------------------+
-                  +------------------+
-""")
+add_uml_image(doc, "erd.png", width_cm=13.0)
 add_caption(doc, "Hình 3.2: Sơ đồ ERD của hệ thống", kind="figure")
 
 
@@ -1948,217 +1897,48 @@ add_para(doc,
     "Sơ đồ lớp dưới đây thể hiện các Entity class chính, các Service "
     "tầng nghiệp vụ và mối quan hệ giữa chúng. Đối tượng DTO và "
     "Controller được giản lược để tập trung vào domain model.")
-add_code(doc, """
-+---------------------+        +----------------------+
-|        User         |        |      Employee        |
-+---------------------+        +----------------------+
-| -id: Long           |<------>| -employeeId: Long    |
-| -username: String   | 1   0..1 -firstName: String   |
-| -email: String      |        | -lastName: String    |
-| -password: String   |        | -position: String    |
-| -role: String       |        | -department: String  |
-| -createdAt: LDT     |        | -group: String       |
-+---------------------+        | -skills: String      |
-                               | -hiredAt: LDT        |
-                               | -user: User          |
-                               +----------------------+
-                                              | 1
-                                              |
-                                            0..*
-                                       +-----------------+
-                                       |   Attendance    |
-                                       +-----------------+
-                                       | -id             |
-                                       | -date: LocalDate|
-                                       | -status         |
-                                       | -checkIn        |
-                                       | -checkOut       |
-                                       | -notes          |
-                                       | -employee       |
-                                       +-----------------+
-
-+---------------------+        +-------------------------+
-|       Project       |1     0..*         Task           |
-+---------------------+--------+-------------------------+
-| -id: Long           |        | -taskId: Long           |
-| -name: String       |        | -title: String          |
-| -description: Text  |        | -description: Text      |
-| -startDate          |        | -requiredSkills: Text   |
-| -endDate            |        | -status: String         |
-| -status             |        | -dueDate                |
-| -manager: Employee  |        | -completedAt            |
-+---------------------+        | -project: Project       |
-                               | -assignedTo: Employee   |
-                               +-------------------------+
-
-+------------------------------------------+
-|         AiSuggestionService              |
-+------------------------------------------+
-| +recommendEmployees(req): List<DTO>      |
-| +recommendEmployeesForTask(id): List<DTO>|
-| -collectStats(emps): Map<Long,Stats>     |
-| -buildPrompt(req, emps, stats): String   |
-| -callOpenAi(prompt, emps): List<DTO>     |               ^
-| -calcAttendanceScore(emp,map)|               |
-| -fetchOpenAiSummary(desc)    |---------------+
-+------------------------------+
-""")
-add_caption(doc, "Hình 3.3: Sơ đồ lớp (Class Diagram)", kind="figure")
+add_uml_image(doc, "class-diagram-thuc-the.png", width_cm=13.0)
+add_caption(doc, "Hình 3.3a: Sơ đồ lớp – Entity (Domain Model)", kind="figure")
+add_para(doc,
+    "Bên cạnh các lớp Entity, hệ thống còn có tầng Controller–Service–"
+    "Repository tổ chức theo kiến trúc Spring Boot, được mô tả ở Hình 3.3b "
+    "dưới đây. Lớp đặc biệt `AiSuggestionService` gọi tới nhiều repository "
+    "và OpenAI API thông qua `OpenAiClient`.")
+add_uml_image(doc, "class-diagram-kien-truc.png", width_cm=15.0)
+add_caption(doc, "Hình 3.3b: Sơ đồ lớp – Kiến trúc Controller / Service / Repository",
+            kind="figure")
 
 
 add_h2(doc, "3.8. Sơ đồ tuần tự (Sequence Diagram)")
 add_h3(doc, "3.8.1. Sơ đồ tuần tự – Đăng nhập")
-add_code(doc, """
-Client       AuthController     AuthenticationManager    UserDetailsService    Database     JwtUtil
-  |                |                       |                      |                |            |
-  |--POST login--->|                       |                      |                |            |
-  |                |--authenticate(u,p)--->|                      |                |            |
-  |                |                       |--loadUserByName(u)-->|                |            |
-  |                |                       |                      |---SELECT-----> |            |
-  |                |                       |                      |<--User row---- |            |
-  |                |                       |<--UserDetails--------|                |            |
-  |                |<--Authentication------|                      |                |            |
-  |                |--generateToken(u)---------------------------------------------------------> |
-  |                |<--JWT String-----------------------------------------------------------------|
-  |<--200 OK + JWT |                       |                      |                |            |
-""")
+add_uml_image(doc, "sequence-dang-nhap.png", width_cm=15.5)
 add_caption(doc, "Hình 3.4: Sơ đồ tuần tự – Đăng nhập", kind="figure")
 
 add_h3(doc, "3.8.2. Sơ đồ tuần tự – AI gợi ý nhân viên")
-add_code(doc, """
-Client     SuggestionController     AiSuggestionService    RedisCache    Repositories     OpenAI API
-  |                |                       |                  |              |              |
-  |--POST /api/suggestions/recommend---->|                    |              |              |
-  |                |--recommendEmployees(req)-->|             |              |              |
-  |                |                       |--lookup(cacheKey)|              |              |
-  |                |                       |<-- MISS ---------|              |              |
-  |                |                       |--employeeRepository.findAll()-->|              |
-  |                |                       |<-- List<Employee> (kèm skills)--|              |
-  |                |                       |--taskRepo.findByAssignedToIn(ids)>             |
-  |                |                       |--attendanceRepo.findByEmployeeIdInAndDate(...)>|
-  |                |                       |--collectStats()                 |              |
-  |                |                       |--buildPrompt(task + emps + stats)              |
-  |                |                       |--POST /v1/chat/completions----------------->|
-  |                |                       |<-- JSON [{employeeId, rank, reasoning}]------|
-  |                |                       |--store(cacheKey, result, TTL=5m)|              |
-  |                |<--List<EmployeeSuggestionDTO>top5---------|              |              |
-  |<-- 200 OK + data -|                    |                   |              |              |
-""")
+add_uml_image(doc, "sequence-ai-goi-y.png", width_cm=15.5)
 add_caption(doc, "Hình 3.5: Sơ đồ tuần tự – AI gợi ý nhân viên", kind="figure")
 
 add_h3(doc, "3.8.3. Sơ đồ tuần tự – Tạo công việc và gán nhân viên")
-add_code(doc, """
-Client    TaskController    TaskService   ProjectRepo   EmployeeRepo   TaskRepo
-  |             |                |              |              |             |
-  |--POST /api/tasks (body)----->|              |              |             |
-  |             |--createTask(req)->|           |              |             |
-  |             |                |--findById(projectId)------>|              |
-  |             |                |<--Project----                |              |
-  |             |                |--findById(employeeId)------------------->|
-  |             |                |<--Employee--------------------------------|
-  |             |                |--new Task(title, project, employee...)   |
-  |             |                |--save(task)---------------------------------->
-  |             |                |<--persisted Task-------------------------------
-  |             |<--TaskDTO------|                |              |             |
-  |<-- 201 Created -|             |               |              |             |
-""")
+add_uml_image(doc, "sequence-quan-ly-cong-viec.png", width_cm=15.5)
 add_caption(doc, "Hình 3.6: Sơ đồ tuần tự – Tạo công việc và gán nhân viên", kind="figure")
 
 
 add_h2(doc, "3.9. Sơ đồ hoạt động (Activity Diagram)")
 add_h3(doc, "3.9.1. Activity Diagram – Chấm công ngày")
-add_code(doc, """
-    ( Start )
-        |
-        v
-+------------------+
-|  User mở /attendance |
-+------------------+
-        |
-        v
-+------------------+
-| Chọn nhân viên    |
-| Chọn ngày         |
-| Chọn trạng thái   |
-+------------------+
-        |
-        v
-   < Đầy đủ trường? >--- No ---> Hiển thị lỗi -+
-        | Yes                                  |
-        v                                      |
-+------------------+                           |
-| Gửi POST          |                          |
-| /api/attendance   |                          |
-+------------------+                           |
-        |                                      |
-        v                                      |
-< Đã tồn tại bản ghi >--- Yes ---> Hỏi xác nhận ghi đè
-        | No                                   |
-        v                                      v
-   Lưu vào DB                            Cập nhật DB
-        |                                      |
-        +--------------+-----------------------+
-                       v
-              Hiển thị thông báo
-                       v
-                    ( End )
-""")
+add_uml_image(doc, "activity-cham-cong.png", width_cm=13.5)
 add_caption(doc, "Hình 3.7: Sơ đồ hoạt động – Chấm công ngày", kind="figure")
+
+add_h3(doc, "3.9.2. Activity Diagram – AI gợi ý nhân viên")
+add_uml_image(doc, "activity-ai-goi-y.png", width_cm=14.0)
+add_caption(doc, "Hình 3.7b: Sơ đồ hoạt động – AI gợi ý nhân viên", kind="figure")
 
 
 add_h2(doc, "3.10. Kiến trúc tổng thể hệ thống")
 add_para(doc,
     "Hệ thống được thiết kế theo kiến trúc 3 tầng kết hợp microservice "
     "nhẹ. Tất cả các thành phần được đóng gói trong Docker container và "
-    "kết nối qua một mạng Docker bridge nội bộ.")
-add_code(doc, """
-+--------------------------------------------------------------------------+
-|                         CLIENTS / NGƯỜI DÙNG                              |
-+----------------------+-------------------------+-------------------------+
-|  Web Browser         |  Mobile App (Flutter)   |  External API consumer  |
-|  React + Vite + TW   |  Android / iOS          |  (Postman, đối tác)     |
-|  Port 5173 (dev)     |  HTTPS                  |  Swagger UI             |
-|  Port 80   (prod)    |                         |                          |
-+----------+-----------+-----------+-------------+-------------+-----------+
-           |                       |                           |
-           +-----------+-----------+---------------------------+
-                       |  HTTPS REST + JWT
-                       v
-+--------------------------------------------------------------------------+
-|              BACKEND SERVER – Spring Boot 3.5.0 (Port 5000)              |
-|--------------------------------------------------------------------------|
-|  Controller layer                                                         |
-|   - AuthController  EmployeeController  ProjectController                |
-|   - TaskController  AttendanceController  SuggestionController           |
-|--------------------------------------------------------------------------|
-|  Security layer                                                          |
-|   - JwtAuthenticationFilter   - SecurityConfig   - JwtTokenProvider      |
-|--------------------------------------------------------------------------|
-|  Service layer                                                           |
-|   - UserService   EmployeeService   ProjectService   TaskService         |
-|   - AttendanceService   AiSuggestionService   CurrentUserService         |
-|--------------------------------------------------------------------------|
-|  Cache abstraction (Spring Cache + RedisCacheManager)                    |
-|--------------------------------------------------------------------------|
-|  Repository layer (Spring Data JPA / Hibernate)                          |
-|   - UserRepo  EmployeeRepo  ProjectRepo  TaskRepo                        |
-|   - AttendanceRepo  SuggestionRepo                                       |
-+----------+-------------------------------------+-------------------------+
-           |                                     |
-           v JDBC                                v RESP
-+----------+---------------------+    +----------+---------------------+
-|   PostgreSQL 16 (Port 5432)    |    |   Redis 7 (Port 6379)          |
-|   Volume: pgdata               |    |   Volume: redisdata            |
-+--------------------------------+    +--------------------------------+
-
-      Outbound  ------------------ +
-                                   |
-                                   v
-                         OpenAI Chat API (gpt-4o-mini)
-
-(Tất cả các container chạy trong cùng Docker network `taskmgmt_net`,
-được orchestrate bởi docker-compose.yml)
-""")
+    "kết nối qua một mạng Docker bridge nội bộ `taskmgmt_net`.")
+add_uml_image(doc, "architecture.png", width_cm=15.5)
 add_caption(doc, "Hình 3.8: Sơ đồ kiến trúc tổng thể hệ thống", kind="figure")
 
 

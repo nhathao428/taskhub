@@ -1,0 +1,34 @@
+@startuml use-case-cham-cong
+!include _style.puml
+title Use Case — Quản lý Chấm công
+
+left to right direction
+
+actor "Nhân viên" as Emp
+actor "Quản lý" as Mgr
+
+rectangle "Module Chấm công" {
+  usecase "Chấm công vào (Check-in)" as UC_In
+  usecase "Chấm công ra (Check-out)" as UC_Out
+  usecase "Xem lịch sử chấm công\ncủa tôi" as UC_My
+  usecase "Xem báo cáo chấm công\ntoàn nhân viên" as UC_Rep
+  usecase "Xuất Excel" as UC_Exp
+}
+
+Emp --> UC_In
+Emp --> UC_Out
+Emp --> UC_My
+
+Mgr --> UC_Rep
+Mgr --> UC_Exp
+Mgr --> UC_My
+
+UC_Rep ..> UC_Exp : <<extend>>
+
+note bottom of UC_In
+  Mỗi nhân viên chỉ được chấm công
+  một lần mỗi ngày (kiểm tra trùng).
+end note
+
+Mgr -|> Emp
+@enduml

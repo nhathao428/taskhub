@@ -1,0 +1,28 @@
+@startuml use-case-xac-thuc
+!include _style.puml
+title Use Case — Xác thực người dùng
+
+left to right direction
+
+actor "Người dùng\nchưa đăng nhập" as Guest
+actor "Người dùng\nđã đăng nhập" as Member
+
+rectangle "Hệ thống Xác thực" {
+  usecase "Đăng ký tài khoản" as UC_Reg
+  usecase "Đăng nhập" as UC_Login
+  usecase "Đăng xuất" as UC_Logout
+  usecase "Kiểm tra JWT" as UC_Verify
+}
+
+Guest --> UC_Reg
+Guest --> UC_Login
+Member --> UC_Logout
+
+UC_Login ..> UC_Verify : <<include>>
+UC_Logout ..> UC_Verify : <<include>>
+
+note right of UC_Login
+  Trả về JWT chứa username + role,
+  có hiệu lực 24 giờ.
+end note
+@enduml

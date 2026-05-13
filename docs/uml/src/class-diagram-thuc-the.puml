@@ -1,0 +1,69 @@
+@startuml class-diagram-thuc-the
+!include _style.puml
+title Class Diagram — Entity (Domain Model)
+
+class User {
+  - id : Long
+  - username : String
+  - email : String
+  - password : String
+  - role : String
+  - status : String
+  - createdAt : LocalDateTime
+  + getRole() : String
+}
+
+class Employee {
+  - employeeId : Long
+  - firstName : String
+  - lastName : String
+  - position : String
+  - department : String
+  - employeeGroup : String
+  - skills : String
+  - hiredAt : LocalDateTime
+  + getFullName() : String
+}
+
+class Project {
+  - id : Long
+  - name : String
+  - description : String
+  - startDate : LocalDate
+  - endDate : LocalDate
+  - status : String
+}
+
+class Task {
+  - taskId : Long
+  - title : String
+  - description : String
+  - requiredSkills : String
+  - status : String
+  - dueDate : LocalDate
+  - completedAt : LocalDateTime
+}
+
+class Attendance {
+  - id : Long
+  - date : LocalDate
+  - status : String
+  - checkIn : LocalTime
+  - checkOut : LocalTime
+  - notes : String
+}
+
+class Suggestion {
+  - id : Long
+  - requiredSkills : String
+  - taskTitle : String
+  - createdAt : LocalDateTime
+}
+
+User "1" -- "0..1" Employee : owns >
+Employee "1" -- "0..*" Task : assignedTo <
+Employee "1" -- "0..*" Attendance : has >
+Employee "1" -- "0..*" Project : manages >
+Project "1" -- "0..*" Task : contains >
+User "1" -- "0..*" Suggestion : creates >
+@enduml

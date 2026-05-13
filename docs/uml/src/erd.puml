@@ -1,0 +1,79 @@
+@startuml erd
+!include _style.puml
+title Sơ đồ ERD — Cơ sở dữ liệu PostgreSQL
+
+entity "users" as Users {
+  * id : BIGSERIAL <<PK>>
+  --
+  * username : VARCHAR(50) <<UQ>>
+  * email : VARCHAR(100) <<UQ>>
+  * password : VARCHAR(255)
+  * role : VARCHAR(20)
+  * status : VARCHAR(20)
+  * created_at : TIMESTAMP
+}
+
+entity "employees" as Employees {
+  * employee_id : BIGSERIAL <<PK>>
+  --
+  user_id : BIGINT <<FK>>
+  * first_name : VARCHAR(50)
+  * last_name : VARCHAR(50)
+  position : VARCHAR(50)
+  department : VARCHAR(50)
+  employee_group : VARCHAR(100)
+  skills : TEXT
+  hired_at : TIMESTAMP
+}
+
+entity "projects" as Projects {
+  * id : BIGSERIAL <<PK>>
+  --
+  * name : VARCHAR(200)
+  description : TEXT
+  start_date : DATE
+  end_date : DATE
+  * status : VARCHAR(20)
+  manager_id : BIGINT <<FK>>
+}
+
+entity "tasks" as Tasks {
+  * task_id : BIGSERIAL <<PK>>
+  --
+  * title : VARCHAR(100)
+  description : TEXT
+  required_skills : TEXT
+  * status : VARCHAR(50)
+  due_date : DATE
+  completed_at : TIMESTAMP
+  project_id : BIGINT <<FK>>
+  assigned_to : BIGINT <<FK>>
+}
+
+entity "attendances" as Attendance {
+  * id : BIGSERIAL <<PK>>
+  --
+  * attendance_date : DATE
+  * status : VARCHAR(20)
+  check_in : TIME
+  check_out : TIME
+  notes : TEXT
+  * employee_id : BIGINT <<FK>>
+}
+
+entity "suggestions" as Sug {
+  * id : BIGSERIAL <<PK>>
+  --
+  required_skills : VARCHAR(500)
+  task_title : VARCHAR(200)
+  user_id : BIGINT <<FK>>
+  * created_at : TIMESTAMP
+}
+
+Users ||..o| Employees : "1 : 0..1"
+Employees ||..o{ Tasks : "1 : 0..* (assigned)"
+Employees ||..o{ Attendance : "1 : 0..*"
+Employees ||..o{ Projects : "manager"
+Projects ||..o{ Tasks : "1 : 0..*"
+Users ||..o{ Sug : "1 : 0..*"
+@enduml

@@ -1,0 +1,88 @@
+' Style chung – làm các sơ đồ trông giống StarUML xuất ra:
+'   - màu nền trắng, không đổ bóng
+'   - viền rõ, font Arial
+'   - mũi tên đường thẳng, màu xám đậm
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundCorner 6
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 13
+skinparam ArrowColor #333333
+skinparam ArrowFontColor #333333
+
+skinparam Class {
+  BackgroundColor #FFFFFF
+  BorderColor #2C5282
+  HeaderBackgroundColor #BEE3F8
+  AttributeFontColor #2D3748
+  AttributeFontSize 12
+  FontStyle plain
+}
+
+skinparam Object {
+  BackgroundColor #FFFFFF
+  BorderColor #2C5282
+}
+
+skinparam Entity {
+  BackgroundColor #FFFFFF
+  BorderColor #2C5282
+  HeaderBackgroundColor #BEE3F8
+}
+
+skinparam Usecase {
+  BackgroundColor #E6F3FB
+  BorderColor #2C5282
+  FontSize 13
+}
+
+skinparam Actor {
+  BackgroundColor #FFFFFF
+  BorderColor #2C5282
+  FontSize 12
+  FontStyle bold
+}
+
+skinparam Sequence {
+  ArrowColor #333333
+  LifeLineBorderColor #2C5282
+  LifeLineBackgroundColor #EBF8FF
+  ParticipantBackgroundColor #BEE3F8
+  ParticipantBorderColor #2C5282
+  ParticipantFontStyle bold
+  ActorBackgroundColor #FFFFFF
+  ActorBorderColor #2C5282
+  GroupBackgroundColor #F7FAFC
+  GroupBorderColor #2C5282
+}
+
+skinparam Activity {
+  BackgroundColor #E6F3FB
+  BorderColor #2C5282
+  StartColor #2C5282
+  EndColor #2C5282
+  DiamondBackgroundColor #FEF9E7
+  DiamondBorderColor #B7791F
+}
+
+skinparam Note {
+  BackgroundColor #FEF9E7
+  BorderColor #B7791F
+}
+
+skinparam Package {
+  BackgroundColor #F7FAFC
+  BorderColor #2C5282
+  FontStyle bold
+}
+
+skinparam Component {
+  BackgroundColor #BEE3F8
+  BorderColor #2C5282
+}
+
+skinparam Rectangle {
+  BackgroundColor #F7FAFC
+  BorderColor #2C5282
+  FontStyle bold
+}

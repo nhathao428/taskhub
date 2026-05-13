@@ -1,0 +1,45 @@
+@startuml sequence-quan-ly-cong-viec
+!include _style.puml
+title Sequence Diagram — Tạo công việc & Phân công nhân viên
+
+actor "Quản lý" as Mgr
+participant "TaskController" as TC
+participant "TaskService" as TS
+participant "ProjectRepository" as PR
+participant "EmployeeRepository" as ER
+database "PostgreSQL\n(tasks)" as DB
+
+Mgr -> TC : POST /api/tasks\n{title, projectId, assignedToId, dueDate}
+activate TC
+TC -> TC : @PreAuthorize hasAnyRole('MANAGER','ADMIN')
+TC -> TS : createTask(req)
+activate TS
+
+TS -> PR : findById(projectId)
+PR --> TS : Project
+alt project không tồn tại
+  TS --> TC : NotFoundException
+  TC --> Mgr : 404 Not Found
+end
+
+TS -> ER : findById(assignedToId)
+ER --> TS : Employee
+alt employee không tồn tại
+  TS --> TC : NotFoundException
+  TC --> Mgr : 404 Not Found
+end
+
+TS -> TS : new Task(\n title, project, employee,\n status='pending', dueDate)
+TS -> DB : INSERT
+DB --> TS : task with id
+TS --> TC : TaskDTO
+deactivate TS
+TC --> Mgr : 201 Created\n{task}
+deactivate TC
+
+note right of TS
+  Khi assignedTo có ≥ 5 task
+  IN_PROGRESS, service log
+  cảnh báo nhưng vẫn cho phép.
+end note
+@enduml

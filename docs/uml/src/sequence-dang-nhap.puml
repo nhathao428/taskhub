@@ -1,0 +1,37 @@
+@startuml sequence-dang-nhap
+!include _style.puml
+title Sequence Diagram — Đăng nhập (JWT)
+
+actor "Client" as C
+participant "AuthController" as AC
+participant "AuthenticationManager" as AM
+participant "UserDetailsService" as UDS
+database "PostgreSQL\n(users)" as DB
+participant "BCrypt" as BC
+participant "JwtTokenProvider" as JWT
+
+C -> AC : POST /api/auth/login\n{username, password}
+activate AC
+AC -> AM : authenticate(token)
+activate AM
+AM -> UDS : loadUserByUsername(username)
+activate UDS
+UDS -> DB : SELECT * FROM users\nWHERE username = ?
+DB --> UDS : User row
+UDS --> AM : UserDetails
+deactivate UDS
+AM -> BC : matches(rawPwd, hash)
+BC --> AM : true / false
+
+alt mật khẩu đúng
+  AM --> AC : Authentication ✓
+  deactivate AM
+  AC -> JWT : generateToken(username, role)
+  JWT --> AC : JWT String
+  AC --> C : 200 OK\n{token, user}
+else mật khẩu sai
+  AM --> AC : BadCredentials
+  AC --> C : 401 Unauthorized\n{error}
+end
+deactivate AC
+@enduml

@@ -1,0 +1,27 @@
+@startuml activity-dang-nhap
+!include _style.puml
+title Activity Diagram — Đăng nhập
+
+start
+:User mở /login;
+:Nhập username + password;
+:Nhấn "Đăng nhập";
+:Frontend gửi POST /api/auth/login;
+
+if (username tồn tại trong DB?) then (Yes)
+  if (BCrypt.matches(pwd, hash)?) then (Yes)
+    :Tạo JWT (username + role + exp = 24h);
+    :Lưu token vào localStorage;
+    :Điều hướng đến /dashboard;
+    stop
+  else (No)
+    :Trả 401\n"Mật khẩu không đúng";
+    :Hiển thị toast lỗi;
+  endif
+else (No)
+  :Trả 401\n"Tài khoản không tồn tại";
+  :Hiển thị toast lỗi;
+endif
+:Quay lại form login;
+stop
+@enduml

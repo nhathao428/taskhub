@@ -1,147 +1,137 @@
-# 📊 Sơ đồ UML — Hệ thống Quản lý Công việc
+# Sơ đồ UML — Hệ thống Quản lý Công việc
 
-Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Activity mô tả kiến trúc và luồng hoạt động chính của hệ thống. Tất cả sơ đồ được vẽ bằng SVG thuần tiếng Việt, phù hợp để đưa vào báo cáo đồ án.
+Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Activity mô tả kiến trúc và luồng hoạt động chính của hệ thống. Tất cả sơ đồ được sinh bằng **PlantUML** từ source code (`docs/uml/src/*.puml`) và render ra PNG ở `docs/uml/png/` — phong cách trình bày tương đương StarUML.
+
+Tái tạo PNG: `java -jar docs/uml/plantuml.jar -charset UTF-8 -tpng -o "../png" "docs/uml/src/*.puml"`.
 
 ---
 
 ## 1. Sơ đồ Use Case
 
-### 1.1. Use Case — Xác thực
+### 1.1. Use Case tổng thể
 
-Mô tả các chức năng xác thực của hệ thống: đăng ký tài khoản, đăng nhập và đăng xuất. Hệ thống sử dụng JWT Token để xác thực phiên làm việc, token có hiệu lực 24 giờ.
+Sơ đồ tổng thể gồm 14 use case chia thành 5 nhóm chức năng (Xác thực, Nhân viên & Dự án, Công việc & Chấm công, AI Gợi ý, Quản trị). Ba actor là EMPLOYEE → MANAGER → ADMIN có quan hệ kế thừa (generalization): vai trò cấp trên kế thừa mọi use case của vai trò cấp dưới.
 
-![Use Case Xác thực](diagrams/use-case-xac-thuc.svg)
+![Use Case tổng thể](uml/png/use-case-tong-the.png)
 
----
+### 1.2. Use Case — Xác thực
 
-### 1.2. Use Case — Quản lý Chấm công
+Đăng ký, đăng nhập, đăng xuất — tất cả đều `<<include>>` use case "Kiểm tra JWT". Token có hiệu lực 24 giờ, chứa username + role.
 
-Mô tả luồng chấm công của nhân viên: chấm công vào (check-in), chấm công ra (check-out), xem lịch sử và báo cáo. Quản lý có thêm quyền xem báo cáo tổng hợp. Mỗi nhân viên chỉ được chấm công một lần mỗi ngày.
+![Use Case Xác thực](uml/png/use-case-xac-thuc.png)
 
-![Use Case Chấm công](diagrams/use-case-cham-cong.svg)
+### 1.3. Use Case — Chấm công
 
----
+Nhân viên check-in / check-out / xem lịch sử của mình; Quản lý xem báo cáo tổng hợp và có thể `<<extend>>` để xuất Excel. Mỗi nhân viên chỉ được chấm công một lần mỗi ngày.
 
-### 1.3. Use Case — Quản lý Dự án & Công việc
+![Use Case Chấm công](uml/png/use-case-cham-cong.png)
 
-Mô tả đầy đủ các chức năng CRUD dự án và công việc. Quản lý có toàn quyền tạo/sửa/xóa dự án và công việc, đồng thời phân công nhân viên. Nhân viên có thể xem và cập nhật tiến độ công việc được giao.
+### 1.4. Use Case — Quản lý Dự án & Công việc
 
-![Use Case Dự án và Công việc](diagrams/use-case-du-an-cong-viec.svg)
+CRUD đầy đủ cho dự án và công việc. Backend kiểm tra ownership: nhân viên chỉ sửa được task của chính mình. Quan hệ `<<include>>` giữa "Tạo công việc" và "Xem danh sách dự án".
 
----
+![Use Case Dự án và Công việc](uml/png/use-case-du-an-cong-viec.png)
 
-### 1.4. Use Case — AI Gợi ý Nhân viên
+### 1.5. Use Case — AI Gợi ý Nhân viên
 
-Mô tả quy trình AI gợi ý nhân viên phù hợp. Backend thu thập dữ liệu thô của 3 tiêu chí (tiến độ task trước, thời gian hoàn thành, chấm công) rồi giao cho OpenAI GPT tự xếp hạng. Không còn rule-based fallback — không có API key thì trả 422.
+OpenAI GPT-4o-mini là một system actor bên ngoài. Backend gom số liệu thô và xây prompt tiếng Việt rồi gọi AI; kết quả được cache 5 phút bằng Redis.
 
-![Use Case AI Gợi ý](diagrams/use-case-ai-goi-y.svg)
-
----
-
-## 2. Sơ đồ lớp — Class Diagram
-
-### 2.1. Sơ đồ lớp thực thể (Entity)
-
-Mô tả 6 thực thể chính của hệ thống và mối quan hệ giữa chúng. `NhanVien` liên kết với `NguoiDung` (ManyToOne), `CongViec` thuộc về `DuAn` và được phân công cho `NhanVien`. `ChamCong` gắn với `NhanVien`. `GoiY` thuộc về `NguoiDung`.
-
-![Class Diagram Thực thể](diagrams/class-diagram-thuc-the.svg)
+![Use Case AI Gợi ý](uml/png/use-case-ai-goi-y.png)
 
 ---
 
-### 2.2. Sơ đồ lớp kiến trúc (Controller — Service — Repository)
+## 2. Class Diagram
 
-Mô tả kiến trúc phân tầng của ứng dụng Spring Boot: Controller nhận request HTTP và xác thực JWT, Service xử lý nghiệp vụ, Repository truy vấn database thông qua JPA, Entity ánh xạ bảng MySQL. `AiSuggestionService` là service đặc biệt truy vấn nhiều repository.
+### 2.1. Sơ đồ lớp Entity (Domain Model)
 
-![Class Diagram Kiến trúc](diagrams/class-diagram-kien-truc.svg)
+6 entity chính: `User`, `Employee`, `Project`, `Task`, `Attendance`, `Suggestion`. `User` 1:0..1 `Employee`. `Employee` quản lý nhiều `Project`, được gán nhiều `Task`, có nhiều bản ghi `Attendance`.
 
----
+![Class Diagram Entity](uml/png/class-diagram-thuc-the.png)
 
-## 3. Sơ đồ tuần tự — Sequence Diagram
+### 2.2. Sơ đồ lớp Kiến trúc (Controller / Service / Repository)
 
-### 3.1. Đăng nhập
+Sơ đồ phân tầng Spring Boot 3 lớp: Controller → Service → Repository, kèm hai thành phần ngoài (`OpenAiClient`, `RedisCache`). `AiSuggestionService` là service đặc biệt – truy vấn 3 repository và gọi OpenAI.
 
-Mô tả luồng xác thực JWT đầy đủ: từ Client → AuthController → AuthenticationManager → UserDetailsService → Database → BCrypt comparison → JWT generation. Phân nhánh rõ ràng: thành công (200 OK + token) hoặc thất bại (401 Unauthorized).
-
-![Sequence Đăng nhập](diagrams/sequence-dang-nhap.svg)
+![Class Diagram Kiến trúc](uml/png/class-diagram-kien-truc.png)
 
 ---
 
-### 3.2. Chấm công
+## 3. Sequence Diagram
 
-Mô tả luồng check-in và check-out: xác thực JWT, kiểm tra trùng lặp (đã chấm công hôm nay chưa), lưu bản ghi với timestamp. Check-out cập nhật giờ ra. Có xử lý lỗi cho từng trường hợp.
+### 3.1. Đăng nhập (JWT)
 
-![Sequence Chấm công](diagrams/sequence-cham-cong.svg)
+Luồng xác thực: Client → AuthController → AuthenticationManager → UserDetailsService → PostgreSQL → BCrypt → JwtTokenProvider. Hai nhánh: 200 OK + token hoặc 401 Unauthorized.
 
----
+![Sequence Đăng nhập](uml/png/sequence-dang-nhap.png)
+
+### 3.2. Chấm công Check-in / Check-out
+
+Hai luồng tách rời: Check-in (kiểm tra trùng → INSERT) và Check-out (kiểm tra có bản ghi vào → UPDATE). Mỗi luồng có nhánh lỗi: 409 Conflict (đã chấm rồi) và 404 Not Found (chưa check-in).
+
+![Sequence Chấm công](uml/png/sequence-cham-cong.png)
 
 ### 3.3. AI Gợi ý Nhân viên
 
-Mô tả luồng AI gợi ý dựa trên code thực tế của `AiSuggestionService`: 2 batch query song song (Task, Attendance), tổng hợp raw stats (tổng/hoàn thành/đang xử lý/đúng hạn/trễ ngày, ngày làm việc 30 ngày), build prompt tiếng Việt rồi gọi OpenAI Chat Completions. AI tự xếp hạng top 5 + reasoning. Không có API key → throw `BusinessException` (HTTP 422).
+Luồng đầy đủ: cache lookup → MISS → batch query song song (Task + Attendance) → collectStats → buildPrompt → POST OpenAI → parse JSON → cache 5m → trả top 5. Nhánh HIT trả ngay từ cache.
 
-![Sequence AI Gợi ý](diagrams/sequence-ai-goi-y.svg)
+![Sequence AI Gợi ý](uml/png/sequence-ai-goi-y.png)
 
----
+### 3.4. Tạo công việc và Phân công nhân viên
 
-### 3.4. Quản lý Công việc (Tạo + Phân công)
+POST /api/tasks với `@PreAuthorize` cho MANAGER/ADMIN. Service kiểm tra project + employee tồn tại trước khi INSERT. Trả 404 nếu thiếu, 201 nếu thành công.
 
-Mô tả luồng tạo công việc mới (POST /api/tasks, status = PENDING) và phân công nhân viên (PUT /api/tasks/{id}, cập nhật assigned_to). Cả hai luồng yêu cầu role MANAGER hoặc ADMIN. Nhân viên chỉ được PATCH /api/tasks/{id}/status cho task của chính mình.
-
-![Sequence Quản lý Công việc](diagrams/sequence-quan-ly-cong-viec.svg)
+![Sequence Tạo công việc](uml/png/sequence-quan-ly-cong-viec.png)
 
 ---
 
-## 4. Sơ đồ hoạt động — Activity Diagram
+## 4. Activity Diagram
 
 ### 4.1. Đăng nhập
 
-Mô tả luồng đăng nhập với 2 lần kiểm tra: username có tồn tại không, sau đó password có khớp BCrypt không. Cả hai nhánh lỗi đều quay về form nhập liệu. Thành công thì tạo JWT và chuyển đến Dashboard.
+Hai lần kiểm tra: username có tồn tại + BCrypt khớp password. Cả hai nhánh lỗi quay về form, nhánh thành công tạo JWT và chuyển đến `/dashboard`.
 
-![Activity Đăng nhập](diagrams/activity-dang-nhap.svg)
-
----
+![Activity Đăng nhập](uml/png/activity-dang-nhap.png)
 
 ### 4.2. Đăng ký
 
-Mô tả luồng đăng ký với 2 lần kiểm tra trùng: username và email. Nếu hợp lệ, mã hóa mật khẩu bằng BCrypt, tạo User với role = EMPLOYEE (mặc định), lưu vào database.
+Validate form (client-side), sau đó backend kiểm tra trùng username và email. Mật khẩu được mã hoá BCrypt, user mới có role mặc định EMPLOYEE.
 
-![Activity Đăng ký](diagrams/activity-dang-ky.svg)
+![Activity Đăng ký](uml/png/activity-dang-ky.png)
 
----
+### 4.3. Quản lý Nhân viên (CRUD)
 
-### 4.3. Quản lý Nhân viên
+Bốn nhánh CRUD: Xem chi tiết, Thêm (kèm validate trùng email), Sửa, Xóa (kèm kiểm tra ràng buộc — không cho xóa nếu còn task gán).
 
-Mô tả 4 thao tác CRUD nhân viên: Xem danh sách (GET), Thêm mới (POST với validation), Sửa (PUT), Xóa (DELETE). Tất cả thao tác đều trở về màn hình danh sách nhân viên sau khi hoàn tất.
-
-![Activity Quản lý Nhân viên](diagrams/activity-quan-ly-nhan-vien.svg)
-
----
+![Activity Quản lý Nhân viên](uml/png/activity-quan-ly-nhan-vien.png)
 
 ### 4.4. Chấm công
 
-Mô tả 3 luồng: Chấm công vào (kiểm tra trùng → tạo bản ghi mới), Chấm công ra (kiểm tra có bản ghi vào → cập nhật giờ ra), Xem lịch sử (GET danh sách). Mỗi luồng có xử lý lỗi riêng.
+Swimlane 3 tầng (Nhân viên / Frontend / Backend). Backend tự quyết định check-in hay check-out dựa trên bản ghi đã có hôm nay.
 
-![Activity Chấm công](diagrams/activity-cham-cong.svg)
-
----
+![Activity Chấm công](uml/png/activity-cham-cong.png)
 
 ### 4.5. AI Gợi ý Nhân viên
 
-Mô tả luồng AI đầy đủ: nhập tiêu đề + mô tả task → batch query Task & Attendance → tổng hợp raw stats (tiến độ / thời gian hoàn thành / chấm công) → build prompt tiếng Việt → gọi OpenAI → parse JSON response → trả top 5 với rank + reasoning. Backend KHÔNG tự tính điểm.
+Swimlane 4 tầng (Quản lý / Frontend / Backend / OpenAI). Khối parallel mô tả 3 batch query trên 3 repository. Nhánh cache HIT trả ngay không gọi AI.
 
-![Activity AI Gợi ý](diagrams/activity-ai-goi-y.svg)
+![Activity AI Gợi ý](uml/png/activity-ai-goi-y.png)
+
+### 4.6. Quản lý Dự án (CRUD)
+
+Tương tự CRUD Nhân viên: tạo / sửa / xóa với ràng buộc "không xóa được nếu còn task thuộc dự án".
+
+![Activity Quản lý Dự án](uml/png/activity-quan-ly-du-an.png)
+
+### 4.7. Quản lý Công việc (CRUD + cập nhật trạng thái)
+
+Tạo, sửa, xóa (quyền MANAGER) và cập nhật trạng thái (mọi nhân viên với task của mình). Backend kiểm tra ownership, set `completed_at = NOW()` khi trạng thái chuyển sang completed.
+
+![Activity Quản lý Công việc](uml/png/activity-quan-ly-cong-viec.png)
 
 ---
 
-### 4.6. Quản lý Dự án
+## 5. Kiến trúc tổng thể
 
-Mô tả 4 thao tác CRUD dự án: Xem danh sách, Tạo mới (với ngày bắt đầu/kết thúc, status = ongoing), Cập nhật, Xóa. Tất cả đều trả về danh sách dự án sau khi thực hiện.
+Sơ đồ component-style mô tả 3 tier (Client / Application / Data) và các kết nối: Web/Mobile/Tools → Spring Boot (JWT) → PostgreSQL + Redis + OpenAI. Tất cả container chạy chung Docker network `taskmgmt_net`.
 
-![Activity Quản lý Dự án](diagrams/activity-quan-ly-du-an.svg)
-
----
-
-### 4.7. Quản lý Công việc
-
-Mô tả 5 thao tác: Xem, Tạo mới (status = PENDING), Phân công nhân viên, Cập nhật trạng thái (nếu COMPLETED thì set completedAt = now()), Xóa. Trường `completedAt` được dùng bởi AI để tính hiệu suất.
-
-![Activity Quản lý Công việc](diagrams/activity-quan-ly-cong-viec.svg)
+![Architecture](uml/png/architecture.png)

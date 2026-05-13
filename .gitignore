@@ -21,3 +21,6 @@ frontend/node_modules/
 
 # Office temp / lock files
 ~$*
+
+# PlantUML jar (download riêng – xem docs/uml/README.md)
+docs/uml/plantuml.jar
