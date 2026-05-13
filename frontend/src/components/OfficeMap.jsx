@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Circle, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Circle, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
@@ -28,13 +27,8 @@ const meIcon = new L.Icon({
   popupAnchor: [0, -32],
 })
 
-function Recenter({ center }) {
-  const map = useMap()
-  useEffect(() => {
-    if (center) map.setView(center, map.getZoom(), { animate: true })
-  }, [center, map])
-  return null
-}
+// (Recenter component removed – it triggered a minification bug in
+//  react-leaflet 4.2 + Vite. The map renders fine without auto-recenter.)
 
 /**
  * Bản đồ Leaflet (OpenStreetMap) hiển thị offices + tuỳ chọn vị trí hiện tại.
@@ -65,35 +59,32 @@ export default function OfficeMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Recenter center={currentPosition || (offices[0] && [offices[0].latitude, offices[0].longitude])} />
-
-        {offices.map((o) => (
-          <div key={o.id}>
-            <Circle
-              center={[o.latitude, o.longitude]}
-              radius={o.radiusMeters || 100}
-              pathOptions={{
-                color: o.id === selectedOfficeId ? '#7c3aed' : '#2563eb',
-                fillColor: o.id === selectedOfficeId ? '#a78bfa' : '#60a5fa',
-                fillOpacity: 0.18,
-                weight: 2,
-              }}
-              eventHandlers={onSelectOffice ? { click: () => onSelectOffice(o.id) } : undefined}
-            />
-            <Marker position={[o.latitude, o.longitude]}>
-              <Popup>
-                <div className="text-sm">
-                  <p className="font-semibold mb-1">{o.name}</p>
-                  {o.address && <p className="text-gray-600 mb-1">{o.address}</p>}
-                  <p className="text-gray-500">
-                    Bán kính: <b>{o.radiusMeters}m</b>
-                    {' '}— Trạng thái: <b>{o.status}</b>
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          </div>
-        ))}
+        {offices.flatMap((o) => [
+          <Circle
+            key={`c-${o.id}`}
+            center={[o.latitude, o.longitude]}
+            radius={o.radiusMeters || 100}
+            pathOptions={{
+              color: o.id === selectedOfficeId ? '#7c3aed' : '#2563eb',
+              fillColor: o.id === selectedOfficeId ? '#a78bfa' : '#60a5fa',
+              fillOpacity: 0.18,
+              weight: 2,
+            }}
+            eventHandlers={onSelectOffice ? { click: () => onSelectOffice(o.id) } : undefined}
+          />,
+          <Marker key={`m-${o.id}`} position={[o.latitude, o.longitude]}>
+            <Popup>
+              <div className="text-sm">
+                <p className="font-semibold mb-1">{o.name}</p>
+                {o.address && <p className="text-gray-600 mb-1">{o.address}</p>}
+                <p className="text-gray-500">
+                  Bán kính: <b>{o.radiusMeters}m</b>
+                  {' '}— Trạng thái: <b>{o.status}</b>
+                </p>
+              </div>
+            </Popup>
+          </Marker>,
+        ])}
 
         {currentPosition && (
           <Marker position={currentPosition} icon={meIcon}>

@@ -3787,6 +3787,150 @@ add_para(doc,
     "thoại di động.")
 
 
+add_h2(doc, "5.6. Xác thực chấm công bằng GPS và bản đồ")
+add_para(doc,
+    "Một trong những hạn chế lớn nhất của các hệ thống chấm công truyền "
+    "thống là người dùng có thể \"chấm hộ\" hoặc bấm check-in từ bất kỳ "
+    "đâu mà hệ thống không thể xác minh. Trong bối cảnh doanh nghiệp nhỏ "
+    "có nhiều chi nhánh / nhân viên thường làm việc ngoài hiện trường, "
+    "việc kiểm chứng vị trí trở thành yêu cầu nghiệp vụ quan trọng. Đề "
+    "tài đã bổ sung tính năng xác thực chấm công bằng GPS kết hợp bản đồ "
+    "tương tác – đảm bảo mỗi lần check-in / check-out đều có toạ độ vị "
+    "trí thực tế của người chấm, được đối chiếu với danh sách các văn "
+    "phòng / điểm làm việc đã đăng ký.")
+
+add_h3(doc, "5.6.1. Mô hình geofence đa văn phòng")
+add_para(doc,
+    "Hệ thống cho phép quản lý cấu hình nhiều điểm văn phòng "
+    "(office_locations) – mỗi điểm là một bộ ba thông tin "
+    "(latitude, longitude, radiusMeters). Khi nhân viên gửi yêu cầu "
+    "chấm công kèm toạ độ GPS, backend sử dụng công thức Haversine để "
+    "tính khoảng cách Euclidean trên mặt cầu đến tất cả các văn phòng có "
+    "trạng thái ACTIVE, sau đó chọn văn phòng gần nhất:")
+add_code(doc, """
+double haversine(double lat1, lng1, lat2, lng2) {
+    final double R = 6_371_000;     // Bán kính Trái Đất (mét)
+    double dLat = Math.toRadians(lat2 - lat1);
+    double dLng = Math.toRadians(lng2 - lng1);
+    double a = Math.sin(dLat / 2)^2 +
+               Math.cos(Math.toRadians(lat1)) *
+               Math.cos(Math.toRadians(lat2)) *
+               Math.sin(dLng / 2)^2;
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+""")
+add_para(doc,
+    "Nếu khoảng cách đến văn phòng gần nhất ≤ radiusMeters → bản ghi "
+    "được gán trạng thái APPROVED ngay lập tức. Nếu lớn hơn, hoặc client "
+    "báo cờ isMocked (GPS giả lập – phổ biến với Android Developer "
+    "Options) → bản ghi chuyển sang PENDING_REVIEW chờ quản lý duyệt thủ "
+    "công. Cách thiết kế này vừa đảm bảo tính nghiêm ngặt vừa linh hoạt "
+    "cho các trường hợp đặc biệt như đi công tác hay làm việc từ xa.")
+
+add_h3(doc, "5.6.2. Trang Quản lý văn phòng (manager)")
+add_para(doc,
+    "Quản lý truy cập trang /office-locations để CRUD danh sách văn "
+    "phòng. Mỗi văn phòng được biểu diễn trên bản đồ Leaflet (sử dụng "
+    "tile OpenStreetMap miễn phí, không cần API key) bằng marker "
+    "(vị trí tâm) và vòng tròn xanh thể hiện phạm vi geofence. Form "
+    "thêm/sửa cung cấp nút \"Dùng vị trí hiện tại\" – tự động điền toạ "
+    "độ GPS của trình duyệt vào form, giúp quản lý không phải tra cứu "
+    "lat/lng thủ công.")
+add_image(doc, "14_office_locations.png", width_cm=15.5)
+add_caption(doc, "Hình 5.23: Trang Quản lý văn phòng với bản đồ Leaflet",
+            kind="figure")
+
+add_h3(doc, "5.6.3. Trang Chấm công của tôi với bản đồ trực tiếp")
+add_para(doc,
+    "Trang /my-attendance của nhân viên hiển thị bản đồ Leaflet "
+    "412×360px ở vị trí trung tâm, bên trái nút Check-in/Check-out. "
+    "Khi mở trang, ứng dụng gọi `navigator.geolocation.getCurrentPosition()` "
+    "để xin quyền GPS – marker đỏ \"vị trí của tôi\" sẽ xuất hiện trên "
+    "bản đồ, cạnh các marker xanh của văn phòng. Một card bên phải tóm "
+    "tắt: toạ độ GPS hiện tại, văn phòng gần nhất, khoảng cách (mét) so "
+    "với bán kính geofence, và badge ✓ trong vùng / ⚠ ngoài vùng để "
+    "người dùng biết trước hậu quả khi bấm check-in.")
+add_image(doc, "15_my_attendance_map.png", width_cm=15.5)
+add_caption(doc, "Hình 5.24: Chấm công của tôi với bản đồ Leaflet, GPS và "
+                 "chỉ báo khoảng cách",
+            kind="figure")
+
+add_para(doc,
+    "Bảng lịch sử bên dưới được mở rộng với 3 cột mới: Văn phòng "
+    "(office gắn vào lúc check-in), Khoảng cách (mét đo được tại thời "
+    "điểm check-in) và Trạng thái với badge ba màu – Đã duyệt (xanh lá), "
+    "Chờ duyệt (vàng), Từ chối (đỏ). Nhân viên có thể tự kiểm tra ngay "
+    "bản ghi nào còn đang chờ phê duyệt.")
+
+add_h3(doc, "5.6.4. Trang Chấm công cho quản lý: duyệt PENDING_REVIEW")
+add_para(doc,
+    "Khi đăng nhập vai trò MANAGER, trang /attendance hiển thị toàn bộ "
+    "bản ghi chấm công kèm cột Trạng thái và cột Hành động. Đối với "
+    "những bản ghi PENDING_REVIEW (do ngoài vùng geofence, GPS bị mock, "
+    "hoặc người dùng không cấp quyền GPS), quản lý có 2 nút duyệt inline:")
+for s in [
+    "Nút ✓ (xanh lá): gọi PATCH /api/attendance/{id}/review với "
+    "{status: APPROVED} – chuyển bản ghi sang đã duyệt.",
+    "Nút ✕ (đỏ): gọi PATCH /api/attendance/{id}/review với "
+    "{status: REJECTED} – đánh dấu bản ghi vô hiệu, không tính lương.",
+]:
+    add_bullet(doc, s)
+add_para(doc,
+    "Spring Security ràng buộc endpoint review chỉ chấp nhận role "
+    "MANAGER hoặc ADMIN; service sẽ ném BusinessException nếu bản ghi "
+    "đã được duyệt trước đó để tránh thay đổi trạng thái không hợp lệ.")
+add_image(doc, "16_attendance_pending.png", width_cm=15.5)
+add_caption(doc, "Hình 5.25: Trang Chấm công của quản lý với cột "
+                 "Văn phòng/Khoảng cách và nút duyệt nhanh",
+            kind="figure")
+
+add_h3(doc, "5.6.5. Khác biệt giữa web và mobile về độ tin cậy GPS")
+add_para(doc,
+    "Trình duyệt web cấp quyền vị trí qua Geolocation API – tuy nhiên "
+    "người dùng có thể dễ dàng giả mạo toạ độ thông qua Chrome DevTools "
+    "(Sensors → Geolocation). Vì vậy đối với bản web, hệ thống xử lý "
+    "thiên về \"tin nhưng vẫn xác minh sau\": bản ghi vẫn được tạo nhưng "
+    "sẽ chuyển PENDING_REVIEW nếu có dấu hiệu bất thường. Trên ứng dụng "
+    "mobile Flutter, package `geolocator` đọc trực tiếp GPS native và "
+    "cung cấp cờ `isMocked` báo cho biết bản ghi đến từ một ứng dụng "
+    "giả lập (như Fake GPS, Lockito) – cờ này được gửi trực tiếp lên "
+    "backend để đẩy bản ghi sang PENDING_REVIEW bất kể vị trí thực. "
+    "Tổ chức theo hai lớp này (mobile tin cậy cao + web hỗ trợ duyệt) "
+    "vừa giữ trải nghiệm linh hoạt cho người dùng vừa cho phép quản lý "
+    "phát hiện bất thường ngay khi nó xuất hiện.")
+
+add_h3(doc, "5.6.6. Mô hình dữ liệu mở rộng")
+add_para(doc,
+    "Để hỗ trợ chức năng này, đề tài bổ sung 1 bảng mới và 7 cột vào "
+    "bảng attendance hiện có:")
+add_table(
+    doc,
+    headers=["Đối tượng", "Mô tả"],
+    rows=[
+        ("office_locations (mới)",
+         "Bảng văn phòng/chi nhánh: id, name, address, latitude, "
+         "longitude, radius_meters (mặc định 100m), status "
+         "(ACTIVE/INACTIVE), created_at."),
+        ("attendance.check_in_lat / check_in_lng",
+         "Toạ độ GPS lúc bấm Check-in (kiểu DOUBLE)."),
+        ("attendance.check_out_lat / check_out_lng",
+         "Toạ độ GPS lúc bấm Check-out."),
+        ("attendance.check_in_office_id (FK)",
+         "Văn phòng gần nhất gắn vào bản ghi check-in."),
+        ("attendance.check_in_distance_m",
+         "Khoảng cách (mét) tới văn phòng đó tại thời điểm check-in."),
+        ("attendance.review_status",
+         "ENUM(APPROVED, PENDING_REVIEW, REJECTED). Mặc định APPROVED."),
+        ("attendance.is_mocked",
+         "BOOLEAN. Mobile client báo `true` nếu phát hiện GPS giả lập."),
+    ],
+    col_widths=[5.0, 10.5],
+)
+add_caption(doc, "Bảng 5.4: Lược đồ dữ liệu mở rộng cho chức năng "
+                 "xác thực chấm công GPS",
+            kind="table")
+
+
 # ==================================================================
 # CHƯƠNG 6: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 # ==================================================================
@@ -3803,6 +3947,7 @@ for s in [
     "Phát triển frontend web React thích ứng theo role: quản lý xem dashboard tổng quan + đầy đủ module CRUD; nhân viên xem dashboard cá nhân + trang My Tasks + My Attendance.",
     "Phát triển ứng dụng mobile Flutter với 6 màn hình cốt lõi, chạy được trên cả Android và iOS.",
     "Tích hợp thành công OpenAI GPT-4o-mini làm \"engine\" gợi ý: backend gom dữ liệu thô (lịch sử task, chấm công, kỹ năng), LLM xếp hạng định tính TOP 5 nhân viên kèm `reasoning` bằng tiếng Việt.",
+    "Bổ sung tính năng xác thực chấm công bằng GPS + bản đồ Leaflet/OpenStreetMap: cấu hình đa văn phòng (office_locations), tính khoảng cách Haversine, đẩy bản ghi ngoài vùng / GPS mock sang PENDING_REVIEW cho quản lý duyệt. Mobile dùng `geolocator` + cờ `isMocked` để chống fake GPS.",
     "Redis cache trên Spring Cache giúp giảm thời gian phản hồi của module AI từ ~1450 ms xuống dưới 10 ms cho các request lặp lại trên cùng task, đồng thời tiết kiệm chi phí API.",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose – cài đặt được trên bất kỳ máy có Docker chỉ với 1 câu lệnh.",
 ]:
