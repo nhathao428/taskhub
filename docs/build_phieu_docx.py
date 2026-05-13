@@ -6,7 +6,7 @@ Sinh 4 file Word phiếu hành chính của Đồ án cơ sở thành các file 
   4. PHIEU_CHAM_DIEM_GVPB.docx
 
 Trước đây 4 phiếu được gộp chung trong BAO_CAO_DO_AN_CO_SO.docx; tách ra để
-nộp riêng theo yêu cầu của Viện Kỹ thuật HUTECH.
+nộp riêng theo yêu cầu của Khoa Công nghệ Thông tin.
 """
 from pathlib import Path
 
@@ -105,7 +105,7 @@ def init_doc():
 def add_header_vien(doc, title, sub=None, title_size=16):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = p.add_run("VIỆN KỸ THUẬT HUTECH")
+    run = p.add_run("KHOA CÔNG NGHỆ THÔNG TIN")
     set_run(run, size=13, bold=True)
 
     p = doc.add_paragraph()
@@ -175,7 +175,7 @@ def build_phieu_giao_de_tai():
         "Flutter chạy được.",
         "2) Cơ sở dữ liệu PostgreSQL có script khởi tạo schema và dữ liệu mẫu.",
         "3) Tài liệu API (Swagger / OpenAPI) và tài liệu hướng dẫn cài đặt.",
-        "4) Báo cáo đồ án đầy đủ theo mẫu của Viện Kỹ thuật HUTECH.",
+        "4) Báo cáo đồ án đầy đủ theo mẫu của Khoa Công nghệ Thông tin.",
     ]:
         add_p(doc, s, align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=2)
 
@@ -278,7 +278,7 @@ def build_phieu_theo_doi_tien_do():
           align=WD_ALIGN_PARAGRAPH.LEFT, space_before=6, space_after=4)
     add_p(doc,
           "Hình thức trình bày đúng quy định; nội dung chi tiết, đầy đủ các "
-          "chương theo mẫu của Viện Kỹ thuật HUTECH. Sản phẩm thực hiện được – "
+          "chương theo mẫu của Khoa Công nghệ Thông tin. Sản phẩm thực hiện được – "
           "backend, frontend, mobile, AI gợi ý chạy ổn định. Sinh viên có thái "
           "độ học tập tốt, chủ động trao đổi tiến độ hàng tuần với giảng viên "
           "hướng dẫn.",

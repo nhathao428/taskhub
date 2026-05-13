@@ -440,7 +440,7 @@ def add_cover_page(doc, is_main=True):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(0)
-    run = p.add_run("VIỆN KỸ THUẬT HUTECH")
+    run = p.add_run("KHOA CÔNG NGHỆ THÔNG TIN")
     set_run(run, size=13, bold=True)
 
     add_p(doc, "", space_after=12)
@@ -530,8 +530,8 @@ add_h1(doc, "LỜI CẢM ƠN")
 
 paragraphs_thanks = [
     "Lời đầu tiên, em xin gửi lời cảm ơn chân thành và sâu sắc nhất đến ThS. Dương Thành Phết – giảng viên hướng dẫn đồ án môn Đồ án cơ sở. Trong suốt quá trình thực hiện đề tài, thầy đã tận tình hướng dẫn, định hướng giải pháp, giải đáp thắc mắc, cung cấp tài liệu tham khảo có giá trị và đưa ra những góp ý sắc bén giúp em hoàn thành đồ án một cách tốt nhất. Sự hướng dẫn tận tâm, kiên nhẫn của thầy là nguồn động lực lớn giúp em vượt qua những khó khăn trong quá trình nghiên cứu và triển khai hệ thống.",
-    "Em xin gửi lời cảm ơn đến Ban Giám hiệu Trường Đại học Công nghệ TP.HCM (HUTECH) và Viện Kỹ thuật HUTECH đã tạo điều kiện thuận lợi, cung cấp cơ sở vật chất, phòng thực hành, thư viện và môi trường học tập hiện đại trong suốt quá trình học tập tại trường. Chương trình đào tạo bài bản và các môn học chuyên ngành của Viện đã trang bị cho em nền tảng kiến thức vững chắc để thực hiện đề tài này.",
-    "Em cũng xin gửi lời cảm ơn đến toàn thể quý thầy cô trong Viện Kỹ thuật HUTECH đã truyền đạt kiến thức trong suốt những năm học vừa qua. Những kiến thức về Lập trình hướng đối tượng, Cấu trúc dữ liệu và giải thuật, Cơ sở dữ liệu, Mạng máy tính, Kỹ thuật phần mềm, Lập trình Web, An toàn thông tin và Trí tuệ nhân tạo mà quý thầy cô đã giảng dạy là nền tảng trực tiếp để em xây dựng hệ thống trong đồ án này.",
+    "Em xin gửi lời cảm ơn đến Ban Giám hiệu Trường Đại học Công nghệ TP.HCM (HUTECH) và Khoa Công nghệ Thông tin đã tạo điều kiện thuận lợi, cung cấp cơ sở vật chất, phòng thực hành, thư viện và môi trường học tập hiện đại trong suốt quá trình học tập tại trường. Chương trình đào tạo bài bản và các môn học chuyên ngành của Khoa đã trang bị cho em nền tảng kiến thức vững chắc để thực hiện đề tài này.",
+    "Em cũng xin gửi lời cảm ơn đến toàn thể quý thầy cô trong Khoa Công nghệ Thông tin đã truyền đạt kiến thức trong suốt những năm học vừa qua. Những kiến thức về Lập trình hướng đối tượng, Cấu trúc dữ liệu và giải thuật, Cơ sở dữ liệu, Mạng máy tính, Kỹ thuật phần mềm, Lập trình Web, An toàn thông tin và Trí tuệ nhân tạo mà quý thầy cô đã giảng dạy là nền tảng trực tiếp để em xây dựng hệ thống trong đồ án này.",
     "Em xin chân thành cảm ơn các anh chị khóa trên, bạn bè cùng lớp đã chia sẻ tài liệu, kinh nghiệm và hỗ trợ kỹ thuật trong quá trình em thực hiện đồ án. Sự trao đổi cởi mở trong các nhóm học tập đã giúp em có cái nhìn đa chiều và giải quyết nhiều vấn đề phát sinh trong quá trình phát triển hệ thống.",
     "Cuối cùng, em xin bày tỏ lòng biết ơn sâu sắc đến gia đình đã luôn động viên, ủng hộ và tạo mọi điều kiện tốt nhất để em học tập và hoàn thành đồ án. Sự quan tâm và khích lệ của gia đình là nguồn sức mạnh tinh thần vô giá giúp em vượt qua mọi khó khăn trong suốt quá trình học tập và thực hiện đề tài.",
     "Do thời gian thực hiện và kinh nghiệm còn hạn chế, đồ án chắc chắn không tránh khỏi những thiếu sót về cả nội dung lẫn hình thức. Em rất mong nhận được sự góp ý, nhận xét chân thành từ quý thầy cô để em có thể hoàn thiện hơn trong tương lai.",
@@ -556,7 +556,7 @@ opening = [
     "Trong bối cảnh cách mạng công nghiệp lần thứ tư đang diễn ra mạnh mẽ trên phạm vi toàn cầu, công nghệ thông tin đã trở thành động lực then chốt thúc đẩy sự phát triển kinh tế – xã hội của mọi quốc gia. Tại Việt Nam, Chính phủ đã ban hành nhiều chính sách quan trọng nhằm thúc đẩy chuyển đổi số trong các doanh nghiệp, đặc biệt là doanh nghiệp nhỏ và vừa – khu vực kinh tế chiếm hơn 97% tổng số doanh nghiệp và đóng góp khoảng 45% GDP cả nước.",
     "Tuy nhiên, một thực tế đáng quan tâm là phần lớn doanh nghiệp nhỏ và vừa, đặc biệt là các doanh nghiệp nhỏ đa ngành, vẫn đang sử dụng các phương pháp quản lý truyền thống như bảng tính Excel, sổ ghi chép tay hoặc các nhóm chat trên các ứng dụng nhắn tin để quản lý công việc, phân công nhân sự và theo dõi tiến độ. Cách làm này dẫn đến nhiều bất cập như thiếu minh bạch, phân công không tối ưu, khó tổng hợp dữ liệu, không có cơ sở khoa học để ra quyết định và đặc biệt là chưa tận dụng được sức mạnh của trí tuệ nhân tạo trong việc gợi ý nhân viên phù hợp cho từng công việc.",
     "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dùng OpenAI GPT-4o-mini xếp hạng định tính theo kỹ năng, tiến độ, đúng hạn và chấm công, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
-    "Đồ án được thực hiện trong khuôn khổ môn học Đồ án cơ sở thuộc chương trình đào tạo Công nghệ thông tin của Viện Kỹ thuật HUTECH. Báo cáo này được tổ chức thành 6 chương, trình bày một cách có hệ thống từ tổng quan đề tài, cơ sở lý thuyết, phân tích – thiết kế hệ thống, triển khai ứng dụng đến kiểm thử, demo và kết luận. Toàn bộ mã nguồn, tài liệu kỹ thuật và sản phẩm cuối cùng đều được công bố tại kho lưu trữ của tác giả để phục vụ mục đích học tập và phát triển tiếp theo.",
+    "Đồ án được thực hiện trong khuôn khổ môn học Đồ án cơ sở thuộc chương trình đào tạo Công nghệ thông tin của Khoa Công nghệ Thông tin. Báo cáo này được tổ chức thành 6 chương, trình bày một cách có hệ thống từ tổng quan đề tài, cơ sở lý thuyết, phân tích – thiết kế hệ thống, triển khai ứng dụng đến kiểm thử, demo và kết luận. Toàn bộ mã nguồn, tài liệu kỹ thuật và sản phẩm cuối cùng đều được công bố tại kho lưu trữ của tác giả để phục vụ mục đích học tập và phát triển tiếp theo.",
     "Em xin trân trọng giới thiệu báo cáo và mong nhận được những ý kiến đóng góp quý báu của quý thầy cô.",
 ]
 for t in opening:
@@ -3838,7 +3838,7 @@ add_table(
         ("Redis cache cho AI Suggestion", "100% – hoàn thành"),
         ("Docker Compose toàn bộ stack (PostgreSQL + Redis + backend + frontend)", "100% – hoàn thành"),
         ("Kiểm thử tối thiểu 30 test cases", "123% – 37/30 test cases"),
-        ("Tài liệu hoàn chỉnh theo mẫu Viện Kỹ thuật HUTECH", "100% – hoàn thành"),
+        ("Tài liệu hoàn chỉnh theo mẫu Khoa Công nghệ Thông tin", "100% – hoàn thành"),
     ],
     col_widths=[8.5, 7.0],
 )
@@ -3907,7 +3907,7 @@ add_para(doc,
     "đẩy chuyển đổi số quốc gia.")
 add_para(doc,
     "Tác giả xin gửi lời cảm ơn chân thành đến giảng viên hướng dẫn, "
-    "Viện Kỹ thuật HUTECH và toàn thể quý thầy cô đã hỗ trợ trong quá "
+    "Khoa Công nghệ Thông tin và toàn thể quý thầy cô đã hỗ trợ trong quá "
     "trình hoàn thành đồ án. Em hy vọng nhận được nhiều ý kiến đóng góp "
     "của thầy cô và bạn bè để có thể hoàn thiện đề tài và phát triển nó "
     "trong tương lai./.")
