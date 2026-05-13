@@ -206,7 +206,9 @@ def add_bullet(doc, text):
 
 
 def add_image(doc, filename, width_cm=15.5):
-    """Chèn ảnh screenshot căn giữa, scale theo chiều rộng cố định."""
+    """Chèn ảnh screenshot căn giữa, scale theo chiều rộng cố định.
+    filename có thể là tên file (đặt trong SHOTS_DIR) hoặc đường dẫn con
+    (ví dụ "mobile/m01_login.png")."""
     path = _os.path.join(SHOTS_DIR, filename)
     if not _os.path.exists(path):
         add_p(doc, f"[Không tìm thấy ảnh: {filename}]",
@@ -219,6 +221,49 @@ def add_image(doc, filename, width_cm=15.5):
     run = p.add_run()
     run.add_picture(path, width=Cm(width_cm))
     return p
+
+
+def add_mobile_pair(doc, left_file, left_cap, right_file, right_cap,
+                    width_cm=6.2):
+    """Chèn 2 ảnh chụp màn hình mobile cạnh nhau trong bảng 1 hàng × 2 cột.
+    Bên dưới ảnh có caption nhỏ (italic, bold, căn giữa)."""
+    tbl = doc.add_table(rows=2, cols=2)
+    tbl.autofit = False
+    tbl.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for col in range(2):
+        tbl.columns[col].width = Cm(8.0)
+
+    for col, (fname, cap) in enumerate([(left_file, left_cap),
+                                        (right_file, right_cap)]):
+        if fname is None:
+            continue
+        cell = tbl.rows[0].cells[col]
+        cell.width = Cm(8.0)
+        # Xóa paragraph mặc định trong cell
+        cell.text = ""
+        p = cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        path = _os.path.join(SHOTS_DIR, fname)
+        if _os.path.exists(path):
+            p.add_run().add_picture(path, width=Cm(width_cm))
+        else:
+            r = p.add_run(f"[Không tìm thấy ảnh: {fname}]")
+            set_run(r, italic=True)
+
+        cap_cell = tbl.rows[1].cells[col]
+        cap_cell.text = ""
+        cp = cap_cell.paragraphs[0]
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cr = cp.add_run(cap)
+        set_run(cr, size=SIZE_BODY, italic=True, bold=True)
+    add_p(doc, "", space_after=4)
+    return tbl
+
+
+def add_mobile_image(doc, filename, caption, width_cm=7.0):
+    """Chèn 1 ảnh mobile đơn lẻ + caption ngay bên dưới."""
+    add_image(doc, filename, width_cm=width_cm)
+    add_caption(doc, caption, kind="figure")
 
 
 def add_caption(doc, text, kind="figure"):
@@ -451,275 +496,11 @@ add_cover_page(doc, is_main=True)
 doc.add_page_break()
 add_cover_page(doc, is_main=False)
 
+# Lưu ý: 4 phiếu hành chính (Giao đề tài / Theo dõi tiến độ / Chấm điểm GVHD /
+# Chấm điểm GVPB) đã được tách ra thành các file .docx độc lập do
+# docs/build_phieu_docx.py sinh ra. Báo cáo này chỉ còn nội dung chuyên môn.
 
-# ==================================================================
-# 2) PHIẾU GIAO ĐỀ TÀI ĐAMH
-# ==================================================================
-doc.add_page_break()
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("VIỆN KỸ THUẬT HUTECH")
-set_run(run, size=13, bold=True)
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p.paragraph_format.space_after = Pt(18)
-run = p.add_run("PHIẾU GIAO ĐỀ TÀI")
-set_run(run, size=16, bold=True)
-
-add_p(doc, "TÊN MÔN HỌC: ĐỒ ÁN CƠ SỞ", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
-add_p(doc, "NGÀNH: CÔNG NGHỆ THÔNG TIN", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=8)
-
-add_p(doc, "Họ và tên sinh viên được giao đề tài (sĩ số trong nhóm: 01):",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "• NGUYỄN NHẬT HẢO    MSSV: 2380612688    Lớp: 23DTHC1",
-      align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=10)
-
-add_p(doc, "Tên đề tài: Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI",
-      align=WD_ALIGN_PARAGRAPH.LEFT, bold=True, space_after=8)
-
-add_p(doc, "Các dữ liệu ban đầu:", align=WD_ALIGN_PARAGRAPH.LEFT, bold=True, space_after=2)
-for s in [
-    "- Khảo sát thực tế quy trình quản lý công việc tại doanh nghiệp nhỏ đa ngành.",
-    "- Tài liệu về Spring Boot 3.x, React 18, Flutter 3.x, PostgreSQL 16, Docker.",
-    "- Tài liệu kỹ thuật về OpenAI API và phương pháp tích hợp LLM vào ứng dụng nội bộ.",
-    "- Các nghiên cứu về hệ thống gợi ý đa tiêu chí và xu hướng ứng dụng LLM vào tự động hoá phân công nhân sự.",
-]:
-    add_p(doc, s, align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=2)
-
-add_p(doc, "Nội dung nhiệm vụ:", align=WD_ALIGN_PARAGRAPH.LEFT, bold=True, space_before=6, space_after=2)
-for s in [
-    "- Phân tích yêu cầu, thiết kế kiến trúc hệ thống và cơ sở dữ liệu.",
-    "- Triển khai backend RESTful API bằng Spring Boot, bảo mật bằng Spring Security + JWT.",
-    "- Triển khai frontend web bằng React 18 + Vite + Tailwind CSS.",
-    "- Triển khai ứng dụng mobile bằng Flutter cho iOS và Android.",
-    "- Tích hợp module AI gợi ý nhân viên phù hợp dùng OpenAI GPT-4o-mini xếp hạng định tính dựa trên kỹ năng, tiến độ, đúng hạn và chấm công.",
-    "- Đóng gói hệ thống bằng Docker Compose với PostgreSQL 16 và Redis 7.",
-    "- Kiểm thử và viết tài liệu hướng dẫn cài đặt, vận hành.",
-]:
-    add_p(doc, s, align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=2)
-
-add_p(doc, "Kết quả tối thiểu phải có:", align=WD_ALIGN_PARAGRAPH.LEFT, bold=True, space_before=6, space_after=2)
-for s in [
-    "1) Mã nguồn hoàn chỉnh backend Spring Boot, frontend React và ứng dụng Flutter chạy được.",
-    "2) Cơ sở dữ liệu PostgreSQL có script khởi tạo schema và dữ liệu mẫu.",
-    "3) Tài liệu API (Swagger / OpenAPI) và tài liệu hướng dẫn cài đặt.",
-    "4) Báo cáo đồ án đầy đủ theo mẫu của Viện Kỹ thuật HUTECH.",
-]:
-    add_p(doc, s, align=WD_ALIGN_PARAGRAPH.LEFT, indent_first=0, space_after=2)
-
-add_p(doc, "Ngày giao đề tài: 03/02/2026    Ngày nộp báo cáo: 11/05/2026",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_before=10, space_after=24)
-
-tbl = doc.add_table(rows=1, cols=2)
-tbl.autofit = True
-for i, (h1, h2) in enumerate([("Sinh viên thực hiện", "TP. HCM, ngày … tháng … năm 2026")]):
-    c1 = tbl.rows[0].cells[0]
-    c2 = tbl.rows[0].cells[1]
-    for cell, txt in [(c1, h1), (c2, h2)]:
-        cell.text = ""
-        p = cell.paragraphs[0]
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        r = p.add_run(txt)
-        set_run(r, bold=True)
-    sub_lines = [
-        "(Ký và ghi rõ họ tên các thành viên)",
-        "Giảng viên hướng dẫn",
-    ]
-    for cell, sub in zip([c1, c2], sub_lines):
-        p = cell.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        r = p.add_run(sub)
-        set_run(r, italic=True)
-    for cell, sig in zip([c1, c2], ["Nguyễn Nhật Hảo", "ThS. Dương Thành Phết"]):
-        for _ in range(4):
-            cell.add_paragraph("")
-        p = cell.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        r = p.add_run(sig)
-        set_run(r, bold=True)
-
-
-# ==================================================================
-# 3) PHIẾU THEO DÕI TIẾN ĐỘ
-# ==================================================================
-doc.add_page_break()
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("VIỆN KỸ THUẬT HUTECH")
-set_run(run, size=13, bold=True)
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("PHIẾU THEO DÕI TIẾN ĐỘ")
-set_run(run, size=15, bold=True)
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p.paragraph_format.space_after = Pt(12)
-run = p.add_run("THỰC HIỆN ĐỒ ÁN MÔN HỌC & ĐÁNH GIÁ KẾT QUẢ THỰC HIỆN")
-set_run(run, size=14, bold=True)
-
-add_p(doc, "TÊN MÔN HỌC: ĐỒ ÁN CƠ SỞ", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
-add_p(doc, "NGÀNH: CÔNG NGHỆ THÔNG TIN", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=8)
-add_p(doc, "Tên đề tài: Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Giảng viên hướng dẫn: ThS. Dương Thành Phết",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Sinh viên thực hiện: NGUYỄN NHẬT HẢO – MSSV: 2380612688 – Lớp: 23DTHC1",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=10)
-
-progress_rows = [
-    ("1", "03/02/2026", "Giao đề tài",
-     "Sinh viên nhận đề tài, xác định mục tiêu, phạm vi và kết quả tối thiểu."),
-    ("2", "10/02/2026", "Khảo sát hiện trạng, thu thập yêu cầu",
-     "Hoàn thành khảo sát quy trình quản lý công việc, tổng hợp yêu cầu chức năng và phi chức năng."),
-    ("3", "17/02/2026", "Phân tích yêu cầu, vẽ Use Case",
-     "Hoàn thành sơ đồ Use Case và đặc tả use case chi tiết cho 8 nhóm chức năng."),
-    ("4", "24/02/2026", "Thiết kế CSDL, ERD",
-     "Hoàn thành ERD với 6 bảng và mô tả chi tiết các trường."),
-    ("5", "03/03/2026", "Thiết kế kiến trúc, Class & Sequence Diagram",
-     "Hoàn thành sơ đồ lớp, sơ đồ tuần tự cho các luồng nghiệp vụ chính."),
-    ("6", "10/03/2026", "Triển khai backend – Auth, JWT, User",
-     "Cài đặt Spring Security + JWT, module User/Auth chạy được, test bằng Postman."),
-    ("7", "17/03/2026", "Triển khai backend – Employee, Project, Task",
-     "Hoàn thành CRUD đầy đủ cho Employee, Project, Task; cache Redis hoạt động."),
-    ("8", "24/03/2026", "Triển khai backend – Attendance & AiSuggestionService",
-     "Module chấm công và AI gợi ý hoàn thiện, tích hợp OpenAI GPT-4o-mini."),
-    ("9", "31/03/2026", "Triển khai frontend React",
-     "Hoàn thành các trang Login/Register/Dashboard/Employees/Projects/Tasks/Attendance/AI."),
-    ("10", "14/04/2026", "Triển khai ứng dụng mobile Flutter",
-     "Hoàn thành các màn hình chính cho Android, gọi backend qua dio."),
-    ("11", "28/04/2026", "Kiểm thử tổng thể, viết tài liệu",
-     "Kiểm thử 35 test cases, viết API Specification, Setup Guide, UML Diagrams."),
-    ("12", "11/05/2026", "Hoàn thành và bảo vệ đồ án",
-     "Đóng quyển báo cáo, chuẩn bị slide trình bày, bảo vệ đồ án trước hội đồng."),
-]
-add_table(
-    doc,
-    headers=["Tuần", "Ngày", "Nội dung thực hiện", "Kết quả thực hiện của sinh viên"],
-    rows=progress_rows,
-    col_widths=[1.4, 2.4, 5.2, 7.0],
-)
-
-add_p(doc, "Đánh giá kết quả báo cáo:", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT,
-      space_before=6, space_after=4)
-add_p(doc,
-      "Hình thức trình bày đúng quy định; nội dung chi tiết, đầy đủ các chương theo "
-      "mẫu của Viện Kỹ thuật HUTECH. Sản phẩm thực hiện được – backend, frontend, "
-      "mobile, AI gợi ý chạy ổn định. Sinh viên có thái độ học tập tốt, chủ động "
-      "trao đổi tiến độ hàng tuần với giảng viên hướng dẫn.",
-      align=WD_ALIGN_PARAGRAPH.JUSTIFY, space_after=8)
-
-add_p(doc, "Cách tính điểm:", bold=True, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2)
-add_p(doc,
-      "Điểm đánh giá quá trình thực hiện đồ án = 50% × Tính chủ động, tích cực, "
-      "sáng tạo + 50% × Đáp ứng nội dung nhiệm vụ.",
-      align=WD_ALIGN_PARAGRAPH.JUSTIFY, indent_first=0, space_after=2)
-add_p(doc,
-      "Tổng điểm kết thúc học phần = Điểm đánh giá quá trình × 40% + Điểm chấm "
-      "báo cáo GVHD × 30% + Điểm chấm báo cáo GVPB × 30%.",
-      align=WD_ALIGN_PARAGRAPH.JUSTIFY, indent_first=0, space_after=12)
-
-# ==================================================================
-# 4) PHIẾU CHẤM ĐIỂM GVHD
-# ==================================================================
-doc.add_page_break()
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("VIỆN KỸ THUẬT HUTECH")
-set_run(run, size=13, bold=True)
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p.paragraph_format.space_after = Pt(18)
-run = p.add_run("PHIẾU CHẤM ĐIỂM ĐỒ ÁN MÔN HỌC – GIẢNG VIÊN HƯỚNG DẪN")
-set_run(run, size=14, bold=True)
-
-add_p(doc, "Họ và tên sinh viên: NGUYỄN NHẬT HẢO – MSSV: 2380612688 – Lớp: 23DTHC1",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Tên đề tài: Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Giảng viên hướng dẫn: ThS. Dương Thành Phết",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=10)
-
-add_table(
-    doc,
-    headers=["STT", "Tiêu chí đánh giá", "Điểm tối đa", "Điểm chấm"],
-    rows=[
-        ("1", "Hình thức trình bày báo cáo (đúng mẫu, bố cục rõ ràng, ít sai chính tả)", "1.0", ""),
-        ("2", "Mức độ hoàn thành nội dung báo cáo so với nhiệm vụ được giao", "2.0", ""),
-        ("3", "Kết quả thực hiện đề tài (sản phẩm chạy được, có demo)", "3.0", ""),
-        ("4", "Tính sáng tạo, ứng dụng công nghệ mới (AI, microservice...)", "1.5", ""),
-        ("5", "Mức độ phức tạp của giải pháp kỹ thuật", "1.0", ""),
-        ("6", "Khả năng trình bày, trả lời câu hỏi", "1.5", ""),
-        ("TỔNG", "", "10.0", ""),
-    ],
-    col_widths=[1.3, 9.5, 2.5, 2.5],
-)
-
-add_p(doc, "Nhận xét của giảng viên hướng dẫn:", bold=True,
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_before=8, space_after=4)
-for _ in range(8):
-    add_p(doc, "." * 90, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2)
-
-add_p(doc, "Điểm số (bằng chữ): ......................................................",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_before=8, space_after=18)
-add_p(doc, "TP. HCM, ngày … tháng … năm 2026",
-      align=WD_ALIGN_PARAGRAPH.RIGHT, space_after=4)
-add_p(doc, "Giảng viên hướng dẫn", bold=True,
-      align=WD_ALIGN_PARAGRAPH.RIGHT, space_after=36)
-add_p(doc, "ThS. Dương Thành Phết", bold=True,
-      align=WD_ALIGN_PARAGRAPH.RIGHT)
-
-
-# ==================================================================
-# 5) PHIẾU CHẤM ĐIỂM GVPB
-# ==================================================================
-doc.add_page_break()
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run = p.add_run("VIỆN KỸ THUẬT HUTECH")
-set_run(run, size=13, bold=True)
-p = doc.add_paragraph()
-p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-p.paragraph_format.space_after = Pt(18)
-run = p.add_run("PHIẾU CHẤM ĐIỂM ĐỒ ÁN MÔN HỌC – GIẢNG VIÊN PHẢN BIỆN")
-set_run(run, size=14, bold=True)
-
-add_p(doc, "Họ và tên sinh viên: NGUYỄN NHẬT HẢO – MSSV: 2380612688 – Lớp: 23DTHC1",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Tên đề tài: Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=4)
-add_p(doc, "Giảng viên phản biện: ………………………………………………………",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_after=10)
-
-add_table(
-    doc,
-    headers=["STT", "Tiêu chí đánh giá", "Điểm tối đa", "Điểm chấm"],
-    rows=[
-        ("1", "Hình thức trình bày báo cáo", "1.0", ""),
-        ("2", "Tính hợp lý của giải pháp – kiến trúc – thuật toán", "2.5", ""),
-        ("3", "Kết quả thực hiện đề tài và demo sản phẩm", "3.0", ""),
-        ("4", "Tính sáng tạo, ứng dụng công nghệ mới", "1.5", ""),
-        ("5", "Khả năng trình bày, trả lời câu hỏi phản biện", "2.0", ""),
-        ("TỔNG", "", "10.0", ""),
-    ],
-    col_widths=[1.3, 9.5, 2.5, 2.5],
-)
-
-add_p(doc, "Nhận xét của giảng viên phản biện:", bold=True,
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_before=8, space_after=4)
-for _ in range(8):
-    add_p(doc, "." * 90, align=WD_ALIGN_PARAGRAPH.LEFT, space_after=2)
-
-add_p(doc, "Điểm số (bằng chữ): ......................................................",
-      align=WD_ALIGN_PARAGRAPH.LEFT, space_before=8, space_after=18)
-add_p(doc, "TP. HCM, ngày … tháng … năm 2026",
-      align=WD_ALIGN_PARAGRAPH.RIGHT, space_after=4)
-add_p(doc, "Giảng viên phản biện", bold=True,
-      align=WD_ALIGN_PARAGRAPH.RIGHT, space_after=36)
-add_p(doc, "(Ký và ghi rõ họ tên)", italic=True,
-      align=WD_ALIGN_PARAGRAPH.RIGHT)
-
-
-print("[OK] Cover + 4 forms generated")
+print("[OK] Cover only (4 phiếu đã tách thành file riêng)")
 
 
 # ==================================================================
@@ -4128,6 +3909,102 @@ add_para(doc,
     "hàng.")
 add_image(doc, "13_emp_projects.png", width_cm=15.5)
 add_caption(doc, "Hình 5.13: Trang Dự án – góc nhìn nhân viên (chỉ đọc)", kind="figure")
+
+
+add_h2(doc, "5.5. Demo giao diện ứng dụng Mobile (Flutter)")
+add_para(doc,
+    "Bên cạnh giao diện web React dành cho người dùng làm việc trên máy "
+    "tính, hệ thống còn cung cấp một ứng dụng mobile Flutter để nhân viên "
+    "và quản lý có thể truy cập nhanh các chức năng cốt lõi mọi lúc, mọi "
+    "nơi từ điện thoại di động. Ứng dụng mobile chia sẻ cùng backend "
+    "Spring Boot với phiên bản web, gọi REST API qua package `http` và "
+    "lưu JWT vào `shared_preferences`. Các ảnh chụp dưới đây được thực "
+    "hiện ở viewport 412×915 (kích thước Pixel 7), tỉ lệ pixel 2.0 cho ra "
+    "ảnh sắc nét tương đương khi xem trên thiết bị thật.")
+
+add_h3(doc, "5.5.1. Màn hình Đăng nhập và Đăng ký")
+add_para(doc,
+    "Màn hình đăng nhập sử dụng Material 3 với icon `Icons.task_alt` đặc "
+    "trưng. Form gồm hai trường Email + Mật khẩu với validate cơ bản "
+    "(email có '@', mật khẩu không rỗng). Nút \"Đăng nhập\" hiện "
+    "`CircularProgressIndicator` trong lúc gọi `POST /api/auth/login`. "
+    "Liên kết \"Đăng ký\" chuyển sang màn đăng ký với 3 trường Username, "
+    "Email, Mật khẩu.")
+add_mobile_pair(doc,
+    "mobile/m01_login.png", "Hình 5.14: Màn Đăng nhập",
+    "mobile/m02_register.png", "Hình 5.15: Màn Đăng ký")
+
+add_h3(doc, "5.5.2. Dashboard tổng quan")
+add_para(doc,
+    "Sau khi đăng nhập thành công, người dùng được đưa đến Dashboard. "
+    "AppBar có hai action: icon `auto_awesome` (ngôi sao) mở màn AI Gợi "
+    "ý và menu 3 chấm chứa nút Đăng xuất. Banner xanh chào mừng hiển "
+    "thị tên người dùng. Bốn ô thống kê (Nhân viên, Dự án, Công việc, "
+    "Chấm công hôm nay) được sắp xếp dạng GridView 2 cột. Card \"Trạng "
+    "thái công việc\" tóm tắt số lượng task theo từng trạng thái. "
+    "`BottomNavigationBar` 5 mục ở dưới cùng cho phép chuyển nhanh "
+    "giữa các module.")
+add_mobile_image(doc, "mobile/m03_dashboard.png",
+                 "Hình 5.16: Dashboard tổng quan trên mobile")
+
+add_h3(doc, "5.5.3. Quản lý Nhân viên, Dự án và Công việc")
+add_para(doc,
+    "Ba màn hình quản lý cốt lõi đều thiết kế theo dạng ListView với "
+    "card cho từng bản ghi. Mỗi card hiển thị thông tin tóm tắt: ở màn "
+    "Nhân viên là tên + chức vụ + phòng ban (chữ cái đầu được dùng "
+    "làm avatar); màn Dự án là tên + mô tả ngắn + badge trạng thái; "
+    "màn Công việc là tiêu đề + mô tả + tên dự án + ngày hạn + badge "
+    "trạng thái cùng filter chip ở đầu (Tất cả / Chờ xử lý / Đang làm "
+    "/ Hoàn thành). FloatingActionButton ở góc dưới phải cho phép thêm "
+    "bản ghi mới (chỉ hiển thị với role MANAGER/ADMIN).")
+add_mobile_pair(doc,
+    "mobile/m04_employees.png", "Hình 5.17: Tab Nhân viên",
+    "mobile/m05_projects.png", "Hình 5.18: Tab Dự án")
+add_mobile_image(doc, "mobile/m06_tasks.png",
+                 "Hình 5.19: Tab Công việc – có filter chip ở đầu")
+
+add_h3(doc, "5.5.4. Chấm công")
+add_para(doc,
+    "Màn hình chấm công gồm hai phần: Card thao tác phía trên cho phép "
+    "nhập mã nhân viên rồi bấm Check-in (xanh lá) hoặc Check-out "
+    "(cam) – gọi `POST /api/attendance/{id}/checkin`. Phần dưới chia "
+    "làm hai khu vực: \"Chấm công hôm nay\" cho nhanh chóng kiểm tra "
+    "ai đã đến và \"Lịch sử chấm công\" liệt kê các bản ghi trước đó "
+    "với ngày, giờ vào, giờ ra. Icon dấu tích xanh thể hiện trạng thái "
+    "PRESENT, dấu X đỏ là ABSENT.")
+add_mobile_image(doc, "mobile/m07_attendance.png",
+                 "Hình 5.20: Tab Chấm công trên mobile")
+
+add_h3(doc, "5.5.5. AI Gợi ý nhân viên")
+add_para(doc,
+    "Tính năng nổi bật nhất của ứng dụng mobile là gọi AI gợi ý nhân "
+    "viên ngay trên điện thoại. Banner gradient tím–hồng nổi bật với "
+    "icon `auto_awesome` thể hiện tính chất \"thông minh\" của tính "
+    "năng. Form bên dưới có hai trường: Tiêu đề công việc (bắt buộc) "
+    "và Mô tả tuỳ chọn. Nút \"Phân tích bằng AI\" gọi "
+    "`POST /api/suggestions/recommend` với body JSON `{taskTitle, "
+    "taskDescription}`. Trong khi chờ phản hồi (~1–2 giây), nút hiển "
+    "thị `CircularProgressIndicator`.")
+add_mobile_pair(doc,
+    "mobile/m08_ai_suggestions.png",
+    "Hình 5.21: Form AI Gợi ý nhân viên",
+    "mobile/m09_ai_result.png",
+    "Hình 5.22: Kết quả top 5 nhân viên do AI đề xuất")
+add_para(doc,
+    "Kết quả trả về được render dưới dạng danh sách card xếp theo "
+    "ranking. Ba vị trí đầu tiên có ribbon huy chương (vàng – bạc – "
+    "đồng); các vị trí tiếp theo dùng màu nhạt hơn. Mỗi card gồm "
+    "avatar tên viết tắt, họ tên đầy đủ, phòng ban và đoạn `reasoning` "
+    "ngắn bằng tiếng Việt giải thích vì sao nhân viên đó phù hợp – "
+    "đúng tinh thần Explainable AI mà đề tài đặt ra.")
+
+add_para(doc,
+    "Tổng quát, ứng dụng mobile được thiết kế bám sát Material Design 3 "
+    "với palette màu xanh chủ đạo, các thành phần đều có touch feedback "
+    "và animation chuyển trang mượt. Việc dùng chung backend với bản "
+    "web giúp dữ liệu giữa hai nền tảng luôn đồng bộ – một nhân viên "
+    "có thể tạo task trên web rồi cập nhật tiến độ ngay trên điện "
+    "thoại di động.")
 
 
 # ==================================================================
