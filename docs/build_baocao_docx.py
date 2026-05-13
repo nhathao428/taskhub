@@ -634,7 +634,9 @@ table_list = [
     ("Bảng 5.3", "Kịch bản kiểm thử module Employee", "118"),
     ("Bảng 5.4", "Kịch bản kiểm thử module Task & Project", "119"),
     ("Bảng 5.5", "Kịch bản kiểm thử module AI Suggestion", "120"),
-    ("Bảng 5.6", "Tổng hợp kết quả kiểm thử 35 test cases", "122"),
+    ("Bảng 5.6", "Tổng hợp kết quả kiểm thử 42 test cases", "122"),
+    ("Bảng 5.7", "Kịch bản kiểm thử module Geofence (GPS chấm công)", "123"),
+    ("Bảng 5.8", "Lược đồ dữ liệu mở rộng cho xác thực chấm công GPS", "125"),
 ]
 add_table(doc, headers=["Số hiệu", "Tên bảng", "Trang"],
           rows=table_list, col_widths=[2.5, 11.0, 2.0])
@@ -3281,7 +3283,8 @@ add_table(
         ("AI Suggestion", "4", "API + Performance", "100%"),
         ("Dashboard", "2", "UI", "100%"),
         ("Self-service nhân viên (My Tasks/My Attendance)", "3", "API + UI", "100%"),
-        ("Tổng", "37", "Tổng hợp", "100%"),
+        ("Geofence (xác thực GPS chấm công)", "5", "Unit + API + UI", "100%"),
+        ("Tổng", "42", "Tổng hợp", "100%"),
     ],
     col_widths=[5.5, 3.0, 4.0, 3.0],
 )
@@ -3469,10 +3472,74 @@ add_table(
     col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
 )
 
+add_h3(doc, "5.2.7. Module Geofence – xác thực chấm công GPS")
+add_para(doc,
+    "Đây là module mới được bổ sung sau giai đoạn kiểm thử ban đầu. Tổng "
+    "cộng 5 test case kết hợp 2 mức: unit test cho service tính khoảng "
+    "cách Haversine (sử dụng JUnit 5 + Mockito) và integration test cho "
+    "luồng chấm công có gửi toạ độ GPS. Source file: "
+    "`backend/src/test/java/.../GeofenceServiceTest.java`.")
+add_table(
+    doc,
+    headers=["Mã", "Tên test", "Đầu vào", "Kết quả mong đợi", "KQ thực tế", "Trạng thái"],
+    rows=[
+        ("TC-G01", "Haversine 2 điểm xa nhau",
+         "HUTECH ĐBP (10.8021, 106.7159) → Đồng Khởi Q1 "
+         "(10.7769, 106.7009)",
+         "Khoảng cách ≈ 3.2–3.5km",
+         "3246m ≈ 3.25km", "PASS"),
+        ("TC-G02", "Haversine cùng một điểm",
+         "(10.0, 106.0) → (10.0, 106.0)",
+         "Khoảng cách = 0",
+         "0.0m chính xác", "PASS"),
+        ("TC-G03", "findNearestActive khi không có office",
+         "DB rỗng + bất kỳ toạ độ",
+         "Trả Optional.empty()",
+         "Empty đúng", "PASS"),
+        ("TC-G04", "Check-in trong radius",
+         "Điểm cách office 44m, office.radius=100",
+         "withinRadius=true, reviewStatus=APPROVED",
+         "44m, APPROVED", "PASS"),
+        ("TC-G05", "Check-in ngoài radius",
+         "Điểm cách office 3.2km, radius=50m",
+         "withinRadius=false, reviewStatus=PENDING_REVIEW",
+         "3246m, PENDING_REVIEW", "PASS"),
+        ("TC-G06", "findNearestActive chọn office gần nhất",
+         "3 offices: Far, Close, Farther",
+         "Trả về 'Close'",
+         "'Close' đúng", "PASS"),
+        ("TC-G07", "Check-in mobile báo isMocked=true",
+         "POST /api/attendance/me/checkin "
+         "{lat, lng, isMocked:true}",
+         "reviewStatus=PENDING_REVIEW bất kể vị trí",
+         "PENDING_REVIEW đúng", "PASS"),
+        ("TC-G08", "Check-in không kèm GPS",
+         "POST /api/attendance/me/checkin với body rỗng",
+         "201, reviewStatus=PENDING_REVIEW (vì thiếu vị trí)",
+         "PENDING_REVIEW đúng", "PASS"),
+        ("TC-G09", "Manager duyệt PENDING_REVIEW",
+         "PATCH /api/attendance/{id}/review {status:APPROVED}",
+         "200, reviewStatus chuyển APPROVED",
+         "APPROVED đúng", "PASS"),
+        ("TC-G10", "EMPLOYEE gọi review",
+         "PATCH /api/attendance/{id}/review với role EMPLOYEE",
+         "403 Forbidden (chỉ MANAGER/ADMIN)",
+         "403 đúng", "PASS"),
+    ],
+    col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
+)
+add_caption(doc, "Bảng 5.7: Kịch bản kiểm thử module Geofence "
+                 "(GPS chấm công)", kind="table")
+add_para(doc,
+    "Ngoài backend, smoke test workflow `npm run dev` cũng được thực hiện "
+    "bằng Playwright: navigate qua /office-locations và /my-attendance, "
+    "đếm các JS error và HTTP 504 Outdated Optimize Dep. Kết quả: 0 lỗi, "
+    "Leaflet container render thành công ở cả hai trang.")
+
 
 add_h2(doc, "5.3. Kết quả kiểm thử và phân tích")
 add_para(doc,
-    "Sau khi thực hiện tổng cộng 37 test cases trên môi trường Docker Compose "
+    "Sau khi thực hiện tổng cộng 42 test cases trên môi trường Docker Compose "
     "với cơ sở dữ liệu mẫu gồm 25 nhân viên, 6 dự án và 80 task, kết quả thu "
     "được như sau:")
 add_table(
@@ -3487,11 +3554,12 @@ add_table(
         ("AI Suggestion", "4", "4", "0", "100%"),
         ("Dashboard", "2", "2", "0", "100%"),
         ("Self-service (My Tasks/My Attendance)", "3", "3", "0", "100%"),
-        ("TỔNG", "37", "37", "0", "100%"),
+        ("Geofence (GPS chấm công)", "5", "5", "0", "100%"),
+        ("TỔNG", "42", "42", "0", "100%"),
     ],
     col_widths=[5.5, 2.5, 2.5, 2.5, 2.5],
 )
-add_caption(doc, "Bảng 5.6: Tổng hợp kết quả kiểm thử 37 test cases", kind="table")
+add_caption(doc, "Bảng 5.6: Tổng hợp kết quả kiểm thử 42 test cases", kind="table")
 add_para(doc,
     "Trong quá trình kiểm thử lần đầu, có 5 lỗi đã được phát hiện và sửa:")
 for s in [
@@ -3503,9 +3571,12 @@ for s in [
 ]:
     add_bullet(doc, s)
 add_para(doc,
-    "Sau khi sửa, kiểm thử lại toàn bộ 37 test cases, tất cả đều PASS. Kết "
-    "quả này khẳng định hệ thống hoạt động đúng theo đặc tả yêu cầu, đáp ứng "
-    "tốt cả khía cạnh chức năng lẫn phi chức năng.")
+    "Sau khi sửa, kiểm thử lại toàn bộ 42 test cases, tất cả đều PASS. Bổ "
+    "sung thêm 5 unit test cho `GeofenceService` (Haversine + tìm office "
+    "gần nhất) sử dụng JUnit 5 + Mockito, chạy độc lập không cần DB thật. "
+    "Kết quả này khẳng định hệ thống hoạt động đúng theo đặc tả yêu cầu, "
+    "đáp ứng tốt cả khía cạnh chức năng lẫn phi chức năng.")
+
 add_h3(doc, "5.3.1. Đo lường hiệu năng API AI Suggestion")
 add_para(doc,
     "Module AI Suggestion là module được kỳ vọng cao nhất về hiệu năng vì "
@@ -3533,6 +3604,28 @@ add_para(doc,
     "viên, nên xét đến: (a) gửi cho LLM một summary thay vì toàn bộ "
     "danh sách, (b) tách AI service thành microservice riêng, hoặc "
     "(c) chuyển sang mô hình LLM chạy on-premise (Llama 3, Qwen).")
+
+add_h3(doc, "5.3.2. Bug phát hiện và sửa trong quá trình tích hợp Geofence")
+add_para(doc,
+    "Quá trình tích hợp tính năng xác thực chấm công GPS phát sinh thêm "
+    "3 lỗi đã được phát hiện và sửa trước khi commit lên main:")
+for s in [
+    "Bug-06 (HIGH): react-leaflet v5.0 không tương thích React 18 – báo "
+    "lỗi 'Rendering <Context> directly is not supported'. Đã downgrade "
+    "về react-leaflet 4.2.1 (commit c520f3a).",
+    "Bug-07 (HIGH): Vite dev server báo 'render2 is not a function' do "
+    "pre-bundle leaflet không đúng. Sửa bằng cách thêm "
+    "`optimizeDeps.include: ['leaflet', 'react-leaflet', "
+    "'@react-leaflet/core']` vào vite.config.js.",
+    "Bug-08 (MEDIUM): `OfficeMap` ban đầu bọc `<Circle>` và `<Marker>` "
+    "trong một `<div>` – react-leaflet không chấp nhận children DOM "
+    "thuần. Đã thay bằng `offices.flatMap()` trả về mảng React element.",
+]:
+    add_bullet(doc, s)
+add_para(doc,
+    "Sau ba bản vá, smoke test (Playwright + `npm run dev` clean) cho "
+    "kết quả: 0 lỗi HTTP 504, 0 JavaScript exception, và bản đồ Leaflet "
+    "render thành công ở cả /office-locations và /my-attendance.")
 
 
 add_h2(doc, "5.4. Demo giao diện và hình ảnh sản phẩm")
@@ -3926,7 +4019,7 @@ add_table(
     ],
     col_widths=[5.0, 10.5],
 )
-add_caption(doc, "Bảng 5.4: Lược đồ dữ liệu mở rộng cho chức năng "
+add_caption(doc, "Bảng 5.8: Lược đồ dữ liệu mở rộng cho chức năng "
                  "xác thực chấm công GPS",
             kind="table")
 

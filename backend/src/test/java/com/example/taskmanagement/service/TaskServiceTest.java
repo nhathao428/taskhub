@@ -83,7 +83,8 @@ class TaskServiceTest {
     @Test
     void testCreateTask_Simple() {
         CreateTaskRequest request = new CreateTaskRequest(
-                "New Task", "Description", LocalDate.now(), "pending", null, null);
+                "New Task", "Description", null,
+                LocalDate.now(), "pending", null, null);
 
         Task saved = new Task();
         saved.setTitle("New Task");
