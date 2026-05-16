@@ -4,46 +4,33 @@ title Kiến trúc tổng thể hệ thống
 
 skinparam componentStyle uml2
 skinparam linetype ortho
+skinparam nodesep 35
+skinparam ranksep 50
 
 actor "Người dùng" as User
 
-node "Client tier" as ClientTier {
-  component "Web Browser\n(React 18 + Vite)" as Web
+rectangle "TẦNG CLIENT" as ClientTier {
+  component "Web App\n(React 18 + Vite)" as Web
   component "Mobile App\n(Flutter 3.x)" as Mobile
-  component "API consumer\n(Postman, Swagger)" as Tools
 }
 
-node "Application tier\n(Docker network: taskmgmt_net)" as AppTier {
-  component "Spring Boot 3.5\n(Port 5000)" as Backend {
-    [Controller layer]
-    [Security (JWT) layer]
-    [Service layer]
-    [Cache abstraction]
-    [Repository (JPA)]
-  }
+rectangle "TẦNG ỨNG DỤNG" as AppTier {
+  component "Spring Boot REST API  ·  cổng 5000\n\nController  →  Service  →  Repository\nBảo mật JWT   ·   Spring Cache" as Backend
 }
 
-node "Data tier" as DataTier {
-  database "PostgreSQL 16\n(Port 5432)" as PG
-  database "Redis 7\n(Port 6379)" as Redis
+rectangle "TẦNG DỮ LIỆU" as DataTier {
+  database "PostgreSQL 16" as PG
+  database "Redis 7\n(bộ nhớ đệm)" as Redis
 }
 
-cloud "Gemini API\n(gemini-2.5-flash)" as Gemini
+cloud "Google Gemini API\n(gemini-2.5-flash)" as Gemini
 
-User --> Web : HTTPS
-User --> Mobile : HTTPS
-Web --> Backend : REST + JWT
-Mobile --> Backend : REST + JWT
-Tools --> Backend : REST + JWT
+User --> Web
+User --> Mobile
+Web --> Backend : REST / JWT
+Mobile --> Backend : REST / JWT
+Backend --> PG : JDBC
+Backend --> Redis : cache
+Backend --> Gemini : HTTPS
 
-Backend --> PG : JDBC / HikariCP
-Backend --> Redis : RESP / Spring Cache
-Backend --> Gemini : HTTPS / API key
-
-note bottom of Backend
-  @PreAuthorize phân quyền 3 role:
-  ADMIN > MANAGER > EMPLOYEE.
-  Cache key = hash(taskTitle+skills),
-  TTL 5 phút cho AI Suggestion.
-end note
 @enduml
