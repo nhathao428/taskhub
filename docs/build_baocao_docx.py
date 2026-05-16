@@ -4383,14 +4383,14 @@ refs = [
     ('[17] Hibernate Team, "Hibernate ORM 6 User Guide", '
      'https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html, '
      'truy cập tháng 3/2026.'),
-    ('[18] Baeldung, "Spring Boot and JWT Security Tutorial", '
+    ('[18] Baeldung, "Using JWT with Spring Security OAuth", '
      'https://www.baeldung.com/spring-security-oauth-jwt, truy cập tháng 2/2026.'),
     ('[19] Martin Fowler, "Patterns of Enterprise Application Architecture", '
      'Addison-Wesley Professional, 2002.'),
     ('[20] Ian Sommerville, "Software Engineering, 10th Edition", '
      'Pearson Education, 2016.'),
-    ('[21] Roger S. Pressman, "Software Engineering: A Practitioner\'s Approach, 8th Edition", '
-     'McGraw-Hill Education, 2014.'),
+    ('[21] Roger S. Pressman, Bruce R. Maxim, "Software Engineering: A Practitioner\'s '
+     'Approach, 8th Edition", McGraw-Hill Education, 2014.'),
     ('[22] Eric Freeman et al., "Head First Design Patterns, 2nd Edition", '
      'O\'Reilly Media, 2020.'),
     ('[23] Robert C. Martin, "Clean Architecture: A Craftsman\'s Guide to Software Structure '
@@ -4399,14 +4399,13 @@ refs = [
      'Addison-Wesley Professional, 2013.'),
     ('[25] Ashish Vaswani et al., "Attention Is All You Need", '
      'Advances in Neural Information Processing Systems 30 (NIPS 2017).'),
-    ('[26] Nguyễn Thị Thu Hà, "Hệ thống gợi ý nhân viên dựa trên đa tiêu chí", '
-     'Tạp chí Công nghệ Thông tin và Truyền thông, số 1/2023, trang 45–52.'),
-    ('[27] Đỗ Văn Nhật và cộng sự, "Ứng dụng Weighted Scoring trong gợi ý nhân lực '
-     'cho doanh nghiệp vừa và nhỏ", Tạp chí Khoa học và Công nghệ Đại học '
-     'Đà Nẵng, số 5(126)/2018, trang 12–17.'),
+    ('[26] Charu C. Aggarwal, "Recommender Systems: The Textbook", '
+     'Springer International Publishing, 2016.'),
+    ('[27] Thomas L. Saaty, "The Analytic Hierarchy Process: Planning, Priority '
+     'Setting, Resource Allocation", McGraw-Hill, New York, 1980.'),
     ('[28] Phòng Thương mại và Công nghiệp Việt Nam (VCCI), "Báo cáo PCI 2023 – '
      'Chỉ số năng lực cạnh tranh cấp tỉnh của Việt Nam", Hà Nội, 2024.'),
-    ('[29] Bộ Kế hoạch và Đầu tư, "Sách trắng doanh nghiệp Việt Nam 2024", '
+    ('[29] Bộ Kế hoạch và Đầu tư, "Sách trắng doanh nghiệp Việt Nam năm 2024", '
      'Nhà xuất bản Thống kê, Hà Nội, 2024.'),
     ('[30] Sam Newman, "Building Microservices, 2nd Edition", O\'Reilly Media, 2021.'),
 ]
