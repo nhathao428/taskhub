@@ -14,28 +14,9 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 
 ## 🏗️ Kiến trúc tổng quan
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                      CLIENT LAYER                       │
-│   ┌──────────────────┐       ┌─────────────────────┐   │
-│   │  React + Vite    │       │   Flutter Mobile     │   │
-│   │  (port 5173)     │       │  (Android / iOS)     │   │
-│   └────────┬─────────┘       └──────────┬──────────┘   │
-└────────────┼──────────────────────────────┼─────────────┘
-             │         HTTP / REST API       │
-             ▼                               ▼
-┌─────────────────────────────────────────────────────────┐
-│                     BACKEND LAYER                       │
-│         Spring Boot REST API (port 5000)                │
-│    JWT Auth │ CRUD APIs │ AI Suggestion (Gemini)        │
-└──────────┬─────────────────────────┬────────────────────┘
-           │                         │
-           ▼                         ▼
-┌──────────────────┐     ┌──────────────────────┐
-│  PostgreSQL 16   │     │     Redis 7           │
-│  (port 5432)     │     │  (port 6379 / cache)  │
-└──────────────────┘     └──────────────────────┘
-```
+![Sơ đồ kiến trúc tổng thể](docs/uml/png/architecture.png)
+
+Hệ thống chia 3 tầng: **Client** (Web React + Mobile Flutter) → **Application** (Spring Boot REST API, port 5000, bảo mật JWT) → **Data** (PostgreSQL 16, Redis 7). Module AI gọi Google Gemini để gợi ý nhân viên.
 
 ---
 

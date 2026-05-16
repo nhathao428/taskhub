@@ -40,4 +40,6 @@ CLAUDE.md
 # Riêng báo cáo chính được commit để xem/tải trực tiếp trên GitHub.
 docs/*.docx
 !docs/BAO_CAO_DO_AN_CO_SO.docx
-docs/uml/png/
+docs/uml/png/*
+# Giữ lại sơ đồ kiến trúc để hiển thị trong README trên GitHub
+!docs/uml/png/architecture.png
