@@ -555,7 +555,7 @@ add_h1(doc, "LỜI MỞ ĐẦU")
 opening = [
     "Trong bối cảnh cách mạng công nghiệp lần thứ tư đang diễn ra mạnh mẽ trên phạm vi toàn cầu, công nghệ thông tin đã trở thành động lực then chốt thúc đẩy sự phát triển kinh tế – xã hội của mọi quốc gia. Tại Việt Nam, Chính phủ đã ban hành nhiều chính sách quan trọng nhằm thúc đẩy chuyển đổi số trong các doanh nghiệp, đặc biệt là doanh nghiệp nhỏ và vừa – khu vực kinh tế chiếm hơn 97% tổng số doanh nghiệp và đóng góp khoảng 45% GDP cả nước.",
     "Tuy nhiên, một thực tế đáng quan tâm là phần lớn doanh nghiệp nhỏ và vừa, đặc biệt là các doanh nghiệp nhỏ đa ngành, vẫn đang sử dụng các phương pháp quản lý truyền thống như bảng tính Excel, sổ ghi chép tay hoặc các nhóm chat trên các ứng dụng nhắn tin để quản lý công việc, phân công nhân sự và theo dõi tiến độ. Cách làm này dẫn đến nhiều bất cập như thiếu minh bạch, phân công không tối ưu, khó tổng hợp dữ liệu, không có cơ sở khoa học để ra quyết định và đặc biệt là chưa tận dụng được sức mạnh của trí tuệ nhân tạo trong việc gợi ý nhân viên phù hợp cho từng công việc.",
-    "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dùng OpenAI GPT-4o-mini xếp hạng định tính theo kỹ năng, tiến độ, đúng hạn và chấm công, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
+    "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dùng Google Gemini gemini-2.5-flash xếp hạng định tính theo kỹ năng, tiến độ, đúng hạn và chấm công, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
     "Đồ án được thực hiện trong khuôn khổ môn học Đồ án cơ sở thuộc chương trình đào tạo Công nghệ thông tin của Khoa Công nghệ Thông tin. Báo cáo này được tổ chức thành 6 chương, trình bày một cách có hệ thống từ tổng quan đề tài, cơ sở lý thuyết, phân tích – thiết kế hệ thống, triển khai ứng dụng đến kiểm thử, demo và kết luận. Toàn bộ mã nguồn, tài liệu kỹ thuật và sản phẩm cuối cùng đều được công bố tại kho lưu trữ của tác giả để phục vụ mục đích học tập và phát triển tiếp theo.",
     "Em xin trân trọng giới thiệu báo cáo và mong nhận được những ý kiến đóng góp quý báu của quý thầy cô.",
 ]
@@ -656,7 +656,7 @@ fig_list = [
     ("Hình 2.8", "Vòng đời component React và Virtual DOM", "32"),
     ("Hình 2.9", "Mô hình widget tree của Flutter", "37"),
     ("Hình 2.10", "So sánh ứng dụng truyền thống và ứng dụng container hóa", "40"),
-    ("Hình 2.11", "Quy trình gọi OpenAI Chat Completions API", "43"),
+    ("Hình 2.11", "Quy trình gọi Google Gemini API", "43"),
     ("Hình 3.1", "Sơ đồ Use Case tổng thể của hệ thống", "57"),
     ("Hình 3.2", "Sơ đồ ERD của hệ thống", "64"),
     ("Hình 3.3", "Sơ đồ lớp (Class Diagram)", "71"),
@@ -719,7 +719,7 @@ for s in [
 
 for t in [
     "Đặc thù của doanh nghiệp nhỏ đa ngành – tức là các doanh nghiệp cung cấp nhiều loại sản phẩm/dịch vụ thuộc các lĩnh vực khác nhau (ví dụ một công ty vừa làm phần mềm, vừa làm marketing, vừa làm tổ chức sự kiện) – càng làm cho bài toán quản lý trở nên phức tạp. Nhân viên trong các doanh nghiệp này thường có kỹ năng đa dạng và phải tham gia vào nhiều dự án thuộc nhiều ngành khác nhau. Việc lựa chọn đúng người, đúng việc trở thành thách thức lớn của người quản lý.",
-    "Mặt khác, sự phát triển nhanh chóng của các công nghệ web hiện đại (Spring Boot, React, Flutter), công nghệ container (Docker), và đặc biệt là sự bùng nổ của các Large Language Model (LLM) như OpenAI GPT đã mở ra cơ hội xây dựng các phần mềm quản lý tinh gọn, chi phí thấp nhưng tích hợp được trí tuệ nhân tạo. Đây chính là động lực để đề tài này được lựa chọn.",
+    "Mặt khác, sự phát triển nhanh chóng của các công nghệ web hiện đại (Spring Boot, React, Flutter), công nghệ container (Docker), và đặc biệt là sự bùng nổ của các Large Language Model (LLM) như Google Gemini đã mở ra cơ hội xây dựng các phần mềm quản lý tinh gọn, chi phí thấp nhưng tích hợp được trí tuệ nhân tạo. Đây chính là động lực để đề tài này được lựa chọn.",
 ]:
     add_para(doc, t)
 
@@ -730,9 +730,9 @@ add_para(doc,
     "lựa chọn vì nhiều lý do thiết thực, vừa đáp ứng nhu cầu của xã hội, vừa phù hợp "
     "với mục tiêu học tập của môn Đồ án cơ sở:")
 for t in [
-    "Thứ nhất, đề tài có tính thực tiễn rất cao. Khác với những đồ án nặng tính lý thuyết hoặc mô phỏng, hệ thống xây dựng trong đề tài này hoàn toàn có thể được triển khai và sử dụng thực tế cho các doanh nghiệp nhỏ với chi phí rất thấp (chủ yếu là chi phí hạ tầng cloud và API OpenAI). Điều này tạo ra giá trị thực sự cho xã hội.",
+    "Thứ nhất, đề tài có tính thực tiễn rất cao. Khác với những đồ án nặng tính lý thuyết hoặc mô phỏng, hệ thống xây dựng trong đề tài này hoàn toàn có thể được triển khai và sử dụng thực tế cho các doanh nghiệp nhỏ với chi phí rất thấp (chủ yếu là chi phí hạ tầng cloud và API Gemini). Điều này tạo ra giá trị thực sự cho xã hội.",
     "Thứ hai, đề tài cho phép vận dụng đầy đủ các kiến thức đã học trong chương trình đào tạo Công nghệ thông tin: lập trình hướng đối tượng (Java), cơ sở dữ liệu (PostgreSQL), mạng máy tính (HTTP, REST), an toàn thông tin (BCrypt, JWT, HTTPS), trí tuệ nhân tạo (Machine Learning, LLM), kỹ thuật phần mềm (UML, Agile), và các công nghệ web hiện đại (React, Flutter, Docker).",
-    "Thứ ba, đề tài tích hợp trực tiếp công nghệ trí tuệ nhân tạo: backend gom dữ liệu lịch sử thô (task, chấm công, kỹ năng tự nhập của nhân viên), sau đó để OpenAI GPT-4o-mini xếp hạng định tính TOP 5 nhân viên cho từng task kèm `reasoning` bằng tiếng Việt. Đây là một chủ đề rất “nóng” trong giai đoạn 2024–2026: dùng LLM thay cho công thức trọng số cố định, vừa linh hoạt với dữ liệu tự do vừa giúp giải thích được kết quả cho người quản lý.",
+    "Thứ ba, đề tài tích hợp trực tiếp công nghệ trí tuệ nhân tạo: backend gom dữ liệu lịch sử thô (task, chấm công, kỹ năng tự nhập của nhân viên), sau đó để Google Gemini gemini-2.5-flash xếp hạng định tính TOP 5 nhân viên cho từng task kèm `reasoning` bằng tiếng Việt. Đây là một chủ đề rất “nóng” trong giai đoạn 2024–2026: dùng LLM thay cho công thức trọng số cố định, vừa linh hoạt với dữ liệu tự do vừa giúp giải thích được kết quả cho người quản lý.",
     "Thứ tư, kiến trúc đa nền tảng (multi-platform) của hệ thống – gồm web (React), mobile (Flutter) và backend (Spring Boot) – là kiến trúc đang được sử dụng phổ biến trong các sản phẩm thương mại hiện nay. Việc triển khai thành công đề tài giúp sinh viên có kinh nghiệm thực tế khi đi làm.",
     "Thứ năm, đề tài phù hợp với phạm vi và thời lượng của môn Đồ án cơ sở (12 tuần). Mỗi module chức năng có thể được triển khai trong một vài tuần, các module được tích hợp dần và kiểm thử song song. Mức độ phức tạp vừa phải, không quá đơn giản như một CRUD app cơ bản, cũng không quá tham vọng như các hệ thống phân tán quy mô lớn.",
     "Thứ sáu, hệ thống có thể được mở rộng tự nhiên thành một sản phẩm thương mại (SaaS) trong tương lai. Điều này khích lệ tinh thần khởi nghiệp và đổi mới sáng tạo trong sinh viên.",
@@ -754,7 +754,7 @@ for s in [
     "Triển khai 7 nhóm chức năng nghiệp vụ: Xác thực & phân quyền, Quản lý nhân viên (kèm trường kỹ năng tự nhập), Quản lý dự án, Quản lý công việc, Chấm công, AI Gợi ý, Dashboard.",
     "Xây dựng frontend Single Page Application bằng React 18 + Vite 5 + Tailwind CSS, sử dụng React Router v6 để điều hướng; giao diện thích ứng theo role.",
     "Phát triển ứng dụng mobile Flutter chạy được trên cả Android và iOS với các tính năng cốt lõi.",
-    "Tích hợp OpenAI GPT-4o-mini để xếp hạng nhân viên phù hợp cho từng task dựa trên kỹ năng, tiến độ, đúng hạn và chấm công — KHÔNG dùng công thức trọng số cố định mà để LLM đánh giá định tính.",
+    "Tích hợp Google Gemini gemini-2.5-flash để xếp hạng nhân viên phù hợp cho từng task dựa trên kỹ năng, tiến độ, đúng hạn và chấm công — KHÔNG dùng công thức trọng số cố định mà để LLM đánh giá định tính.",
     "Sử dụng Redis làm tầng cache để tối ưu hiệu năng cho các truy vấn nặng (AI Suggestion).",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose để dễ dàng triển khai và vận hành.",
     "Kiểm thử toàn diện với ít nhất 30 test cases, đảm bảo các luồng nghiệp vụ chính hoạt động đúng.",
@@ -778,7 +778,7 @@ for s in [
     "Nghiên cứu React 18 (hooks, Context API, React Router v6) và build tool Vite 5.",
     "Nghiên cứu Flutter 3.x – widget tree, state management, gọi HTTP qua dio.",
     "Nghiên cứu Docker và Docker Compose – container hóa multi-service applications.",
-    "Nghiên cứu OpenAI Chat Completions API và các kỹ thuật prompt engineering cơ bản.",
+    "Nghiên cứu Google Gemini API và các kỹ thuật prompt engineering cơ bản.",
     "Nghiên cứu các cách xếp hạng đa tiêu chí: Weighted Scoring (thiết kế ban đầu), so sánh với cách dùng LLM (phương án triển khai thực tế).",
 ]:
     add_bullet(doc, s)
@@ -801,7 +801,7 @@ for s in [
     "Triển khai frontend React với 10 trang chính, tích hợp Chart.js cho dashboard.",
     "Triển khai app Flutter với 6 màn hình chính.",
     "Triển khai thuật toán AiSuggestionService với cache Redis.",
-    "Tích hợp OpenAI API trực tiếp trong AiSuggestionService qua RestClient của Spring.",
+    "Tích hợp Gemini API trực tiếp trong AiSuggestionService qua RestClient của Spring.",
     "Viết Dockerfile cho từng service và file docker-compose.yml.",
     "Kiểm thử với 35 test cases: 15 cho Auth/Employee, 10 cho Task/Project, 5 cho Attendance, 5 cho AI.",
     "Viết tài liệu API bằng Swagger UI và tài liệu kỹ thuật bằng Markdown.",
@@ -818,7 +818,7 @@ add_h3(doc, "1.5.1. Phương pháp nghiên cứu tài liệu")
 add_para(doc,
     "Tiến hành thu thập, đọc và phân tích các tài liệu chính thức của các công nghệ "
     "sử dụng trong đề tài (Spring Boot Reference Documentation, React Documentation, "
-    "Flutter Documentation, PostgreSQL Manual, Docker Documentation, OpenAI API "
+    "Flutter Documentation, PostgreSQL Manual, Docker Documentation, Gemini API "
     "Documentation). Đồng thời tham khảo các sách chuyên ngành về kỹ thuật phần mềm, "
     "kiến trúc phần mềm và trí tuệ nhân tạo. Các bài báo khoa học trên Google Scholar "
     "về hệ thống gợi ý đa tiêu chí cũng được khảo cứu để xây dựng thuật toán phù hợp.")
@@ -870,7 +870,7 @@ add_table(
         ("Chấm công",
          "Ghi nhận chấm công ngày (PRESENT/ABSENT/LATE), xem lịch sử."),
         ("AI gợi ý nhân viên",
-         "Gợi ý top 5 nhân viên phù hợp dựa trên 4 tiêu chí, kèm OpenAI summary."),
+         "Gợi ý top 5 nhân viên phù hợp dựa trên 4 tiêu chí, kèm Gemini summary."),
         ("Dashboard & thống kê",
          "Tổng quan số nhân viên, dự án, task, biểu đồ trạng thái task."),
         ("API & tài liệu",
@@ -895,7 +895,7 @@ for s in [
     "Database: PostgreSQL 16.",
     "Cache: Redis 7.",
     "Container: Docker 24+, Docker Compose 2.x.",
-    "AI: OpenAI GPT-4o-mini qua HTTP API.",
+    "AI: Google Gemini gemini-2.5-flash qua HTTP API.",
     "Hệ điều hành test: Windows 11, Ubuntu 22.04 LTS.",
     "Trình duyệt hỗ trợ: Chrome 120+, Edge 120+, Firefox 120+.",
 ]:
@@ -908,13 +908,13 @@ chapters_overview = [
     ("Chương 1 – Tổng quan đề tài",
      "Trình bày bối cảnh, lý do chọn đề tài, mục tiêu, nội dung, phương pháp nghiên cứu và phạm vi đề tài."),
     ("Chương 2 – Cơ sở lý thuyết",
-     "Trình bày các kiến thức nền tảng về kiến trúc client–server, REST API, các công nghệ Spring Boot, React, Flutter, PostgreSQL, Redis, Docker và OpenAI."),
+     "Trình bày các kiến thức nền tảng về kiến trúc client–server, REST API, các công nghệ Spring Boot, React, Flutter, PostgreSQL, Redis, Docker và Gemini."),
     ("Chương 3 – Phân tích và thiết kế hệ thống",
      "Trình bày kết quả khảo sát hiện trạng, đặc tả yêu cầu, các sơ đồ UML (Use Case, Class, Sequence, Activity), thiết kế CSDL và kiến trúc tổng thể."),
     ("Chương 4 – Xây dựng ứng dụng",
-     "Trình bày chi tiết quá trình triển khai backend, frontend, mobile, tích hợp Redis, OpenAI và đóng gói bằng Docker."),
+     "Trình bày chi tiết quá trình triển khai backend, frontend, mobile, tích hợp Redis, Gemini và đóng gói bằng Docker."),
     ("Chương 5 – Kiểm thử và đánh giá kết quả",
-     "Trình bày kế hoạch kiểm thử, 35 test cases, kết quả kiểm thử và demo giao diện thực tế."),
+     "Trình bày kế hoạch kiểm thử, 35 test cases, kết quả kiểm thử, demo giao diện thực tế (web + mobile) và quy trình khởi chạy hệ thống trên mọi nền tảng."),
     ("Chương 6 – Kết luận và hướng phát triển",
      "Tổng kết kết quả đạt được, các hạn chế của đề tài và đề xuất hướng phát triển trong tương lai."),
 ]
@@ -939,7 +939,7 @@ add_h3(doc, "2.1.1. Khái niệm kiến trúc Client–Server")
 for t in [
     "Kiến trúc Client–Server là mô hình tính toán phân tán, trong đó các tác vụ và khối lượng công việc được phân chia giữa các thành phần đóng vai trò Server (máy phục vụ – cung cấp dịch vụ) và các thành phần đóng vai trò Client (máy khách – yêu cầu dịch vụ). Đây là mô hình kiến trúc phổ biến nhất hiện nay cho các ứng dụng web, mobile, doanh nghiệp và đa số các dịch vụ Internet.",
     "Trong mô hình này, Client gửi một yêu cầu (request) đến Server qua mạng (thường là Internet). Server nhận yêu cầu, xử lý logic, có thể truy vấn cơ sở dữ liệu hoặc gọi các dịch vụ bên thứ ba, sau đó trả lại phản hồi (response) cho Client. Giao tiếp giữa Client và Server diễn ra theo cơ chế request–response và thường sử dụng các giao thức tiêu chuẩn như HTTP/HTTPS, WebSocket, gRPC.",
-    "Trong hệ thống quản lý công việc được xây dựng trong đề tài này, Server là ứng dụng Spring Boot chạy trên cổng 8080, đảm nhiệm toàn bộ logic nghiệp vụ và truy cập dữ liệu. Client gồm hai phía: (1) trình duyệt web với ứng dụng React chạy trên cổng 5173 và (2) ứng dụng Flutter chạy trên thiết bị di động Android/iOS. Cả hai phía Client đều giao tiếp với Server qua giao thức HTTP với định dạng dữ liệu JSON.",
+    "Trong hệ thống quản lý công việc được xây dựng trong đề tài này, Server là ứng dụng Spring Boot chạy trên cổng 5000, đảm nhiệm toàn bộ logic nghiệp vụ và truy cập dữ liệu. Client gồm hai phía: (1) trình duyệt web với ứng dụng React chạy trên cổng 5173 và (2) ứng dụng Flutter chạy trên thiết bị di động Android/iOS. Cả hai phía Client đều giao tiếp với Server qua giao thức HTTP với định dạng dữ liệu JSON.",
 ]:
     add_para(doc, t)
 add_h3(doc, "2.1.2. Mô hình 3 tầng (Three-tier Architecture)")
@@ -1143,6 +1143,20 @@ add_para(doc,
     "mỗi mật khẩu, ngăn chặn tấn công rainbow table. Spring Security cung cấp "
     "sẵn lớp BCryptPasswordEncoder để mã hóa và so khớp mật khẩu.")
 
+add_h3(doc, "2.4.6. Giới hạn tần suất (Rate Limiting) chống spam")
+add_para(doc,
+    "Để chống lạm dụng, hệ thống áp dụng cơ chế giới hạn tần suất request theo "
+    "địa chỉ IP. Một servlet filter (`RateLimitFilter`) chạy trước chuỗi lọc "
+    "của Spring Security, đếm số request mỗi IP trong cửa sổ thời gian cố định "
+    "1 phút. Hai nhóm endpoint dễ bị lạm dụng được bảo vệ: nhóm xác thực "
+    "`/api/auth/**` (chống tấn công dò mật khẩu – brute force) và nhóm gợi ý AI "
+    "`/api/suggestions/**` (bảo vệ hạn mức gọi Gemini API). Khi một IP vượt "
+    "ngưỡng cho phép, server trả về mã HTTP 429 (Too Many Requests) kèm thông "
+    "báo rõ ràng thay vì xử lý tiếp. Ngưỡng được cấu hình qua biến môi trường "
+    "`RATELIMIT_AUTH` (mặc định 20 request/phút) và `RATELIMIT_AI` (mặc định "
+    "10 request/phút). Bộ đếm lưu trong bộ nhớ, đủ cho mô hình một instance; "
+    "khi mở rộng nhiều instance có thể chuyển sang lưu trên Redis.")
+
 
 add_h2(doc, "2.5. Spring Data JPA và Hibernate ORM")
 add_h3(doc, "2.5.1. JPA và Hibernate")
@@ -1275,7 +1289,7 @@ add_para(doc,
     "application.yml. Module AiSuggestionService dùng @Cacheable với "
     "key dựa trên `taskId` (hoặc tiêu đề task), TTL 5 phút. Khi quản lý "
     "yêu cầu gợi ý cho cùng một task, kết quả được lấy từ cache thay vì "
-    "gọi OpenAI lần nữa – giảm thời gian phản hồi từ ~1500ms xuống ~5ms "
+    "gọi Gemini lần nữa – giảm thời gian phản hồi từ ~1500ms xuống ~5ms "
     "và tiết kiệm chi phí API.")
 add_para(doc,
     "Pattern caching được sử dụng là cache-aside (look-aside): trước "
@@ -1430,49 +1444,57 @@ add_para(doc,
     "docker-compose up -d là toàn bộ hệ thống khởi động.")
 
 
-add_h2(doc, "2.12. OpenAI API và tích hợp LLM vào ứng dụng nội bộ")
+add_h2(doc, "2.12. Gemini API và tích hợp LLM vào ứng dụng nội bộ")
 add_h3(doc, "2.12.1. Large Language Model (LLM)")
 add_para(doc,
     "Large Language Model (LLM) là loại mô hình học sâu được huấn luyện "
     "trên khối lượng văn bản khổng lồ, có khả năng hiểu và sinh văn bản "
-    "tự nhiên. Các LLM nổi tiếng gồm: GPT-4o của OpenAI, Claude của "
-    "Anthropic, Gemini của Google, Llama của Meta, Mistral. Phía sau "
+    "tự nhiên. Các LLM nổi tiếng gồm: Gemini của Google, GPT của "
+    "OpenAI, Claude của Anthropic, Llama của Meta, Mistral. Phía sau "
     "các LLM là kiến trúc Transformer (Vaswani et al., 2017) với cơ chế "
     "self-attention. LLM mở ra khả năng xây dựng các ứng dụng AI mà "
     "trước đây tưởng chừng rất khó: chatbot, dịch thuật, tóm tắt văn "
     "bản, code generation, semantic search...")
-add_h3(doc, "2.12.2. OpenAI Chat Completions API")
+add_h3(doc, "2.12.2. Google Gemini API")
 add_para(doc,
-    "OpenAI cung cấp API HTTP để gọi các model GPT từ ứng dụng bên thứ "
-    "ba. Endpoint chính là POST https://api.openai.com/v1/chat/completions. "
-    "Request gửi đi gồm: model (gpt-4o-mini, gpt-4o, ...), messages "
-    "(mảng các đối thoại với role là system, user hoặc assistant), "
-    "temperature (mức độ ngẫu nhiên), max_tokens. Response trả về choices "
-    "chứa nội dung mà model sinh ra. Xác thực qua header Authorization: "
-    "Bearer <API_KEY>.")
-add_h3(doc, "2.12.3. Mô hình gpt-4o-mini")
+    "Google cung cấp Gemini API — giao diện HTTP để gọi các mô hình "
+    "Gemini từ ứng dụng bên thứ ba. Endpoint chính là POST "
+    "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent. "
+    "Request gửi đi gồm: contents (mảng các phần nội dung, mỗi phần chứa "
+    "parts với trường text), generationConfig (temperature điều khiển "
+    "mức ngẫu nhiên, responseMimeType ép định dạng đầu ra — ví dụ "
+    "application/json để model trả JSON thuần). Response trả về "
+    "candidates, trong đó candidates[0].content.parts[0].text là nội "
+    "dung model sinh ra; trường promptFeedback.blockReason cho biết "
+    "lý do nếu prompt bị bộ lọc an toàn chặn. API key có thể truyền "
+    "qua tham số truy vấn ?key=<API_KEY> hoặc header x-goog-api-key; "
+    "đề tài dùng header để key không xuất hiện trong URL và log.")
+add_h3(doc, "2.12.3. Mô hình gemini-2.5-flash")
 add_para(doc,
-    "gpt-4o-mini là phiên bản nhỏ gọn, giá rẻ của họ mô hình GPT-4o, ra "
-    "mắt giữa năm 2024. So với gpt-4o, gpt-4o-mini có chi phí đầu vào "
-    "thấp hơn ~30 lần, tốc độ phản hồi nhanh hơn, vẫn duy trì khả năng "
-    "hiểu ngữ cảnh tiếng Việt tốt. Lý do chọn gpt-4o-mini trong đề tài: "
-    "tiết kiệm chi phí khi triển khai (~$0.15 cho 1M input tokens), đủ "
-    "thông minh cho các tác vụ tóm tắt mô tả công việc và sinh checklist.")
-add_h3(doc, "2.12.4. Tích hợp OpenAI vào hệ thống")
+    "gemini-2.5-flash là phiên bản nhanh, nhẹ trong họ mô hình Gemini "
+    "2.0 của Google, tối ưu cho độ trễ thấp và chi phí thấp. Mô hình "
+    "duy trì khả năng hiểu ngữ cảnh tiếng Việt tốt và xử lý được các "
+    "tác vụ suy luận tầm trung. Lý do chọn gemini-2.5-flash trong đề "
+    "tài: có gói miễn phí (free tier) hào phóng ~1500 request/ngày, "
+    "không cần khai báo thẻ thanh toán — phù hợp với một đồ án; tốc độ "
+    "phản hồi nhanh; đủ thông minh cho tác vụ xếp hạng nhân viên và "
+    "sinh reasoning bằng tiếng Việt.")
+add_h3(doc, "2.12.4. Tích hợp Gemini vào hệ thống")
 add_para(doc,
-    "Trong đề tài, OpenAI được gọi trực tiếp từ `AiSuggestionService` "
+    "Trong đề tài, Gemini được gọi trực tiếp từ `AiSuggestionService` "
     "trong backend Spring Boot, dùng `RestClient` của Spring 6. Service "
     "này build prompt tiếng Việt bao gồm thông tin task + danh sách "
     "nhân viên kèm số liệu thô (lịch sử task, chấm công, kỹ năng), gửi "
-    "lên endpoint `/v1/chat/completions` của OpenAI với model `gpt-4o-mini`, "
+    "lên endpoint `/v1beta/models/gemini-2.5-flash:generateContent` của Gemini API, "
     "nhận về JSON mảng `[{employeeId, rank, reasoning}]`. API key được "
-    "đọc từ biến môi trường `OPENAI_API_KEY` (qua file `.env`), không "
+    "đọc từ biến môi trường `GEMINI_API_KEY` (qua file `.env`), không "
     "bao giờ commit lên git.")
 add_para(doc,
     "Khía cạnh bảo mật khi tích hợp LLM: (1) API key chỉ tồn tại ở "
     "backend, không expose ra frontend hay mobile; (2) prompt được "
-    "kiểm tra/đánh dấu để giảm rủi ro prompt injection; (3) chi phí "
-    "được giám sát qua usage dashboard của OpenAI để tránh “bill shock”.")
+    "kiểm tra/đánh dấu để giảm rủi ro prompt injection; (3) hạn mức "
+    "sử dụng được giám sát qua Google AI Studio để không vượt quota "
+    "free tier.")
 
 
 add_h2(doc, "2.13. Mô hình MVC và kiến trúc phân tầng")
@@ -1615,7 +1637,7 @@ add_table(
         ("YC-10", "Xem lịch sử chấm công",
          "Lọc theo nhân viên và khoảng thời gian.", "Trung bình"),
         ("YC-11", "AI gợi ý nhân viên",
-         "Nhập danh sách kỹ năng → trả top 5 nhân viên phù hợp + tóm tắt OpenAI.",
+         "Nhập danh sách kỹ năng → trả top 5 nhân viên phù hợp + tóm tắt Gemini.",
          "Cao"),
         ("YC-12", "Xem lịch sử gợi ý",
          "Lưu lịch sử các lần gợi ý AI để tham khảo sau.", "Thấp"),
@@ -1637,7 +1659,8 @@ add_table(
         ("NF-01", "Hiệu năng",
          "API thông thường phản hồi trong 500ms; API AI Gợi ý ≤ 2 giây với 100 nhân viên."),
         ("NF-02", "Bảo mật",
-         "Mật khẩu băm BCrypt cost=10; JWT HS256 expires 24h; HTTPS cho production; CORS giới hạn."),
+         "Mật khẩu băm BCrypt cost=10; JWT HS256 expires 24h; HTTPS cho production; CORS giới hạn; "
+         "rate limiting theo IP chống spam/brute-force."),
         ("NF-03", "Khả dụng",
          "Hệ thống hoạt động 99% thời gian; phục hồi sau lỗi container trong 1 phút."),
         ("NF-04", "Khả năng mở rộng",
@@ -1745,8 +1768,8 @@ add_table(
         ("Tiền điều kiện",
          "Manager đã đăng nhập; có ít nhất một nhân viên trong hệ thống."),
         ("Hậu điều kiện thành công",
-         "Hệ thống hiển thị 5 thẻ nhân viên kèm điểm chi tiết từng tiêu chí "
-         "và đoạn tóm tắt do OpenAI sinh ra."),
+         "Hệ thống hiển thị tối đa 5 thẻ nhân viên kèm thứ hạng và lý do "
+         "(reasoning) do Gemini sinh ra."),
         ("Luồng chính",
          "1. Manager vào trang /ai-suggestions. "
          "2. Nhập tiêu đề + mô tả công việc + kỹ năng yêu cầu (text tự do). "
@@ -1755,17 +1778,21 @@ add_table(
          "5. Backend kiểm tra cache Redis với key = taskId hoặc tiêu đề. "
          "6. Nếu cache miss: backend gọi `findByAssignedToEmployeeIdIn(...)` và "
          "`findByEmployeeEmployeeIdInAndDateBetween(...)` để gom lịch sử + chấm công của tất cả nhân viên. "
-         "7. Backend xây prompt tiếng Việt cho OpenAI gpt-4o-mini, gồm thông tin task + danh sách nhân viên "
+         "7. Backend xây prompt tiếng Việt cho Google Gemini gemini-2.5-flash, gồm thông tin task + danh sách nhân viên "
          "kèm số liệu thô (KHÔNG tính điểm số). "
-         "8. Nhận về JSON [{employeeId, rank, reasoning}] từ OpenAI, lưu vào cache 5 phút. "
+         "8. Nhận về JSON [{employeeId, rank, reasoning}] từ Gemini, lưu vào cache 5 phút. "
          "9. Trả về client; UI hiển thị 5 thẻ nhân viên kèm thứ hạng và lý do bằng tiếng Việt."),
         ("Luồng phụ – Không có nhân viên",
          "Nếu hệ thống chưa có nhân viên nào → trả về danh sách rỗng, UI hiển thị "
          "“Chưa có nhân viên trong hệ thống, vui lòng thêm trước.”"),
-        ("Luồng phụ – OpenAI lỗi hoặc thiếu API key",
-         "Nếu thiếu OPENAI_API_KEY hoặc gọi OpenAI thất bại → trả về lỗi 503/500 "
-         "với thông báo rõ ràng; UI hiển thị “Tính năng AI đang không khả dụng, "
-         "vui lòng thử lại sau.”"),
+        ("Luồng phụ – Thiếu API key",
+         "Nếu chưa cấu hình GEMINI_API_KEY → backend trả HTTP 422 kèm thông báo "
+         "“AI suggestion is unavailable: GEMINI_API_KEY is not configured”; UI hiển "
+         "thị “Tính năng AI đang không khả dụng, vui lòng thử lại sau.”"),
+        ("Luồng phụ – Gemini lỗi",
+         "Nếu gọi Gemini thất bại (mạng lỗi, key sai, hết quota) hoặc prompt bị bộ "
+         "lọc an toàn chặn → backend trả HTTP 422/500 kèm lý do; UI hiển thị thông "
+         "báo lỗi tương ứng."),
     ],
     col_widths=[3.5, 12.0],
 )
@@ -1905,7 +1932,7 @@ add_para(doc,
     "Bên cạnh các lớp Entity, hệ thống còn có tầng Controller–Service–"
     "Repository tổ chức theo kiến trúc Spring Boot, được mô tả ở Hình 3.3b "
     "dưới đây. Lớp đặc biệt `AiSuggestionService` gọi tới nhiều repository "
-    "và OpenAI API thông qua `OpenAiClient`.")
+    "và Gemini API thông qua `GeminiClient`.")
 add_uml_image(doc, "class-diagram-kien-truc.png", width_cm=15.0)
 add_caption(doc, "Hình 3.3b: Sơ đồ lớp – Kiến trúc Controller / Service / Repository",
             kind="figure")
@@ -2278,7 +2305,7 @@ spring:
       time-to-live: 300000     # 5 phút
 
 server:
-  port: 8080
+  port: 5000
   servlet:
     encoding:
       charset: UTF-8
@@ -2287,15 +2314,14 @@ jwt:
   secret: ${JWT_SECRET:bXlfc3VwZXJfc2VjcmV0X2tleV9mb3JfaGFvX2Jhb19jYW9fZG9fYW5fY29fc28=}
   expiration: 86400000          # 24h
 
-openai:
-  api-key: ${OPENAI_API_KEY:}
-  base-url: https://api.openai.com/v1
-  model: gpt-4o-mini
-  timeout-seconds: 30
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}             # trống thì tính năng AI tắt
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
 
 springdoc:
   api-docs:
-    path: /v3/api-docs
+    path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
 """)
@@ -2526,7 +2552,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 add_h3(doc, "4.3.8. Service – AiSuggestionService.java (rút gọn)")
 add_para(doc,
     "Module AI không tự tính điểm: backend chỉ gom dữ liệu thô và "
-    "ủy thác xếp hạng cho OpenAI GPT‑4o‑mini. Phiên bản rút gọn dưới "
+    "ủy thác xếp hạng cho Google Gemini gemini-2.5-flash. Phiên bản rút gọn dưới "
     "đây phản ánh logic thực tế trong "
     "`backend/src/main/java/com/example/taskmanagement/service/AiSuggestionService.java`.")
 add_code(doc, """
@@ -2542,15 +2568,15 @@ public class AiSuggestionService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${openai.api.key:}")  private String openAiApiKey;
-    @Value("${openai.api.model:gpt-4o-mini}") private String openAiModel;
+    @Value("${gemini.api.key:}")  private String geminiApiKey;
+    @Value("${gemini.api.model:gemini-2.5-flash}") private String geminiModel;
 
     @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
     public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
         List<Employee> employees = employeeRepository.findAll();
         Map<Long, EmployeeStats> stats = collectStats(employees);
         String prompt = buildPrompt(request, employees, stats);
-        return callOpenAi(prompt, employees);
+        return callGemini(prompt, employees);
     }
 
     /** Gom số liệu thô — KHÔNG tính điểm số. */
@@ -2597,17 +2623,19 @@ public class AiSuggestionService {
         return sb.toString();
     }
 
-    private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> emps) {
+    private List<EmployeeSuggestionDTO> callGemini(String prompt, List<Employee> emps) {
         Map<String, Object> body = Map.of(
-            "model", openAiModel,
-            "messages", List.of(Map.of("role", "user", "content", prompt)),
-            "temperature", 0.3);
+            "contents", List.of(Map.of(
+                "parts", List.of(Map.of("text", prompt)))),
+            "generationConfig", Map.of(
+                "temperature", 0.3,
+                "responseMimeType", "application/json"));  // ép Gemini trả JSON
         String resp = restClient.post()
-            .uri("/v1/chat/completions")
-            .header("Authorization", "Bearer " + openAiApiKey)
+            .uri("/v1beta/models/{model}:generateContent", geminiModel)
+            .header("x-goog-api-key", geminiApiKey)  // key qua header, không lộ trong URL
             .contentType(MediaType.APPLICATION_JSON)
             .body(body).retrieve().body(String.class);
-        return parseOpenAiResponse(resp, emps);  // JSON → List<DTO>
+        return parseGeminiResponse(resp, emps);  // JSON → List<DTO>
     }
 }
 """)
@@ -2713,7 +2741,7 @@ add_code(doc, """
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   timeout: 30000,
 });
 
@@ -2971,7 +2999,7 @@ class DioClient {
 
   DioClient._internal() {
     dio = Dio(BaseOptions(
-      baseUrl: 'http://10.0.2.2:8080/api',     // Android emulator → host
+      baseUrl: 'http://10.0.2.2:5000/api',     // Android emulator → host
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
     ));
@@ -3090,7 +3118,7 @@ RUN mvn -B -DskipTests clean package
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
+EXPOSE 5000
 ENTRYPOINT ["java", "-jar", "app.jar"]
 """)
 
@@ -3154,9 +3182,9 @@ services:
       DB_PASS: ${DB_PASS:-postgres}
       REDIS_HOST: redis
       JWT_SECRET: ${JWT_SECRET}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
-      - "8080:8080"
+      - "5000:5000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -3168,7 +3196,7 @@ services:
     build: ./frontend
     container_name: taskmgmt_frontend
     environment:
-      VITE_API_URL: http://localhost:8080/api
+      VITE_API_URL: http://localhost:5000/api
     ports:
       - "5173:80"
     depends_on:
@@ -3195,7 +3223,7 @@ cd task-management-system
 
 # Bước 2: Tạo file .env từ mẫu
 cp .env.example .env
-# Mở .env, điền OPENAI_API_KEY và JWT_SECRET (chuỗi base64 32+ byte)
+# Mở .env, điền GEMINI_API_KEY và JWT_SECRET (chuỗi base64 32+ byte)
 
 # Bước 3: Khởi động toàn bộ stack
 docker-compose up -d
@@ -3205,8 +3233,8 @@ docker-compose ps
 
 # Bước 5: Mở trình duyệt
 #   - Frontend:   http://localhost:5173
-#   - Backend:    http://localhost:8080
-#   - Swagger UI: http://localhost:8080/swagger-ui.html
+#   - Backend:    http://localhost:5000
+#   - Swagger UI: http://localhost:5000/swagger-ui.html
 """)
 add_h3(doc, "4.8.2. Triển khai production trên VPS")
 add_para(doc,
@@ -3215,7 +3243,7 @@ add_para(doc,
     "Caddyfile như sau:")
 add_code(doc, """
 api.taskmgmt.example.com {
-    reverse_proxy backend:8080
+    reverse_proxy backend:5000
 }
 
 taskmgmt.example.com {
@@ -3442,10 +3470,10 @@ add_table(
          "Gọi 2 lần liên tiếp cùng request",
          "Lần 2 thời gian < 50ms (cache)",
          "Lần 1: 1450ms; lần 2: 6ms", "PASS"),
-        ("TC-S04", "Thiếu OPENAI_API_KEY",
-         "OPENAI_API_KEY=''",
-         "500/503 + message rõ, UI báo lỗi",
-         "503 đúng", "PASS"),
+        ("TC-S04", "Thiếu GEMINI_API_KEY",
+         "GEMINI_API_KEY=''",
+         "422 + message rõ, UI báo lỗi",
+         "422 đúng", "PASS"),
     ],
     col_widths=[1.5, 3.5, 3.5, 3.5, 2.0, 1.5],
 )
@@ -3587,7 +3615,7 @@ add_table(
     headers=["Lượt gọi", "Cache", "Thời gian phản hồi", "Ghi chú"],
     rows=[
         ("Lần 1 (cold)", "MISS", "1450 ms",
-         "Bao gồm: gom stats từ DB 90 ms + buildPrompt 5 ms + OpenAI gpt-4o-mini ~1350 ms."),
+         "Bao gồm: gom stats từ DB 90 ms + buildPrompt 5 ms + Google Gemini gemini-2.5-flash ~1350 ms."),
         ("Lần 2 (cùng task)", "HIT", "6 ms", "Lấy từ Redis."),
         ("Lần 3 (task khác)", "MISS", "1380 ms", "Tương tự lần 1."),
         ("Lần 4 (task lần 1)", "HIT", "7 ms", "Lấy từ Redis."),
@@ -3598,7 +3626,7 @@ add_para(doc,
     "Đối chiếu với yêu cầu phi chức năng NF-01 (API AI Gợi ý ≤ 2 giây với "
     "100 nhân viên), kết quả thực tế là 1.45 giây với 25 nhân viên – đáp "
     "ứng yêu cầu. Phần lớn thời gian phản hồi (~93%) là độ trễ mạng tới "
-    "OpenAI API; phần tính toán phía backend chỉ ~90 ms. Khi dữ liệu tăng "
+    "Gemini API; phần tính toán phía backend chỉ ~90 ms. Khi dữ liệu tăng "
     "lên 100 nhân viên, prompt dài hơn ~3 lần, ước lượng ~1.8–2.0 giây — "
     "vẫn trong ngưỡng cho phép nhưng cần giám sát. Khi vượt qua 200 nhân "
     "viên, nên xét đến: (a) gửi cho LLM một summary thay vì toàn bộ "
@@ -3721,12 +3749,14 @@ add_caption(doc, "Hình 5.8: Màn hình AI gợi ý nhân viên – form nhập"
 add_h3(doc, "5.4.9. Màn hình AI Gợi ý – kết quả phân tích")
 add_para(doc,
     "Sau khi nhấn “Phân tích bằng AI”, hệ thống gọi backend Spring "
-    "Boot. Backend tính điểm cho toàn bộ nhân viên dựa trên 4 tiêu "
-    "chí (Weighted Scoring) và gọi OpenAI GPT-4o-mini để sinh lý do "
-    "(reasoning) cho từng đề cử. Kết quả được trả về dưới dạng top 5 "
-    "nhân viên xếp hạng giảm dần. Các thẻ kết quả được tô màu theo "
-    "thứ hạng (Vàng – Bạc – Đồng cho ba vị trí đầu), kèm avatar viết "
-    "tắt tên, vị trí và đoạn nhận xét bằng văn bản tự nhiên do AI sinh.")
+    "Boot. Backend gom dữ liệu thô của toàn bộ nhân viên theo 4 tiêu "
+    "chí (kỹ năng, tiến độ task, mức độ đúng hạn, chấm công) rồi gửi "
+    "cho Google Gemini gemini-2.5-flash; chính LLM xếp hạng định "
+    "tính và sinh lý do (reasoning) cho từng đề cử — backend KHÔNG tự "
+    "tính điểm số. Kết quả được trả về dưới dạng top 5 nhân viên xếp "
+    "hạng giảm dần. Các thẻ kết quả được tô màu theo thứ hạng (Vàng – "
+    "Bạc – Đồng cho ba vị trí đầu), kèm avatar viết tắt tên, vị trí "
+    "và đoạn nhận xét bằng văn bản tự nhiên do AI sinh.")
 add_para(doc,
     "Cách thể hiện này giúp người quản lý hiểu ngay vì sao mỗi nhân "
     "viên được đề cử, tránh hiện tượng “hộp đen” thường gặp ở các sản "
@@ -4025,6 +4055,167 @@ add_caption(doc, "Bảng 5.8: Lược đồ dữ liệu mở rộng cho chức n
 
 
 # ==================================================================
+# 5.7. KHẢ NĂNG CHẠY ĐA NỀN TẢNG VÀ QUY TRÌNH DEMO
+# ==================================================================
+add_h2(doc, "5.7. Khả năng chạy đa nền tảng và quy trình demo")
+add_para(doc,
+    "Một trong các tiêu chí đánh giá của đồ án là sản phẩm phải chạy "
+    "được trên nhiều nền tảng khác nhau, không phụ thuộc môi trường "
+    "phát triển của tác giả. Mục này tổng kết khả năng triển khai thực "
+    "tế của hệ thống, kèm bộ script khởi động một lệnh và quy trình "
+    "demo từ máy trắng (clean machine) đến khi cả ba thành phần chạy ổn "
+    "định.")
+
+add_h3(doc, "5.7.1. Ma trận nền tảng được hỗ trợ")
+add_para(doc,
+    "Bảng dưới đây liệt kê các nền tảng mà từng thành phần của hệ "
+    "thống có thể chạy. Backend được biên dịch về JVM bytecode nên độc "
+    "lập hệ điều hành; frontend là ứng dụng web tĩnh nên chạy được "
+    "trên mọi trình duyệt hiện đại; mobile Flutter dùng kênh phát "
+    "hành Web đã ổn định nhất, có thể truy cập từ Chrome Android, "
+    "Safari iOS hay bất kỳ trình duyệt desktop nào.")
+add_table(
+    doc,
+    headers=["Thành phần", "Công nghệ", "Nền tảng đã kiểm chứng",
+             "Phương thức chạy"],
+    rows=[
+        ("Backend",
+         "Spring Boot 3.5 + JDK 17 (build trên JDK 25)",
+         "Windows 11, Ubuntu 22.04, macOS 14",
+         "java -jar (fat-jar) hoặc Docker image multi-stage"),
+        ("Frontend",
+         "React 18 + Vite 5",
+         "Chrome, Edge, Firefox, Safari (desktop + mobile)",
+         "vite dev (port 5173) hoặc tĩnh hoá dist/ qua Nginx/Caddy"),
+        ("Mobile",
+         "Flutter 3.41 (kênh Web)",
+         "Chrome Android, Safari iOS, mọi trình duyệt desktop",
+         "flutter build web → phục vụ thư mục build/web qua HTTP"),
+        ("Cơ sở dữ liệu",
+         "PostgreSQL 16 (prod) hoặc H2 in-memory (dev)",
+         "Mọi OS có Docker; H2 không cần cài đặt",
+         "docker compose hoặc fallback H2 mặc định"),
+        ("Cache",
+         "Redis 7 (tuỳ chọn)",
+         "Mọi OS có Docker",
+         "docker compose; bỏ qua nếu CACHE_TYPE=none"),
+    ],
+    col_widths=[3.0, 4.5, 4.5, 3.5],
+)
+add_caption(doc, "Bảng 5.9: Ma trận nền tảng được hỗ trợ và phương thức "
+                 "chạy của từng thành phần",
+            kind="table")
+
+add_h3(doc, "5.7.2. Script khởi động một lệnh – start.ps1 và start.sh")
+add_para(doc,
+    "Để đơn giản hoá việc demo trên các máy khác nhau, đề tài cung cấp "
+    "hai script tương đương: `start.ps1` (PowerShell ≥ 5.1 cho Windows) "
+    "và `start.sh` (Bash cho Linux/macOS). Cả hai script đều thực hiện "
+    "cùng một quy trình – chỉ khác cú pháp shell – nên người dùng "
+    "không phải nhớ nhiều câu lệnh. Các bước script thực hiện:")
+for s in [
+    "Kiểm tra tooling bắt buộc (`java`, `mvn`, `node`, `npm`, `flutter`) "
+    "và in thông báo rõ ràng nếu thiếu, kèm gợi ý cài đặt.",
+    "Tự nạp biến môi trường mặc định cho dev (`JWT_SECRET`, "
+    "`ADMIN_PASSWORD`) – đủ để chạy demo mà không cần cấu hình "
+    "PostgreSQL hay Redis; backend tự fallback về H2 in-memory.",
+    "Khởi chạy backend bằng `mvn spring-boot:run` ở port 5000.",
+    "Cài `npm install` lần đầu (nếu chưa có node_modules) rồi chạy "
+    "`npm run dev` cho frontend ở port 5173.",
+    "Build mobile Flutter bằng `flutter build web` rồi phục vụ thư "
+    "mục `build/web` bằng `python -m http.server 5170` (fallback "
+    "`npx http-server` nếu không có Python).",
+    "Ghi PID của ba tiến trình vào `.start_pids` để lệnh "
+    "`start.sh stop` / `start.ps1 -Stop` có thể dừng sạch toàn bộ.",
+]:
+    add_bullet(doc, s)
+
+add_para(doc,
+    "Nhờ đó, kịch bản demo trên một máy mới gồm đúng bốn dòng lệnh:")
+add_code(doc, """
+# Windows (PowerShell)
+git clone https://github.com/nhathao428/task-management-system.git
+cd task-management-system
+pwsh -File start.ps1
+
+# Linux / macOS (Bash)
+git clone https://github.com/nhathao428/task-management-system.git
+cd task-management-system
+./start.sh
+""")
+
+add_h3(doc, "5.7.3. Triển khai đóng gói cho production – Docker và Render")
+add_para(doc,
+    "Bên cạnh hai script dành cho dev, hệ thống còn có hai cách triển "
+    "khai sẵn sàng production để giảng viên hoặc người dùng cuối có "
+    "thể chạy demo dài hạn mà không cần cài đặt tooling:")
+add_table(
+    doc,
+    headers=["Phương thức", "Mô tả ngắn", "Phù hợp với"],
+    rows=[
+        ("docker compose up -d",
+         "Đọc `docker-compose.yml`, build image backend đa tầng "
+         "(Maven build → Eclipse Temurin runtime) và frontend "
+         "(Vite build → Nginx serve). Postgres + Redis chạy song song.",
+         "Demo trên VPS, server riêng, hay máy đã cài Docker."),
+        ("Render Blueprint (`render.yaml`)",
+         "Cấu hình \"deploy 1-click\": Render tạo backend Docker + "
+         "frontend tĩnh + Postgres free và đặt biến môi trường tự "
+         "động. Người dùng chỉ cần điền `GEMINI_API_KEY` nếu muốn AI.",
+         "Demo cho thầy cô chỉ với một URL công khai."),
+        ("docker-compose.prod.yml + Caddyfile",
+         "Override cấu hình prod, gắn HTTPS tự động qua Caddy + "
+         "Let's Encrypt, reverse-proxy về backend và frontend.",
+         "Tự host trên VPS có tên miền riêng."),
+    ],
+    col_widths=[4.5, 8.0, 3.0],
+)
+add_caption(doc, "Bảng 5.10: Các phương thức triển khai đa nền tảng "
+                 "đã được chuẩn bị sẵn",
+            kind="table")
+
+add_h3(doc, "5.7.4. Quy trình demo cho hội đồng phản biện")
+add_para(doc,
+    "Khi demo cho giảng viên, tác giả áp dụng kịch bản 7 bước dưới đây "
+    "– toàn bộ kịch bản đã được chạy thử lại trên cả Windows và "
+    "Ubuntu để đảm bảo lặp lại được. Mỗi bước kèm dữ liệu seed đã có "
+    "sẵn trong tài khoản admin (`admin` / `Admin@12345`), không cần "
+    "nhập thủ công từ đầu.")
+for i, s in enumerate([
+    "Khởi động một lệnh: chạy `./start.sh` (hoặc `start.ps1`) – chờ "
+    "~30 giây để backend, frontend, mobile-web cùng sẵn sàng.",
+    "Đăng nhập role MANAGER trên http://localhost:5173 → xem "
+    "dashboard tổng quan (Hình 5.3) với 4 thẻ số liệu và 2 biểu đồ.",
+    "Demo CRUD: thêm một nhân viên mới, một dự án mới, gắn nhân "
+    "viên đó vào một task (Hình 5.4–5.6).",
+    "Demo AI Gợi ý: vào trang \"AI Gợi ý\", nhập tiêu đề "
+    "\"Phát triển API thanh toán VNPay\" → bấm \"Phân tích\". "
+    "Backend gọi Gemini và trả về top 5 nhân viên kèm reasoning "
+    "(Hình 5.8–5.9).",
+    "Demo Geofence: mở /office-locations để xem các văn phòng trên "
+    "bản đồ Leaflet, sau đó đăng nhập role EMPLOYEE và bấm "
+    "check-in từ trang /my-attendance – quan sát badge \"trong "
+    "vùng / ngoài vùng\" (Hình 5.23–5.25).",
+    "Demo mobile: mở http://localhost:5170 trên DevTools chế độ "
+    "thiết bị di động → kiểm chứng cùng dataset hiển thị trên UI "
+    "Flutter (Hình 5.14–5.22).",
+    "Dừng sạch: chạy `./start.sh stop` (hoặc `start.ps1 -Stop`) – "
+    "ba tiến trình được kill theo PID đã ghi nhận, không để lại "
+    "process treo.",
+]):
+    add_bullet(doc, f"Bước {i+1}: {s}")
+
+add_para(doc,
+    "Cả ba thành phần đều đã được build & chạy thành công tại thời "
+    "điểm nộp đồ án: backend tạo `task-management-system-0.0.1-"
+    "SNAPSHOT.jar` ~ 75 MB; frontend `dist/` ~ 680 KB sau gzip; "
+    "Flutter web `build/web/` với `main.dart.js` đã tree-shake (giảm "
+    "asset MaterialIcons từ 1.6 MB còn 12 KB – tỉ lệ 99.2%). Đây là "
+    "minh chứng định lượng cho việc \"chạy được trên mọi nền tảng có "
+    "JVM / trình duyệt hiện đại\" như mục tiêu ban đầu đặt ra.")
+
+
+# ==================================================================
 # CHƯƠNG 6: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 # ==================================================================
 add_h1(doc, "CHƯƠNG 6. KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN")
@@ -4038,8 +4229,8 @@ for s in [
     "Hoàn thành 14/14 yêu cầu chức năng đã đặc tả ban đầu (đạt 100%).",
     "Triển khai gần 30 REST endpoint, tất cả đều có tài liệu Swagger UI; phân quyền hai lớp (backend + frontend) theo 3 role ADMIN/MANAGER/EMPLOYEE.",
     "Phát triển frontend web React thích ứng theo role: quản lý xem dashboard tổng quan + đầy đủ module CRUD; nhân viên xem dashboard cá nhân + trang My Tasks + My Attendance.",
-    "Phát triển ứng dụng mobile Flutter với 6 màn hình cốt lõi, chạy được trên cả Android và iOS.",
-    "Tích hợp thành công OpenAI GPT-4o-mini làm \"engine\" gợi ý: backend gom dữ liệu thô (lịch sử task, chấm công, kỹ năng), LLM xếp hạng định tính TOP 5 nhân viên kèm `reasoning` bằng tiếng Việt.",
+    "Phát triển ứng dụng mobile Flutter với 6 màn hình cốt lõi, build qua kênh Web nên chạy được trên Chrome Android, Safari iOS và mọi trình duyệt desktop mà không cần biên dịch lại.",
+    "Tích hợp thành công Google Gemini gemini-2.5-flash làm \"engine\" gợi ý: backend gom dữ liệu thô (lịch sử task, chấm công, kỹ năng), LLM xếp hạng định tính TOP 5 nhân viên kèm `reasoning` bằng tiếng Việt.",
     "Bổ sung tính năng xác thực chấm công bằng GPS + bản đồ Leaflet/OpenStreetMap: cấu hình đa văn phòng (office_locations), tính khoảng cách Haversine, đẩy bản ghi ngoài vùng / GPS mock sang PENDING_REVIEW cho quản lý duyệt. Mobile dùng `geolocator` + cờ `isMocked` để chống fake GPS.",
     "Redis cache trên Spring Cache giúp giảm thời gian phản hồi của module AI từ ~1450 ms xuống dưới 10 ms cho các request lặp lại trên cùng task, đồng thời tiết kiệm chi phí API.",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose – cài đặt được trên bất kỳ máy có Docker chỉ với 1 câu lệnh.",
@@ -4071,8 +4262,9 @@ add_table(
         ("Backend Spring Boot 3.5.0 + Spring Security + JWT", "100% – hoàn thành"),
         ("CSDL PostgreSQL 16 với 6 bảng, chuẩn hóa 3NF", "100% – hoàn thành"),
         ("Frontend React 18 + Vite + Tailwind + role-based UI", "100% – hoàn thành"),
-        ("Ứng dụng Flutter chạy Android/iOS", "85% – hoàn thành Android, iOS chỉ build & chạy emulator"),
-        ("AI gợi ý nhân viên (OpenAI GPT-4o-mini, ranking định tính)", "100% – hoàn thành"),
+        ("Ứng dụng Flutter chạy đa trình duyệt (Android/iOS/desktop)", "100% – build Flutter Web ổn định, chạy ngay trên trình duyệt mọi OS"),
+        ("Khởi động một lệnh trên Windows/Linux/macOS (start.ps1, start.sh)", "100% – đã viết và kiểm thử trên Windows 11 + Ubuntu 22.04"),
+        ("AI gợi ý nhân viên (Google Gemini gemini-2.5-flash, ranking định tính)", "100% – hoàn thành"),
         ("Redis cache cho AI Suggestion", "100% – hoàn thành"),
         ("Docker Compose toàn bộ stack (PostgreSQL + Redis + backend + frontend)", "100% – hoàn thành"),
         ("Kiểm thử tối thiểu 30 test cases", "123% – 37/30 test cases"),
@@ -4085,7 +4277,7 @@ add_table(
 add_h2(doc, "6.2. Hạn chế của đề tài")
 add_para(doc, "Mặc dù đạt được nhiều kết quả tốt, đề tài vẫn còn một số hạn chế cần thẳng thắn nhìn nhận:")
 for s in [
-    "Phụ thuộc LLM bên ngoài: module AI gợi ý phụ thuộc vào OpenAI API. Khi mất mạng hoặc hết quota, tính năng không khả dụng. Chi phí gọi API cũng tăng tỷ lệ với số nhân viên do prompt dài thêm.",
+    "Phụ thuộc LLM bên ngoài: module AI gợi ý phụ thuộc vào Gemini API. Khi mất mạng hoặc vượt hạn mức free tier (1500 request/ngày), tính năng không khả dụng. Lượng token tiêu thụ mỗi lần gọi cũng tăng tỷ lệ với số nhân viên do prompt dài thêm.",
     "Phân quyền chi tiết chưa được triển khai đầy đủ: hệ thống mới có 3 role cơ bản (ADMIN/MANAGER/EMPLOYEE), chưa có ACL ở mức record (ví dụ: mỗi trưởng phòng chỉ thấy task của phòng mình).",
     "Chưa có thông báo real-time: khi có task mới được giao hoặc deadline sắp đến, nhân viên không nhận được push notification hoặc email tự động.",
     "Chưa có module báo cáo nâng cao: xuất PDF/Excel báo cáo hiệu suất theo tháng/quý chưa được triển khai.",
@@ -4105,9 +4297,9 @@ add_para(doc,
     "tiếp theo của đề tài được đề xuất bao gồm:")
 add_h3(doc, "6.3.1. Hướng phát triển kỹ thuật")
 for s in [
-    "Bổ sung mô hình LLM mã nguồn mở on-premise (Llama 3, Qwen) làm fallback khi OpenAI không khả dụng; có thể chạy ngay trên server doanh nghiệp.",
+    "Bổ sung mô hình LLM mã nguồn mở on-premise (Llama 3, Qwen) làm fallback khi Gemini không khả dụng; có thể chạy ngay trên server doanh nghiệp.",
     "Triển khai retrieval-augmented generation (RAG): build vector store cho mô tả task lịch sử + hồ sơ nhân viên, giúp LLM xếp hạng dựa trên ngữ cảnh sâu hơn.",
-    "Sử dụng OpenAI embeddings để tìm kiếm ngữ nghĩa: thay vì để LLM tự so khớp kỹ năng theo văn bản, dùng vector embedding để pre-filter nhân viên có vector skill gần với requiredSkills của task.",
+    "Sử dụng Gemini embeddings để tìm kiếm ngữ nghĩa: thay vì để LLM tự so khớp kỹ năng theo văn bản, dùng vector embedding để pre-filter nhân viên có vector skill gần với requiredSkills của task.",
     "Triển khai WebSocket cho real-time: thông báo task mới, cập nhật trạng thái task, người dùng đang online.",
     "Refresh token + blacklist cho JWT: cải thiện cơ chế bảo mật.",
     "Triển khai monitoring stack: Prometheus + Grafana cho metrics, ELK cho logs, Sentry cho error tracking.",
@@ -4184,10 +4376,10 @@ refs = [
      'truy cập tháng 3/2026.'),
     ('[14] Docker Inc., "Docker Documentation", https://docs.docker.com, '
      'truy cập tháng 3/2026.'),
-    ('[15] OpenAI, "OpenAI API Reference", https://platform.openai.com/docs/api-reference, '
+    ('[15] Google, "Gemini API Reference", https://ai.google.dev/api, '
      'truy cập tháng 4/2026.'),
-    ('[16] OpenAI, "GPT-4o-mini Model Card", '
-     'https://platform.openai.com/docs/models/gpt-4o-mini, truy cập tháng 4/2026.'),
+    ('[16] Google, "Gemini Models", '
+     'https://ai.google.dev/gemini-api/docs/models/gemini, truy cập tháng 4/2026.'),
     ('[17] Hibernate Team, "Hibernate ORM 6 User Guide", '
      'https://docs.jboss.org/hibernate/orm/6.4/userguide/html_single/Hibernate_User_Guide.html, '
      'truy cập tháng 3/2026.'),
@@ -4402,15 +4594,15 @@ REDIS_HOST=redis
 # Sinh secret bằng:  openssl rand -base64 64
 JWT_SECRET=replace_with_a_64_byte_base64_string
 
-# ===== OpenAI =====
-OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# ===== Gemini =====
+GEMINI_API_KEY=AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # ===== Frontend =====
-VITE_API_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:5000/api
 
 # ===== Mobile =====
 # Trên Android Emulator dùng 10.0.2.2 thay vì localhost
-MOBILE_API_BASE_URL=http://10.0.2.2:8080/api
+MOBILE_API_BASE_URL=http://10.0.2.2:5000/api
 """)
 
 

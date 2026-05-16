@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MdAdd, MdEdit, MdDelete } from 'react-icons/md'
 import Modal from '../components/Modal'
 import { useProjects } from '../hooks/useProjects'
+import { useAuth } from '../context/AuthContext'
 
 const emptyForm = { name: '', description: '', startDate: '', endDate: '', status: 'ACTIVE' }
 
@@ -23,6 +24,8 @@ function StatusBadge({ status }) {
 }
 
 export default function Projects() {
+  const { user } = useAuth()
+  const isManager = ['MANAGER', 'ADMIN'].includes(user?.role)
   const { projects, loading, error: fetchError, createProject, updateProject, deleteProject } = useProjects()
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
@@ -89,12 +92,14 @@ export default function Projects() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Dự án</h1>
-        <button
-          onClick={openAdd}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          <MdAdd className="text-xl" /> Thêm dự án
-        </button>
+        {isManager && (
+          <button
+            onClick={openAdd}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <MdAdd className="text-xl" /> Thêm dự án
+          </button>
+        )}
       </div>
 
       {fetchError && (
@@ -115,13 +120,15 @@ export default function Projects() {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày bắt đầu</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày kết thúc</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                {isManager && (
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                )}
               </tr>
             </thead>
             <tbody>
               {projects.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-400">Chưa có dự án nào.</td>
+                  <td colSpan={isManager ? 6 : 5} className="text-center py-8 text-gray-400">Chưa có dự án nào.</td>
                 </tr>
               ) : (
                 projects.map((proj, idx) => (
@@ -131,20 +138,22 @@ export default function Projects() {
                     <td className="px-6 py-4 text-gray-600">{proj.startDate ? proj.startDate.split('T')[0] : '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{proj.endDate ? proj.endDate.split('T')[0] : '-'}</td>
                     <td className="px-6 py-4"><StatusBadge status={proj.status} /></td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => openEdit(proj)}
-                        className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm"
-                      >
-                        <MdEdit /> Sửa
-                      </button>
-                      <button
-                        onClick={() => handleDelete(proj.projectId ?? proj.id)}
-                        className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
-                      >
-                        <MdDelete /> Xóa
-                      </button>
-                    </td>
+                    {isManager && (
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => openEdit(proj)}
+                          className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm"
+                        >
+                          <MdEdit /> Sửa
+                        </button>
+                        <button
+                          onClick={() => handleDelete(proj.projectId ?? proj.id)}
+                          className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
+                        >
+                          <MdDelete /> Xóa
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

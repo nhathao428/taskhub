@@ -7,7 +7,7 @@ participant "SuggestionController" as SC
 participant "AiSuggestionService" as AS
 participant "RedisCache" as Cache
 database "PostgreSQL" as DB
-participant "OpenAI API\n(gpt-4o-mini)" as AI
+participant "Gemini API\n(gemini-2.5-flash)" as AI
 
 Mgr -> SC : POST /api/suggestions/recommend\n{taskTitle, taskDescription, requiredSkills}
 activate SC
@@ -29,7 +29,7 @@ else cache MISS
   end
   AS -> AS : collectStats()\n(total/done/late/onTime/workDays)
   AS -> AS : buildPrompt(task + emps + stats)
-  AS -> AI : POST /v1/chat/completions
+  AS -> AI : POST /v1beta/models/gemini-2.5-flash:generateContent
   AI --> AS : JSON [{employeeId, rank, reasoning}]
   AS -> Cache : store(key, result, TTL=5m)
   AS --> SC : List<EmployeeSuggestionDTO>\n(top 5)

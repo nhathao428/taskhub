@@ -360,7 +360,7 @@ Phân tích và gợi ý top 5 nhân viên phù hợp nhất dựa trên mô t�
 ]
 ```
 
-> Lưu ý: AI ra quyết định hoàn toàn dựa trên 3 tiêu chí (tiến độ task trước, thời gian hoàn thành, chấm công). Backend KHÔNG tự tính điểm — không có `OPENAI_API_KEY` thì endpoint trả `422 Unprocessable Entity`.
+> Lưu ý: AI ra quyết định hoàn toàn dựa trên 3 tiêu chí (tiến độ task trước, thời gian hoàn thành, chấm công). Backend KHÔNG tự tính điểm — không có `GEMINI_API_KEY` thì endpoint trả `422 Unprocessable Entity`.
 
 ---
 

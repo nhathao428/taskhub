@@ -24,7 +24,7 @@ package "Service (Business Logic)" <<Frame>> {
     + recommendEmployeesForTask(taskId) : List<EmployeeSuggestionDTO>
     - collectStats(emps) : Map<Long, EmployeeStats>
     - buildPrompt(req, emps, stats) : String
-    - callOpenAi(prompt, emps) : List<EmployeeSuggestionDTO>
+    - callGemini(prompt, emps) : List<EmployeeSuggestionDTO>
   }
 }
 
@@ -38,7 +38,7 @@ package "Repository (JPA)" <<Frame>> {
 }
 
 package "External" <<Frame>> {
-  class OpenAiClient <<external>>
+  class GeminiClient <<external>>
   class RedisCache <<infra>>
 }
 
@@ -59,7 +59,7 @@ AiSuggestionService --> EmployeeRepository
 AiSuggestionService --> TaskRepository
 AiSuggestionService --> AttendanceRepository
 AiSuggestionService --> SuggestionRepository
-AiSuggestionService --> OpenAiClient
+AiSuggestionService --> GeminiClient
 AiSuggestionService --> RedisCache
 
 note right of AiSuggestionService

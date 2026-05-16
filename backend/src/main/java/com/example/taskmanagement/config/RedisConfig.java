@@ -3,6 +3,7 @@ package com.example.taskmanagement.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,14 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Redis-backed caching. Only active when spring.cache.type=redis (docker/prod).
+ * For local dev / Render (spring.cache.type=none) this config is skipped, so the
+ * @Cacheable methods run without a cache instead of failing on a missing Redis.
+ */
 @Configuration
 @EnableCaching
+@ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis")
 public class RedisConfig {
 
     private ObjectMapper redisObjectMapper() {

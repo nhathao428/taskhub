@@ -5,7 +5,7 @@ title Use Case — AI Gợi ý Nhân viên
 left to right direction
 
 actor "Quản lý" as Mgr
-actor "OpenAI GPT-4o-mini" as AI <<system>>
+actor "Gemini gemini-2.5-flash" as AI <<system>>
 
 rectangle "Module AI Suggestion" {
   usecase "Nhập tiêu đề +\nmô tả công việc" as UC_Input
@@ -22,8 +22,8 @@ UC_Req ..> UC_Cache : <<include>>
 UC_Req ..> AI : <<call>>
 
 note right of AI
-  Backend xây prompt tiếng Việt
-  rồi gọi /v1/chat/completions.
+  Backend xây prompt tiếng Việt rồi gọi
+  /v1beta/models/gemini-2.5-flash:generateContent.
   AI tự xếp hạng – KHÔNG có
   rule-based fallback.
 end note

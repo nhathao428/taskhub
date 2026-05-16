@@ -147,7 +147,7 @@ def build_phieu_giao_de_tai():
     for s in [
         "- Khảo sát thực tế quy trình quản lý công việc tại doanh nghiệp nhỏ đa ngành.",
         "- Tài liệu về Spring Boot 3.x, React 18, Flutter 3.x, PostgreSQL 16, Docker.",
-        "- Tài liệu kỹ thuật về OpenAI API và phương pháp tích hợp LLM vào ứng dụng nội bộ.",
+        "- Tài liệu kỹ thuật về Gemini API và phương pháp tích hợp LLM vào ứng dụng nội bộ.",
         "- Các nghiên cứu về hệ thống gợi ý đa tiêu chí và xu hướng ứng dụng "
         "LLM vào tự động hoá phân công nhân sự.",
     ]:
@@ -161,7 +161,7 @@ def build_phieu_giao_de_tai():
         "Spring Security + JWT.",
         "- Triển khai frontend web bằng React 18 + Vite + Tailwind CSS.",
         "- Triển khai ứng dụng mobile bằng Flutter cho iOS và Android.",
-        "- Tích hợp module AI gợi ý nhân viên phù hợp dùng OpenAI GPT-4o-mini "
+        "- Tích hợp module AI gợi ý nhân viên phù hợp dùng Google Gemini gemini-2.5-flash "
         "xếp hạng định tính dựa trên kỹ năng, tiến độ, đúng hạn và chấm công.",
         "- Đóng gói hệ thống bằng Docker Compose với PostgreSQL 16 và Redis 7.",
         "- Kiểm thử và viết tài liệu hướng dẫn cài đặt, vận hành.",
@@ -255,7 +255,7 @@ def build_phieu_theo_doi_tien_do():
         ("7", "17/03/2026", "Triển khai backend – Employee, Project, Task",
          "Hoàn thành CRUD đầy đủ cho Employee, Project, Task; cache Redis hoạt động."),
         ("8", "24/03/2026", "Triển khai backend – Attendance & AiSuggestionService",
-         "Module chấm công và AI gợi ý hoàn thiện, tích hợp OpenAI GPT-4o-mini."),
+         "Module chấm công và AI gợi ý hoàn thiện, tích hợp Google Gemini gemini-2.5-flash."),
         ("9", "31/03/2026", "Triển khai frontend React",
          "Hoàn thành các trang Login/Register/Dashboard/Employees/Projects/"
          "Tasks/Attendance/AI."),

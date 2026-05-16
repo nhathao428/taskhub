@@ -1,12 +1,12 @@
 # 🗂️ Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành
 
-Hệ thống quản lý toàn diện giúp doanh nghiệp nhỏ quản lý nhân sự, chấm công, dự án, tiến độ công việc và nhận gợi ý phân công nhân viên thông minh từ AI (OpenAI GPT).
+Hệ thống quản lý toàn diện giúp doanh nghiệp nhỏ quản lý nhân sự, chấm công, dự án, tiến độ công việc và nhận gợi ý phân công nhân viên thông minh từ AI (Google Gemini).
 
 ## 🚀 Deploy demo (free)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nhathao428/task-management-system)
 
-Render Blueprint (`render.yaml`) tự tạo backend (Docker) + frontend (static) + Postgres free. Cold start ~30s sau 15ph idle. Sau khi deploy, set `OPENAI_API_KEY` ở Dashboard nếu muốn bật AI suggestion.
+Render Blueprint (`render.yaml`) tự tạo backend (Docker) + frontend (static) + Postgres free. Cold start ~30s sau 15ph idle. Sau khi deploy, set `GEMINI_API_KEY` ở Dashboard nếu muốn bật AI suggestion.
 
 Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 
@@ -27,7 +27,7 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 ┌─────────────────────────────────────────────────────────┐
 │                     BACKEND LAYER                       │
 │         Spring Boot REST API (port 5000)                │
-│    JWT Auth │ CRUD APIs │ AI Suggestion (OpenAI)        │
+│    JWT Auth │ CRUD APIs │ AI Suggestion (Gemini)        │
 └──────────┬─────────────────────────┬────────────────────┘
            │                         │
            ▼                         ▼
@@ -49,7 +49,7 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 | 📋 Quản lý dự án | Tạo, cập nhật, xóa dự án; liên kết với công việc |
 | ✅ Quản lý công việc | Tạo công việc, phân công nhân viên, theo dõi trạng thái |
 | 🕐 Chấm công | Ghi nhận giờ vào/ra theo ngày, xem lịch sử chấm công |
-| 🤖 AI Gợi ý nhân viên | Tích hợp OpenAI GPT để đề xuất top 5 nhân viên phù hợp nhất |
+| 🤖 AI Gợi ý nhân viên | Tích hợp Google Gemini để đề xuất top 5 nhân viên phù hợp nhất |
 | 📊 Dashboard | Biểu đồ thống kê tổng quan (Chart.js) |
 
 ---
@@ -69,7 +69,7 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 | **Cơ sở dữ liệu** | PostgreSQL | 16 |
 | **Cache** | Redis + Spring Cache | 7 |
 | **Container** | Docker, Docker Compose | - |
-| **AI** | OpenAI GPT API | gpt-4o-mini |
+| **AI** | Google Gemini API | gemini-2.5-flash |
 
 ---
 
@@ -140,9 +140,9 @@ spring.data.redis.host=localhost
 spring.data.redis.port=6379
 spring.cache.type=${CACHE_TYPE:none}
 
-# OpenAI (cho tính năng AI gợi ý — không có key thì endpoint trả 422)
-openai.api.key=${OPENAI_API_KEY:}
-openai.api.model=${OPENAI_MODEL:gpt-4o-mini}
+# Gemini (cho tính năng AI gợi ý — không có key thì endpoint trả 422)
+gemini.api.key=${GEMINI_API_KEY:}
+gemini.api.model=${GEMINI_MODEL:gemini-2.5-flash}
 
 # Admin seed (bắt buộc set ADMIN_PASSWORD)
 app.admin.password=${ADMIN_PASSWORD}
@@ -255,7 +255,7 @@ task-management-system/
 
 ## 🤖 Tính năng AI Gợi ý Nhân viên
 
-Hệ thống tích hợp **OpenAI GPT** để phân tích và đề xuất nhân viên phù hợp nhất cho từng công việc. AI ra quyết định hoàn toàn — backend không tự tính điểm.
+Hệ thống tích hợp **Google Gemini** để phân tích và đề xuất nhân viên phù hợp nhất cho từng công việc. AI ra quyết định hoàn toàn — backend không tự tính điểm.
 
 ### Cách hoạt động
 
@@ -264,9 +264,9 @@ Hệ thống tích hợp **OpenAI GPT** để phân tích và đề xuất nhân
    - **Tiến độ task trước**: tổng task được giao, số đã hoàn thành, số đang xử lý
    - **Thời gian hoàn thành**: số task đúng hạn / tổng task có due date, trung bình số ngày trễ
    - **Chấm công**: số ngày làm việc trong 30 ngày gần nhất
-3. Backend đẩy raw data + 3 tiêu chí ưu tiên cho OpenAI GPT (`gpt-4o-mini`) qua prompt tiếng Việt.
+3. Backend đẩy raw data + 3 tiêu chí ưu tiên cho Google Gemini (`gemini-2.5-flash`) qua prompt tiếng Việt.
 4. AI **tự xếp hạng** top 5 nhân viên kèm reasoning bằng tiếng Việt — không có tính điểm bằng code.
-5. Nếu `OPENAI_API_KEY` chưa được set, endpoint trả về **HTTP 422** (`AI suggestion is unavailable`).
+5. Nếu `GEMINI_API_KEY` chưa được set, endpoint trả về **HTTP 422** (`AI suggestion is unavailable`).
 
 ### Ví dụ Request
 

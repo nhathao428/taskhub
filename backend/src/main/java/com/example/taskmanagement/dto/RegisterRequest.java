@@ -18,4 +18,7 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    /** Vai trò mong muốn: MANAGER hoặc EMPLOYEE. Null/không hợp lệ sẽ mặc định EMPLOYEE. */
+    private String role;
 }

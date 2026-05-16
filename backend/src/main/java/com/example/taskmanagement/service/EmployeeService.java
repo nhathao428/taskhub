@@ -3,8 +3,10 @@ package com.example.taskmanagement.service;
 import com.example.taskmanagement.dto.CreateEmployeeRequest;
 import com.example.taskmanagement.dto.UpdateEmployeeRequest;
 import com.example.taskmanagement.entity.Employee;
+import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.EmployeeRepository;
+import com.example.taskmanagement.repository.UserRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
@@ -18,10 +20,13 @@ public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final CurrentUserService currentUserService;
+    private final UserRepository userRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository, CurrentUserService currentUserService) {
+    public EmployeeService(EmployeeRepository employeeRepository, CurrentUserService currentUserService,
+                           UserRepository userRepository) {
         this.employeeRepository = employeeRepository;
         this.currentUserService = currentUserService;
+        this.userRepository = userRepository;
     }
 
     @Cacheable("employees")
@@ -47,6 +52,11 @@ public class EmployeeService {
         employee.setDepartment(request.department());
         employee.setGroup(request.group());
         employee.setSkills(request.skills());
+        if (request.userEmail() != null && !request.userEmail().isBlank()) {
+            User user = userRepository.findByEmail(request.userEmail().trim())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.userEmail()));
+            employee.setUser(user);
+        }
         return employeeRepository.save(employee);
     }
 

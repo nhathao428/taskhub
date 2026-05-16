@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { MdEmail, MdLock, MdPerson, MdWorkspaces, MdPersonAdd } from 'react-icons/md'
+import { MdEmail, MdLock, MdPerson, MdWorkspaces, MdPersonAdd, MdBadge } from 'react-icons/md'
 import { useAuth } from '../context/AuthContext'
 
 export default function Register() {
-  const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '', role: 'EMPLOYEE' })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,7 +24,7 @@ export default function Register() {
     }
     setLoading(true)
     try {
-      await register(form.username, form.email, form.password)
+      await register(form.username, form.email, form.password, form.role)
       setSuccess('Đăng ký thành công! Đang chuyển đến trang đăng nhập...')
       setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
@@ -87,6 +87,22 @@ export default function Register() {
               />
             </div>
           ))}
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
+              <MdBadge className="text-indigo-500" />
+              Vai trò
+            </label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-all"
+            >
+              <option value="EMPLOYEE">Nhân viên</option>
+              <option value="MANAGER">Quản lý</option>
+            </select>
+          </div>
 
           <button
             type="submit"

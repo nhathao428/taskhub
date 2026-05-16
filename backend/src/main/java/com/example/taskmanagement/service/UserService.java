@@ -69,12 +69,21 @@ public class UserService implements UserDetailsService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("EMPLOYEE");
+        user.setRole(resolveRole(request.getRole()));
         userRepository.save(user);
         return new AuthResponse(null, user.getUsername(), user.getEmail(), user.getRole());
     }
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    /** Chỉ cho phép tự đăng ký với vai trò MANAGER hoặc EMPLOYEE; mặc định EMPLOYEE. */
+    private String resolveRole(String requested) {
+        if (requested == null) {
+            return "EMPLOYEE";
+        }
+        String role = requested.trim().toUpperCase();
+        return (role.equals("MANAGER") || role.equals("EMPLOYEE")) ? role : "EMPLOYEE";
     }
 }

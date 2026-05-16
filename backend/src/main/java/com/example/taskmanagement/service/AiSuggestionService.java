@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Suggests the most suitable employees for a task using OpenAI.
+ * Suggests the most suitable employees for a task using Google Gemini.
  * Backend collects raw historical data per employee (past task progress, completion timing,
  * attendance) and lets the AI rank and explain — no rule-based scoring.
  */
@@ -46,11 +47,11 @@ public class AiSuggestionService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    @Value("${openai.api.key:}")
-    private String openAiApiKey;
+    @Value("${gemini.api.key:}")
+    private String geminiApiKey;
 
-    @Value("${openai.api.model:gpt-4o-mini}")
-    private String openAiModel;
+    @Value("${gemini.api.model:gemini-2.5-flash}")
+    private String geminiModel;
 
     public AiSuggestionService(EmployeeRepository employeeRepository,
                                TaskRepository taskRepository,
@@ -60,7 +61,7 @@ public class AiSuggestionService {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.attendanceRepository = attendanceRepository;
-        this.restClient = restClientBuilder.baseUrl("https://api.openai.com").build();
+        this.restClient = restClientBuilder.baseUrl("https://generativelanguage.googleapis.com").build();
         this.objectMapper = objectMapper;
     }
 
@@ -78,7 +79,7 @@ public class AiSuggestionService {
 
         Map<Long, EmployeeStats> statsByEmployee = collectStats(employees);
         String prompt = buildPrompt(request, employees, statsByEmployee);
-        return callOpenAi(prompt, employees);
+        return callGemini(prompt, employees);
     }
 
     @Cacheable(value = "ai_suggestions", key = "'task-' + #taskId")
@@ -96,8 +97,8 @@ public class AiSuggestionService {
     }
 
     private void requireApiKey() {
-        if (openAiApiKey == null || openAiApiKey.isBlank()) {
-            throw new BusinessException("AI suggestion is unavailable: OPENAI_API_KEY is not configured");
+        if (geminiApiKey == null || geminiApiKey.isBlank()) {
+            throw new BusinessException("AI suggestion is unavailable: GEMINI_API_KEY is not configured");
         }
     }
 
@@ -230,29 +231,57 @@ public class AiSuggestionService {
         return sb.toString();
     }
 
-    private List<EmployeeSuggestionDTO> callOpenAi(String prompt, List<Employee> employees) {
+    private List<EmployeeSuggestionDTO> callGemini(String prompt, List<Employee> employees) {
         Map<String, Object> requestBody = Map.of(
-                "model", openAiModel,
-                "messages", List.of(Map.of("role", "user", "content", prompt)),
-                "temperature", 0.3
+                "contents", List.of(Map.of(
+                        "parts", List.of(Map.of("text", prompt))
+                )),
+                "generationConfig", Map.of(
+                        "temperature", 0.3,
+                        "responseMimeType", "application/json"
+                )
         );
 
-        String responseJson = restClient.post()
-                .uri("/v1/chat/completions")
-                .header("Authorization", "Bearer " + openAiApiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(requestBody)
-                .retrieve()
-                .body(String.class);
+        String responseJson;
+        try {
+            responseJson = restClient.post()
+                    .uri("/v1beta/models/{model}:generateContent", geminiModel)
+                    .header("x-goog-api-key", geminiApiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(requestBody)
+                    .retrieve()
+                    .body(String.class);
+        } catch (RestClientResponseException e) {
+            int statusCode = e.getStatusCode().value();
+            log.error("Gemini API trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
+            throw new BusinessException(switch (statusCode) {
+                case 429 -> "AI tạm thời hết hạn mức gọi (rate limit), vui lòng thử lại sau ít phút.";
+                case 503 -> "Dịch vụ AI đang quá tải, vui lòng thử lại sau ít phút.";
+                case 400, 403 -> "Cấu hình AI không hợp lệ — kiểm tra lại GEMINI_API_KEY và model.";
+                default -> "Gọi dịch vụ AI thất bại (mã " + statusCode + "), vui lòng thử lại sau.";
+            });
+        }
 
-        return parseOpenAiResponse(responseJson, employees);
+        return parseGeminiResponse(responseJson, employees);
     }
 
-    private List<EmployeeSuggestionDTO> parseOpenAiResponse(String responseJson, List<Employee> employees) {
+    private List<EmployeeSuggestionDTO> parseGeminiResponse(String responseJson, List<Employee> employees) {
         String content = null;
         try {
             JsonNode root = objectMapper.readTree(responseJson);
-            content = root.get("choices").get(0).get("message").get("content").asText();
+
+            JsonNode candidates = root.path("candidates");
+            if (!candidates.isArray() || candidates.isEmpty()) {
+                String blockReason = root.path("promptFeedback").path("blockReason").asText("");
+                throw new BusinessException("Gemini không trả về kết quả gợi ý"
+                        + (blockReason.isBlank() ? "" : " (prompt bị chặn: " + blockReason + ")"));
+            }
+            content = candidates.get(0).path("content").path("parts").path(0).path("text").asText("");
+            if (content.isBlank()) {
+                String finishReason = candidates.get(0).path("finishReason").asText("");
+                throw new BusinessException("Gemini trả về nội dung rỗng"
+                        + (finishReason.isBlank() ? "" : " (finishReason: " + finishReason + ")"));
+            }
 
             content = content.trim()
                     .replaceAll("(?s)^```json\\s*", "")
@@ -285,6 +314,9 @@ public class AiSuggestionService {
                 fallbackRank++;
             }
             return dtos;
+        } catch (BusinessException e) {
+            log.warn("Gemini did not return a usable suggestion: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to parse AI response. Content excerpt: {}. Error: {}",
                     content != null ? content.substring(0, Math.min(200, content.length())) : "N/A",

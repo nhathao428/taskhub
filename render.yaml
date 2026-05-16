@@ -7,7 +7,7 @@
 # Postgres free for 90 days then needs upgrade.
 #
 # After Postgres is created, Render fills DB_HOST/DB_PORT/etc automatically.
-# Set OPENAI_API_KEY manually in Render dashboard if you want AI suggestion.
+# Set GEMINI_API_KEY manually in Render dashboard if you want AI suggestion.
 
 databases:
   - name: tms-db
@@ -48,10 +48,10 @@ services:
         value: admin@example.com
       - key: ADMIN_PASSWORD
         generateValue: true
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false                              # set manually in dashboard
-      - key: OPENAI_MODEL
-        value: gpt-4o-mini
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
       - key: CORS_ORIGINS
         fromService:
           type: web

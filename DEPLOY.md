@@ -59,7 +59,7 @@ DOMAIN=task.example.com         # đúng domain bạn đã trỏ DNS
 DB_PASSWORD=$(openssl rand -base64 24)
 JWT_SECRET=$(openssl rand -base64 48)
 ADMIN_PASSWORD=<mật khẩu mạnh>
-OPENAI_API_KEY=sk-...           # tùy chọn, để trống thì AI tắt
+GEMINI_API_KEY=AIza...          # tùy chọn, lấy free tại aistudio.google.com/apikey
 ```
 
 Tip — tự gen secrets nhanh:
@@ -122,7 +122,7 @@ cat backup.sql | docker compose exec -T postgres psql -U postgres task_managemen
 | Backend crash on boot | Thiếu env var `JWT_SECRET` hoặc `ADMIN_PASSWORD` |
 | 502 Bad Gateway | Backend chưa boot xong (chờ ~30s) hoặc crash — `docker compose logs backend` |
 | CORS error trong browser | `DOMAIN` trong `.env` không khớp với URL truy cập |
-| AI suggestion 422 | `OPENAI_API_KEY` chưa set |
+| AI suggestion 422 | `GEMINI_API_KEY` chưa set |
 
 ## Tắt stack
 

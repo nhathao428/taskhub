@@ -28,7 +28,7 @@ node "Data tier" as DataTier {
   database "Redis 7\n(Port 6379)" as Redis
 }
 
-cloud "OpenAI Chat API\n(gpt-4o-mini)" as OpenAI
+cloud "Gemini API\n(gemini-2.5-flash)" as Gemini
 
 User --> Web : HTTPS
 User --> Mobile : HTTPS
@@ -38,7 +38,7 @@ Tools --> Backend : REST + JWT
 
 Backend --> PG : JDBC / HikariCP
 Backend --> Redis : RESP / Spring Cache
-Backend --> OpenAI : HTTPS / API key
+Backend --> Gemini : HTTPS / API key
 
 note bottom of Backend
   @PreAuthorize phân quyền 3 role:

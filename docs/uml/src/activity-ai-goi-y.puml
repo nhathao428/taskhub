@@ -23,8 +23,8 @@ else (No)
   }
   :collectStats()\n(total/done/onTime/late/workDays);
   :buildPrompt() – tiếng Việt;
-  :POST /v1/chat/completions;
-  |OpenAI GPT-4o-mini|
+  :POST /v1beta/models/gemini-2.5-flash:generateContent;
+  |Gemini gemini-2.5-flash|
   :Phân tích prompt;
   :Trả JSON [{employeeId,\nrank, reasoning}];
   |Backend (AiSuggestionService)|

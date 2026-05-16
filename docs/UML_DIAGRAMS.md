@@ -34,7 +34,7 @@ CRUD đầy đủ cho dự án và công việc. Backend kiểm tra ownership: n
 
 ### 1.5. Use Case — AI Gợi ý Nhân viên
 
-OpenAI GPT-4o-mini là một system actor bên ngoài. Backend gom số liệu thô và xây prompt tiếng Việt rồi gọi AI; kết quả được cache 5 phút bằng Redis.
+Google Gemini (gemini-2.5-flash) là một system actor bên ngoài. Backend gom số liệu thô và xây prompt tiếng Việt rồi gọi AI; kết quả được cache 5 phút bằng Redis.
 
 ![Use Case AI Gợi ý](uml/png/use-case-ai-goi-y.png)
 
@@ -50,7 +50,7 @@ OpenAI GPT-4o-mini là một system actor bên ngoài. Backend gom số liệu t
 
 ### 2.2. Sơ đồ lớp Kiến trúc (Controller / Service / Repository)
 
-Sơ đồ phân tầng Spring Boot 3 lớp: Controller → Service → Repository, kèm hai thành phần ngoài (`OpenAiClient`, `RedisCache`). `AiSuggestionService` là service đặc biệt – truy vấn 3 repository và gọi OpenAI.
+Sơ đồ phân tầng Spring Boot 3 lớp: Controller → Service → Repository, kèm hai thành phần ngoài (`GeminiClient`, `RedisCache`). `AiSuggestionService` là service đặc biệt – truy vấn 3 repository và gọi Gemini.
 
 ![Class Diagram Kiến trúc](uml/png/class-diagram-kien-truc.png)
 
@@ -72,7 +72,7 @@ Hai luồng tách rời: Check-in (kiểm tra trùng → INSERT) và Check-out (
 
 ### 3.3. AI Gợi ý Nhân viên
 
-Luồng đầy đủ: cache lookup → MISS → batch query song song (Task + Attendance) → collectStats → buildPrompt → POST OpenAI → parse JSON → cache 5m → trả top 5. Nhánh HIT trả ngay từ cache.
+Luồng đầy đủ: cache lookup → MISS → batch query song song (Task + Attendance) → collectStats → buildPrompt → POST Gemini → parse JSON → cache 5m → trả top 5. Nhánh HIT trả ngay từ cache.
 
 ![Sequence AI Gợi ý](uml/png/sequence-ai-goi-y.png)
 
@@ -112,7 +112,7 @@ Swimlane 3 tầng (Nhân viên / Frontend / Backend). Backend tự quyết đị
 
 ### 4.5. AI Gợi ý Nhân viên
 
-Swimlane 4 tầng (Quản lý / Frontend / Backend / OpenAI). Khối parallel mô tả 3 batch query trên 3 repository. Nhánh cache HIT trả ngay không gọi AI.
+Swimlane 4 tầng (Quản lý / Frontend / Backend / Gemini). Khối parallel mô tả 3 batch query trên 3 repository. Nhánh cache HIT trả ngay không gọi AI.
 
 ![Activity AI Gợi ý](uml/png/activity-ai-goi-y.png)
 
@@ -132,6 +132,6 @@ Tạo, sửa, xóa (quyền MANAGER) và cập nhật trạng thái (mọi nhân
 
 ## 5. Kiến trúc tổng thể
 
-Sơ đồ component-style mô tả 3 tier (Client / Application / Data) và các kết nối: Web/Mobile/Tools → Spring Boot (JWT) → PostgreSQL + Redis + OpenAI. Tất cả container chạy chung Docker network `taskmgmt_net`.
+Sơ đồ component-style mô tả 3 tier (Client / Application / Data) và các kết nối: Web/Mobile/Tools → Spring Boot (JWT) → PostgreSQL + Redis + Gemini. Tất cả container chạy chung Docker network `taskmgmt_net`.
 
 ![Architecture](uml/png/architecture.png)

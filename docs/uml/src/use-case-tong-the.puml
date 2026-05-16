@@ -62,6 +62,6 @@ Admin -|> Manager
 
 note bottom of UC11
   Backend gom dữ liệu task + chấm công,
-  gọi OpenAI GPT-4o-mini xếp hạng top 5.
+  gọi Gemini gemini-2.5-flash xếp hạng top 5.
 end note
 @enduml

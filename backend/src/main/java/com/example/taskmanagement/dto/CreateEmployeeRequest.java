@@ -21,5 +21,8 @@ public record CreateEmployeeRequest(
         @Size(max = 100, message = "Group must not exceed 100 characters")
         String group,
 
-        String skills
+        String skills,
+
+        /** Email tài khoản user để liên kết hồ sơ nhân viên (tùy chọn). */
+        String userEmail
 ) {}
