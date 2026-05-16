@@ -13,8 +13,10 @@ import AiSuggestions from './pages/AiSuggestions'
 import MyTasks from './pages/MyTasks'
 import MyAttendance from './pages/MyAttendance'
 import OfficeLocations from './pages/OfficeLocations'
+import Users from './pages/Users'
 
 const MANAGER_ROLES = ['MANAGER', 'ADMIN']
+const ADMIN_ONLY = ['ADMIN']
 
 export default function App() {
   return (
@@ -77,6 +79,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={MANAGER_ROLES}>
                   <AiSuggestions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute allowedRoles={ADMIN_ONLY}>
+                  <Users />
                 </ProtectedRoute>
               }
             />

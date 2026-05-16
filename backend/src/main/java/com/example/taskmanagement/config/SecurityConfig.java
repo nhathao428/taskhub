@@ -112,6 +112,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/attendance/**").hasAnyRole("MANAGER", "ADMIN")
                 .requestMatchers("/api/suggestions/**").hasAnyRole("MANAGER", "ADMIN")
 
+                // Quản lý tài khoản & phân quyền: chỉ ADMIN
+                .requestMatchers("/api/users/**").hasRole("ADMIN")
+
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

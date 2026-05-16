@@ -12,6 +12,7 @@ import {
   MdLogout,
   MdWorkspaces,
   MdLocationOn,
+  MdManageAccounts,
 } from 'react-icons/md'
 
 const managerNav = [
@@ -31,6 +32,9 @@ const employeeNav = [
   { to: '/my-attendance', icon: MdEventAvailable, label: 'Chấm công của tôi' },
 ]
 
+// Mục chỉ ADMIN thấy — quản lý người dùng & phân quyền
+const adminNavItem = { to: '/users', icon: MdManageAccounts, label: 'Người dùng' }
+
 function roleLabel(role) {
   if (role === 'MANAGER') return 'Quản lý'
   if (role === 'ADMIN') return 'Quản trị viên'
@@ -48,7 +52,12 @@ export default function Sidebar() {
   const { logout, user } = useAuth()
   const navigate = useNavigate()
   const role = user?.role || 'EMPLOYEE'
-  const navItems = role === 'EMPLOYEE' ? employeeNav : managerNav
+  const navItems =
+    role === 'EMPLOYEE'
+      ? employeeNav
+      : role === 'ADMIN'
+        ? [...managerNav, adminNavItem]
+        : managerNav
 
   const handleLogout = () => {
     logout()
