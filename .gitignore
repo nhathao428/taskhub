@@ -35,7 +35,9 @@ docs/uml/plantuml.jar
 CLAUDE.md
 
 # File sinh tự động – build lại từ source, không commit:
-#   - .docx  → docs/build_baocao_docx.py, docs/build_phieu_docx.py
+#   - phiếu .docx → docs/build_phieu_docx.py
 #   - uml png → plantuml.jar render từ docs/uml/src/*.puml
+# Riêng báo cáo chính được commit để xem/tải trực tiếp trên GitHub.
 docs/*.docx
+!docs/BAO_CAO_DO_AN_CO_SO.docx
 docs/uml/png/
