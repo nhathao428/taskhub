@@ -4,6 +4,7 @@ import Modal from '../components/Modal'
 import { useTasks } from '../hooks/useTasks'
 import { useProjects } from '../hooks/useProjects'
 import { useEmployees } from '../hooks/useEmployees'
+import { useTranslation } from '../context/LanguageContext'
 
 const emptyForm = {
   title: '',
@@ -28,14 +29,18 @@ const statusConfig = {
 }
 
 function StatusBadge({ status }) {
-  const cfg = statusConfig[status] || { label: status, cls: 'bg-gray-100 text-gray-600' }
-  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.cls}`}>{cfg.label}</span>
+  const { t } = useTranslation()
+  const cfg = statusConfig[status]
+  const label = cfg ? t(cfg.label) : status
+  const cls = cfg ? cfg.cls : 'bg-gray-100 text-gray-600'
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{label}</span>
 }
 
 export default function Tasks() {
   const { tasks, loading, error: taskError, createTask, updateTask, deleteTask } = useTasks()
   const { projects } = useProjects()
   const { employees } = useEmployees()
+  const { t } = useTranslation()
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [form, setForm] = useState(emptyForm)
@@ -71,11 +76,11 @@ export default function Tasks() {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa công việc này?')) return
+    if (!window.confirm(t('Bạn có chắc muốn xóa công việc này?'))) return
     try {
       await deleteTask(id)
     } catch (err) {
-      const msg = err.response?.data?.message || 'Xóa thất bại.'
+      const msg = err.response?.data?.message || t('Xóa thất bại.')
       alert(msg)
     }
   }
@@ -101,7 +106,7 @@ export default function Tasks() {
       }
       setModalOpen(false)
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Lưu thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || t('Lưu thất bại.'))
     } finally {
       setSaving(false)
     }
@@ -124,12 +129,12 @@ export default function Tasks() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Công việc</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('Công việc')}</h1>
         <button
           onClick={openAdd}
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
-          <MdAdd className="text-xl" /> Thêm công việc
+          <MdAdd className="text-xl" /> {t('Thêm công việc')}
         </button>
       </div>
 
@@ -147,19 +152,19 @@ export default function Tasks() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tiêu đề</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mô tả</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Hạn chót</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Dự án</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Phân công</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tiêu đề')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Mô tả')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Hạn chót')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Dự án')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Phân công')}</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
                 </tr>
               </thead>
               <tbody>
                 {tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-gray-400">Chưa có công việc nào.</td>
+                    <td colSpan={7} className="text-center py-8 text-gray-400">{t('Chưa có công việc nào.')}</td>
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (
@@ -172,10 +177,10 @@ export default function Tasks() {
                       <td className="px-6 py-4 text-gray-600">{getAssigneeName(task)}</td>
                       <td className="px-6 py-4 text-center">
                         <button onClick={() => openEdit(task)} className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm">
-                          <MdEdit /> Sửa
+                          <MdEdit /> {t('Sửa')}
                         </button>
                         <button onClick={() => handleDelete(task.taskId ?? task.id)} className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm">
-                          <MdDelete /> Xóa
+                          <MdDelete /> {t('Xóa')}
                         </button>
                       </td>
                     </tr>
@@ -187,44 +192,44 @@ export default function Tasks() {
         )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editTarget ? 'Chỉnh sửa công việc' : 'Thêm công việc mới'}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editTarget ? t('Chỉnh sửa công việc') : t('Thêm công việc mới')}>
         <form onSubmit={handleSave} className="space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tiêu đề</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Tiêu đề')}</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
-              placeholder="Nhập tiêu đề công việc"
+              placeholder={t('Nhập tiêu đề công việc')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Mô tả')}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
-              placeholder="Mô tả công việc"
+              placeholder={t('Mô tả công việc')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Kỹ năng yêu cầu</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Kỹ năng yêu cầu')}</label>
             <input
               type="text"
               value={form.requiredSkills}
               onChange={(e) => setForm({ ...form, requiredSkills: e.target.value })}
-              placeholder="VD: Java, Spring Boot, PostgreSQL"
+              placeholder={t('VD: Java, Spring Boot, PostgreSQL')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <p className="text-xs text-gray-500 mt-1">Quản lý nhập tự do, AI sẽ đối chiếu với kỹ năng của nhân viên khi gợi ý.</p>
+            <p className="text-xs text-gray-500 mt-1">{t('Quản lý nhập tự do, AI sẽ đối chiếu với kỹ năng của nhân viên khi gợi ý.')}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hạn chót</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Hạn chót')}</label>
               <input
                 type="date"
                 value={form.dueDate}
@@ -233,48 +238,48 @@ export default function Tasks() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Trạng thái')}</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                <option value="PENDING">Chờ xử lý</option>
-                <option value="IN_PROGRESS">Đang thực hiện</option>
-                <option value="COMPLETED">Hoàn thành</option>
+                <option value="PENDING">{t('Chờ xử lý')}</option>
+                <option value="IN_PROGRESS">{t('Đang thực hiện')}</option>
+                <option value="COMPLETED">{t('Hoàn thành')}</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Dự án</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Dự án')}</label>
             <select
               value={form.project || ''}
               onChange={(e) => setForm({ ...form, project: e.target.value || null })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="">-- Chọn dự án --</option>
+              <option value="">{t('-- Chọn dự án --')}</option>
               {projects.map((p) => (
                 <option key={p.projectId ?? p.id} value={p.projectId ?? p.id}>{p.name}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phân công cho</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Phân công cho')}</label>
             <select
               value={form.assignedTo || ''}
               onChange={(e) => setForm({ ...form, assignedTo: e.target.value || null })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="">-- Chọn nhân viên --</option>
+              <option value="">{t('-- Chọn nhân viên --')}</option>
               {employees.map((emp) => (
                 <option key={emp.employeeId ?? emp.id} value={emp.employeeId ?? emp.id}>{emp.firstName} {emp.lastName}</option>
               ))}
             </select>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">{t('Hủy')}</button>
             <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
-              {saving ? 'Đang lưu...' : 'Lưu'}
+              {saving ? t('Đang lưu...') : t('Lưu')}
             </button>
           </div>
         </form>

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MdEmail, MdLock, MdPerson, MdWorkspaces, MdPersonAdd } from 'react-icons/md'
 import { useAuth } from '../context/AuthContext'
+import { useTranslation } from '../context/LanguageContext'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 
 export default function Register() {
   const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' })
@@ -9,6 +11,7 @@ export default function Register() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const { register } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -19,19 +22,19 @@ export default function Register() {
     e.preventDefault()
     setError('')
     if (form.password !== form.confirm) {
-      setError('Mật khẩu xác nhận không khớp.')
+      setError(t('Mật khẩu xác nhận không khớp.'))
       return
     }
     setLoading(true)
     try {
       await register(form.username, form.email, form.password)
-      setSuccess('Đăng ký thành công! Đang chuyển đến trang đăng nhập...')
+      setSuccess(t('Đăng ký thành công! Đang chuyển đến trang đăng nhập...'))
       setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          'Đăng ký thất bại. Vui lòng thử lại.'
+          t('Đăng ký thất bại. Vui lòng thử lại.')
       )
     } finally {
       setLoading(false)
@@ -50,13 +53,17 @@ export default function Register() {
       <div className="absolute -top-32 -right-32 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
 
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSwitcher variant="dark" />
+      </div>
+
       <div className="relative bg-white/95 backdrop-blur rounded-3xl shadow-2xl w-full max-w-md mx-4 p-8">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg mb-4">
             <MdWorkspaces className="text-white text-3xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Tạo tài khoản</h1>
-          <p className="text-gray-500 text-sm mt-1">Tham gia Task Manager hôm nay</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('Tạo tài khoản')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('Tham gia Task Manager hôm nay')}</p>
         </div>
 
         {error && (
@@ -75,7 +82,7 @@ export default function Register() {
             <div key={name}>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
                 <Icon className="text-indigo-500" />
-                {label}
+                {label === 'Email' ? label : t(label)}
               </label>
               <input
                 type={type}
@@ -96,21 +103,21 @@ export default function Register() {
             {loading ? (
               <>
                 <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
-                Đang đăng ký...
+                {t('Đang đăng ký...')}
               </>
             ) : (
               <>
                 <MdPersonAdd className="text-lg" />
-                Đăng ký
+                {t('Đăng ký')}
               </>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Đã có tài khoản?{' '}
+          {t('Đã có tài khoản?')}{' '}
           <Link to="/login" className="text-indigo-600 hover:text-purple-600 hover:underline font-semibold transition-colors">
-            Đăng nhập
+            {t('Đăng nhập')}
           </Link>
         </p>
       </div>

@@ -3,6 +3,7 @@ import { MdAdd, MdEdit, MdDelete } from 'react-icons/md'
 import Modal from '../components/Modal'
 import { useProjects } from '../hooks/useProjects'
 import { useAuth } from '../context/AuthContext'
+import { useTranslation } from '../context/LanguageContext'
 
 const emptyForm = { name: '', description: '', startDate: '', endDate: '', status: 'ACTIVE' }
 
@@ -15,16 +16,18 @@ const statusConfig = {
 }
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation()
   const cfg = statusConfig[status] || { label: status, cls: 'bg-gray-100 text-gray-600' }
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.cls}`}>
-      {cfg.label}
+      {statusConfig[status] ? t(cfg.label) : cfg.label}
     </span>
   )
 }
 
 export default function Projects() {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const isManager = ['MANAGER', 'ADMIN'].includes(user?.role)
   const { projects, loading, error: fetchError, createProject, updateProject, deleteProject } = useProjects()
   const [modalOpen, setModalOpen] = useState(false)
@@ -54,11 +57,11 @@ export default function Projects() {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa dự án này?')) return
+    if (!window.confirm(t('Bạn có chắc muốn xóa dự án này?'))) return
     try {
       await deleteProject(id)
     } catch (err) {
-      const msg = err.response?.data?.message || 'Xóa thất bại.'
+      const msg = err.response?.data?.message || t('Xóa thất bại.')
       alert(msg)
     }
   }
@@ -82,7 +85,7 @@ export default function Projects() {
       }
       setModalOpen(false)
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Lưu thất bại.')
+      setError(err.response?.data?.message || err.response?.data?.error || t('Lưu thất bại.'))
     } finally {
       setSaving(false)
     }
@@ -91,13 +94,13 @@ export default function Projects() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Dự án</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('Dự án')}</h1>
         {isManager && (
           <button
             onClick={openAdd}
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
-            <MdAdd className="text-xl" /> Thêm dự án
+            <MdAdd className="text-xl" /> {t('Thêm dự án')}
           </button>
         )}
       </div>
@@ -115,20 +118,20 @@ export default function Projects() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tên dự án</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mô tả</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày bắt đầu</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày kết thúc</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tên dự án')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Mô tả')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày bắt đầu')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày kết thúc')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
                 {isManager && (
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
                 )}
               </tr>
             </thead>
             <tbody>
               {projects.length === 0 ? (
                 <tr>
-                  <td colSpan={isManager ? 6 : 5} className="text-center py-8 text-gray-400">Chưa có dự án nào.</td>
+                  <td colSpan={isManager ? 6 : 5} className="text-center py-8 text-gray-400">{t('Chưa có dự án nào.')}</td>
                 </tr>
               ) : (
                 projects.map((proj, idx) => (
@@ -144,13 +147,13 @@ export default function Projects() {
                           onClick={() => openEdit(proj)}
                           className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm"
                         >
-                          <MdEdit /> Sửa
+                          <MdEdit /> {t('Sửa')}
                         </button>
                         <button
                           onClick={() => handleDelete(proj.projectId ?? proj.id)}
                           className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
                         >
-                          <MdDelete /> Xóa
+                          <MdDelete /> {t('Xóa')}
                         </button>
                       </td>
                     )}
@@ -162,33 +165,33 @@ export default function Projects() {
         )}
       </div>
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editTarget ? 'Chỉnh sửa dự án' : 'Thêm dự án mới'}>
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editTarget ? t('Chỉnh sửa dự án') : t('Thêm dự án mới')}>
         <form onSubmit={handleSave} className="space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tên dự án</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Tên dự án')}</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
-              placeholder="Nhập tên dự án"
+              placeholder={t('Nhập tên dự án')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Mô tả')}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              placeholder="Mô tả ngắn về dự án"
+              placeholder={t('Mô tả ngắn về dự án')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Ngày bắt đầu')}</label>
               <input
                 type="date"
                 value={form.startDate}
@@ -197,7 +200,7 @@ export default function Projects() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Ngày kết thúc')}</label>
               <input
                 type="date"
                 value={form.endDate}
@@ -207,23 +210,23 @@ export default function Projects() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Trạng thái')}</label>
             <select
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="ACTIVE">Hoạt động</option>
-              <option value="ON_TRACK">Đúng tiến độ</option>
-              <option value="IN_PROGRESS">Đang thực hiện</option>
-              <option value="COMPLETED">Hoàn thành</option>
-              <option value="OVERDUE">Quá hạn</option>
+              <option value="ACTIVE">{t('Hoạt động')}</option>
+              <option value="ON_TRACK">{t('Đúng tiến độ')}</option>
+              <option value="IN_PROGRESS">{t('Đang thực hiện')}</option>
+              <option value="COMPLETED">{t('Hoàn thành')}</option>
+              <option value="OVERDUE">{t('Quá hạn')}</option>
             </select>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">Hủy</button>
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">{t('Hủy')}</button>
             <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
-              {saving ? 'Đang lưu...' : 'Lưu'}
+              {saving ? t('Đang lưu...') : t('Lưu')}
             </button>
           </div>
         </form>

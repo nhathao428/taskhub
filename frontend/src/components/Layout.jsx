@@ -1,5 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useTranslation } from '../context/LanguageContext'
 
 const ROUTE_TITLES = {
   '/dashboard': 'Bảng điều khiển',
@@ -7,13 +9,19 @@ const ROUTE_TITLES = {
   '/projects': 'Dự án',
   '/tasks': 'Công việc',
   '/attendance': 'Chấm công',
+  '/office-locations': 'Văn phòng',
   '/ai-suggestions': 'AI Gợi ý',
+  '/users': 'Người dùng',
+  '/my-tasks': 'Công việc của tôi',
+  '/my-attendance': 'Chấm công của tôi',
 }
 
 export default function Layout({ children }) {
   const { pathname } = useLocation()
-  const title = ROUTE_TITLES[pathname] || 'Task Manager'
-  const today = new Date().toLocaleDateString('vi-VN', {
+  const { t, lang } = useTranslation()
+  const titleKey = ROUTE_TITLES[pathname]
+  const title = titleKey ? t(titleKey) : 'Task Manager'
+  const today = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'vi-VN', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -29,6 +37,7 @@ export default function Layout({ children }) {
             <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
             <p className="text-xs text-gray-500 capitalize">{today}</p>
           </div>
+          <LanguageSwitcher />
         </header>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>

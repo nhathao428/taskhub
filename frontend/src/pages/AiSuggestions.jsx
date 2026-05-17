@@ -9,6 +9,7 @@ import {
   MdSearchOff,
 } from 'react-icons/md'
 import api from '../api/axios'
+import { useTranslation } from '../context/LanguageContext'
 
 const RANK_THEMES = {
   1: {
@@ -17,7 +18,6 @@ const RANK_THEMES = {
     quoteBg: 'from-yellow-50 to-orange-50',
     quoteIcon: 'text-yellow-300',
     medal: 'text-yellow-500',
-    label: 'Vàng',
   },
   2: {
     avatar: 'bg-gradient-to-br from-slate-400 to-gray-500',
@@ -25,7 +25,6 @@ const RANK_THEMES = {
     quoteBg: 'from-gray-50 to-slate-50',
     quoteIcon: 'text-gray-300',
     medal: 'text-gray-400',
-    label: 'Bạc',
   },
   3: {
     avatar: 'bg-gradient-to-br from-orange-400 to-red-500',
@@ -33,7 +32,6 @@ const RANK_THEMES = {
     quoteBg: 'from-orange-50 to-red-50',
     quoteIcon: 'text-orange-300',
     medal: 'text-orange-500',
-    label: 'Đồng',
   },
 }
 
@@ -113,6 +111,7 @@ function SuggestionCard({ emp, index }) {
 }
 
 export default function AiSuggestions() {
+  const { t } = useTranslation()
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDescription, setTaskDescription] = useState('')
   const [results, setResults] = useState([])
@@ -129,7 +128,7 @@ export default function AiSuggestions() {
       const res = await api.post('/api/suggestions/recommend', { taskTitle, taskDescription })
       setResults(res.data?.data ?? res.data ?? [])
     } catch (err) {
-      setError(err.response?.data?.message || 'Không thể lấy gợi ý.')
+      setError(err.response?.data?.message || t('Không thể lấy gợi ý.'))
       setResults([])
     } finally {
       setLoading(false)
@@ -147,9 +146,9 @@ export default function AiSuggestions() {
             <MdAutoAwesome className="text-3xl" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">AI Gợi ý nhân viên</h1>
+            <h1 className="text-2xl font-bold">{t('AI Gợi ý nhân viên')}</h1>
             <p className="text-sm text-indigo-100 mt-0.5">
-              Phân tích lịch sử và đề xuất người phù hợp nhất
+              {t('Phân tích lịch sử và đề xuất người phù hợp nhất')}
             </p>
           </div>
         </div>
@@ -161,7 +160,7 @@ export default function AiSuggestions() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <MdAssignment className="text-indigo-500" />
-              Tiêu đề công việc
+              {t('Tiêu đề công việc')}
             </label>
             <input
               type="text"
@@ -175,8 +174,8 @@ export default function AiSuggestions() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
               <MdDescription className="text-indigo-500" />
-              Mô tả công việc
-              <span className="text-gray-400 font-normal text-xs">tùy chọn</span>
+              {t('Mô tả công việc')}
+              <span className="text-gray-400 font-normal text-xs">{t('tùy chọn')}</span>
             </label>
             <textarea
               value={taskDescription}
@@ -194,12 +193,12 @@ export default function AiSuggestions() {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
-                Đang phân tích...
+                {t('Đang phân tích...')}
               </>
             ) : (
               <>
                 <MdAutoAwesome className="text-lg" />
-                Phân tích bằng AI
+                {t('Phân tích bằng AI')}
                 <MdArrowForward className="transition-transform group-hover:translate-x-0.5" />
               </>
             )}
@@ -210,7 +209,7 @@ export default function AiSuggestions() {
       {/* Error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-start gap-2">
-          <span className="font-medium">Lỗi:</span>
+          <span className="font-medium">{t('Lỗi:')}</span>
           <span>{error}</span>
         </div>
       )}
@@ -230,8 +229,8 @@ export default function AiSuggestions() {
           <div className="inline-flex w-20 h-20 rounded-full bg-gray-100 items-center justify-center mb-4">
             <MdSearchOff className="text-4xl text-gray-400" />
           </div>
-          <p className="font-medium text-gray-700">Không tìm thấy nhân viên phù hợp</p>
-          <p className="text-sm text-gray-500 mt-1">Hãy thử mô tả task chi tiết hơn</p>
+          <p className="font-medium text-gray-700">{t('Không tìm thấy nhân viên phù hợp')}</p>
+          <p className="text-sm text-gray-500 mt-1">{t('Hãy thử mô tả task chi tiết hơn')}</p>
         </div>
       )}
 

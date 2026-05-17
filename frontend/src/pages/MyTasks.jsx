@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { MdAssignmentTurnedIn, MdHourglassEmpty, MdPlayArrow } from 'react-icons/md'
+import { useTranslation } from '../context/LanguageContext'
 
 const statusConfig = {
   pending: { label: 'Chờ xử lý', cls: 'bg-yellow-100 text-yellow-700' },
@@ -9,12 +10,16 @@ const statusConfig = {
 }
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation()
   const key = (status || '').toLowerCase()
-  const cfg = statusConfig[key] || { label: status, cls: 'bg-gray-100 text-gray-600' }
-  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.cls}`}>{cfg.label}</span>
+  const cfg = statusConfig[key]
+  const label = cfg ? t(cfg.label) : status
+  const cls = cfg ? cfg.cls : 'bg-gray-100 text-gray-600'
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{label}</span>
 }
 
 export default function MyTasks() {
+  const { t } = useTranslation()
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -27,7 +32,7 @@ export default function MyTasks() {
       setTasks(res.data?.data || [])
       setError('')
     } catch (err) {
-      setError(err.response?.data?.message || 'Không tải được danh sách công việc của bạn.')
+      setError(err.response?.data?.message || t('Không tải được danh sách công việc của bạn.'))
     } finally {
       setLoading(false)
     }
@@ -41,7 +46,7 @@ export default function MyTasks() {
       await api.patch(`/api/tasks/${taskId}/status`, { status: newStatus })
       await load()
     } catch (err) {
-      alert(err.response?.data?.message || 'Cập nhật trạng thái thất bại.')
+      alert(err.response?.data?.message || t('Cập nhật trạng thái thất bại.'))
     } finally {
       setUpdatingId(null)
     }
@@ -55,28 +60,28 @@ export default function MyTasks() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Công việc của tôi</h1>
-      <p className="text-sm text-gray-500 mb-6">Các nhiệm vụ được quản lý phân cho bạn. Bạn có thể cập nhật trạng thái công việc trực tiếp.</p>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('Công việc của tôi')}</h1>
+      <p className="text-sm text-gray-500 mb-6">{t('Các nhiệm vụ được quản lý phân cho bạn. Bạn có thể cập nhật trạng thái công việc trực tiếp.')}</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
           <div className="p-3 rounded-lg bg-yellow-100 text-yellow-700"><MdHourglassEmpty className="text-xl" /></div>
           <div>
-            <p className="text-xs text-gray-500 uppercase">Chờ xử lý</p>
+            <p className="text-xs text-gray-500 uppercase">{t('Chờ xử lý')}</p>
             <p className="text-xl font-bold text-gray-800">{counts.pending}</p>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
           <div className="p-3 rounded-lg bg-blue-100 text-blue-700"><MdPlayArrow className="text-xl" /></div>
           <div>
-            <p className="text-xs text-gray-500 uppercase">Đang thực hiện</p>
+            <p className="text-xs text-gray-500 uppercase">{t('Đang thực hiện')}</p>
             <p className="text-xl font-bold text-gray-800">{counts.in_progress}</p>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow p-4 flex items-center gap-3">
           <div className="p-3 rounded-lg bg-green-100 text-green-700"><MdAssignmentTurnedIn className="text-xl" /></div>
           <div>
-            <p className="text-xs text-gray-500 uppercase">Hoàn thành</p>
+            <p className="text-xs text-gray-500 uppercase">{t('Hoàn thành')}</p>
             <p className="text-xl font-bold text-gray-800">{counts.completed}</p>
           </div>
         </div>
@@ -96,18 +101,18 @@ export default function MyTasks() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tiêu đề</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mô tả</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kỹ năng yêu cầu</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Hạn chót</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Cập nhật</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tiêu đề')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Mô tả')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Kỹ năng yêu cầu')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Hạn chót')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Cập nhật')}</th>
                 </tr>
               </thead>
               <tbody>
                 {tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-8 text-gray-400">Bạn chưa được giao công việc nào.</td>
+                    <td colSpan={6} className="text-center py-8 text-gray-400">{t('Bạn chưa được giao công việc nào.')}</td>
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (
@@ -124,9 +129,9 @@ export default function MyTasks() {
                           onChange={(e) => changeStatus(task.taskId ?? task.id, e.target.value)}
                           className="px-2 py-1 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                          <option value="pending">Chờ xử lý</option>
-                          <option value="in_progress">Đang thực hiện</option>
-                          <option value="completed">Hoàn thành</option>
+                          <option value="pending">{t('Chờ xử lý')}</option>
+                          <option value="in_progress">{t('Đang thực hiện')}</option>
+                          <option value="completed">{t('Hoàn thành')}</option>
                         </select>
                       </td>
                     </tr>

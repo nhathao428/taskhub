@@ -2,33 +2,34 @@ import { useEffect, useMemo, useState } from 'react'
 import api from '../api/axios'
 import { MdLogin, MdLogout, MdMyLocation, MdWarning, MdCheckCircle } from 'react-icons/md'
 import OfficeMap from '../components/OfficeMap'
+import { useTranslation } from '../context/LanguageContext'
 
-function formatDateTime(value) {
+function formatDateTime(value, lang) {
   if (!value) return '-'
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return value
-  return d.toLocaleString('vi-VN')
+  return d.toLocaleString(lang === 'en' ? 'en-US' : 'vi-VN')
 }
 
-function reviewBadge(status) {
+function reviewBadge(status, t) {
   if (status === 'APPROVED') {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-emerald-100 text-emerald-700">
-        <MdCheckCircle /> Đã duyệt
+        <MdCheckCircle /> {t('Đã duyệt')}
       </span>
     )
   }
   if (status === 'PENDING_REVIEW') {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-700">
-        <MdWarning /> Chờ duyệt
+        <MdWarning /> {t('Chờ duyệt')}
       </span>
     )
   }
   if (status === 'REJECTED') {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-rose-100 text-rose-700">
-        ✕ Từ chối
+        ✕ {t('Từ chối')}
       </span>
     )
   }
@@ -36,6 +37,7 @@ function reviewBadge(status) {
 }
 
 export default function MyAttendance() {
+  const { t, lang } = useTranslation()
   const [records, setRecords] = useState([])
   const [offices, setOffices] = useState([])
   const [loading, setLoading] = useState(true)
@@ -57,7 +59,7 @@ export default function MyAttendance() {
       setOffices(rOffices.data?.data || [])
       setError('')
     } catch (err) {
-      setError(err.response?.data?.message || 'Không tải được dữ liệu.')
+      setError(err.response?.data?.message || t('Không tải được dữ liệu.'))
     } finally {
       setLoading(false)
     }
@@ -68,7 +70,7 @@ export default function MyAttendance() {
   const requestLocation = () => {
     setPosError(''); setPosLoading(true)
     if (!('geolocation' in navigator)) {
-      setPosError('Trình duyệt không hỗ trợ Geolocation API.')
+      setPosError(t('Trình duyệt không hỗ trợ Geolocation API.'))
       setPosLoading(false)
       return
     }
@@ -78,7 +80,7 @@ export default function MyAttendance() {
         setPosLoading(false)
       },
       (err) => {
-        setPosError(err.message || 'Không lấy được vị trí. Hãy cấp quyền GPS cho trình duyệt.')
+        setPosError(err.message || t('Không lấy được vị trí. Hãy cấp quyền GPS cho trình duyệt.'))
         setPosLoading(false)
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 },
@@ -119,25 +121,25 @@ export default function MyAttendance() {
       const res = await api.post(path, body)
       const reviewStatus = res.data?.data?.reviewStatus
       if (reviewStatus === 'PENDING_REVIEW') {
-        setMessage(`${label} thành công nhưng vị trí ngoài vùng cho phép – đã chuyển sang chờ duyệt.`)
+        setMessage(t('{label} thành công nhưng vị trí ngoài vùng cho phép – đã chuyển sang chờ duyệt.', { label }))
       } else {
-        setMessage(`${label} thành công.`)
+        setMessage(t('{label} thành công.', { label }))
       }
       await load()
     } catch (err) {
-      setMessage(err.response?.data?.message || `${label} thất bại.`)
+      setMessage(err.response?.data?.message || t('{label} thất bại.', { label }))
     } finally { setBusy(false) }
   }
 
-  const checkIn = () => sendCheckIn('/api/attendance/me/checkin', 'Chấm công vào')
-  const checkOut = () => sendCheckIn('/api/attendance/me/checkout', 'Chấm công ra')
+  const checkIn = () => sendCheckIn('/api/attendance/me/checkin', t('Chấm công vào'))
+  const checkOut = () => sendCheckIn('/api/attendance/me/checkout', t('Chấm công ra'))
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">Chấm công của tôi</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('Chấm công của tôi')}</h1>
       <p className="text-sm text-gray-500 mb-6">
-        Hệ thống dùng GPS để xác minh vị trí. Nếu nằm ngoài vùng cho phép, bản ghi sẽ chuyển sang
-        <span className="font-medium text-amber-600"> trạng thái chờ quản lý duyệt</span>.
+        {t('Hệ thống dùng GPS để xác minh vị trí. Nếu nằm ngoài vùng cho phép, bản ghi sẽ chuyển sang')}
+        <span className="font-medium text-amber-600"> {t('trạng thái chờ quản lý duyệt')}</span>.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -150,16 +152,16 @@ export default function MyAttendance() {
         <div className="flex flex-col gap-3">
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-gray-700">Vị trí hiện tại</p>
+              <p className="text-sm font-semibold text-gray-700">{t('Vị trí hiện tại')}</p>
               <button
                 onClick={requestLocation}
                 disabled={posLoading}
                 className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-50"
               >
-                <MdMyLocation /> Cập nhật
+                <MdMyLocation /> {t('Cập nhật')}
               </button>
             </div>
-            {posLoading && <p className="text-xs text-gray-500">Đang lấy GPS…</p>}
+            {posLoading && <p className="text-xs text-gray-500">{t('Đang lấy GPS…')}</p>}
             {posError && <p className="text-xs text-rose-600">{posError}</p>}
             {position && (
               <p className="text-xs text-gray-600 break-all">
@@ -172,15 +174,15 @@ export default function MyAttendance() {
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                   : 'bg-amber-50 border-amber-200 text-amber-700'
               }`}>
-                Gần nhất: <b>{nearest.office.name}</b><br />
-                Khoảng cách: <b>{Math.round(nearest.distance)}m</b>
+                {t('Gần nhất:')} <b>{nearest.office.name}</b><br />
+                {t('Khoảng cách:')} <b>{Math.round(nearest.distance)}m</b>
                 {' '} / {nearest.office.radiusMeters}m
-                {nearest.within ? ' ✓ trong vùng' : ' — ngoài vùng cho phép'}
+                {nearest.within ? ` ✓ ${t('trong vùng')}` : ` — ${t('ngoài vùng cho phép')}`}
               </div>
             )}
             {!nearest && offices.length === 0 && (
               <p className="text-xs text-gray-400 mt-2">
-                Chưa có văn phòng nào được cấu hình. Liên hệ quản lý.
+                {t('Chưa có văn phòng nào được cấu hình. Liên hệ quản lý.')}
               </p>
             )}
           </div>
@@ -191,7 +193,7 @@ export default function MyAttendance() {
             className="flex items-center justify-center gap-3 px-6 py-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold shadow-md hover:shadow-lg transition-shadow disabled:opacity-60"
           >
             <MdLogin className="text-2xl" />
-            <span>Vào ca (Check-in)</span>
+            <span>{t('Vào ca (Check-in)')}</span>
           </button>
           <button
             onClick={checkOut}
@@ -199,7 +201,7 @@ export default function MyAttendance() {
             className="flex items-center justify-center gap-3 px-6 py-5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-md hover:shadow-lg transition-shadow disabled:opacity-60"
           >
             <MdLogout className="text-2xl" />
-            <span>Tan ca (Check-out)</span>
+            <span>{t('Tan ca (Check-out)')}</span>
           </button>
         </div>
       </div>
@@ -220,30 +222,30 @@ export default function MyAttendance() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Ngày</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ vào</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Giờ ra</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Văn phòng</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Khoảng cách</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ vào')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ ra')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Văn phòng')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Khoảng cách')}</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
               </tr>
             </thead>
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-400">Chưa có bản ghi chấm công nào.</td>
+                  <td colSpan={6} className="text-center py-8 text-gray-400">{t('Chưa có bản ghi chấm công nào.')}</td>
                 </tr>
               ) : (
                 records.map((r, idx) => (
                   <tr key={r.attendanceId ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
                     <td className="px-6 py-4 text-gray-800">{r.date ? String(r.date).split('T')[0] : '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkIn)}</td>
-                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkOut)}</td>
+                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkIn, lang)}</td>
+                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkOut, lang)}</td>
                     <td className="px-6 py-4 text-gray-600">{r.checkInOffice?.name || '-'}</td>
                     <td className="px-6 py-4 text-gray-600">
                       {r.checkInDistanceMeters != null ? `${r.checkInDistanceMeters}m` : '-'}
                     </td>
-                    <td className="px-6 py-4">{reviewBadge(r.reviewStatus)}</td>
+                    <td className="px-6 py-4">{reviewBadge(r.reviewStatus, t)}</td>
                   </tr>
                 ))
               )}

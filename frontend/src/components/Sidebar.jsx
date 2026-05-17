@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTranslation } from '../context/LanguageContext'
 import {
   MdDashboard,
   MdPeople,
@@ -35,10 +36,10 @@ const employeeNav = [
 // Mục chỉ ADMIN thấy — quản lý người dùng & phân quyền
 const adminNavItem = { to: '/users', icon: MdManageAccounts, label: 'Người dùng' }
 
-function roleLabel(role) {
-  if (role === 'MANAGER') return 'Quản lý'
-  if (role === 'ADMIN') return 'Quản trị viên'
-  return 'Nhân viên'
+function roleLabel(role, t) {
+  if (role === 'MANAGER') return t('Quản lý')
+  if (role === 'ADMIN') return t('Quản trị viên')
+  return t('Nhân viên')
 }
 
 function getInitials(username = '') {
@@ -50,6 +51,7 @@ function getInitials(username = '') {
 
 export default function Sidebar() {
   const { logout, user } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const role = user?.role || 'EMPLOYEE'
   const navItems =
@@ -101,7 +103,7 @@ export default function Sidebar() {
                   <span className="absolute -left-3 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-white" />
                 )}
                 <Icon className="text-xl flex-shrink-0" />
-                <span>{label}</span>
+                <span>{t(label)}</span>
               </>
             )}
           </NavLink>
@@ -117,7 +119,7 @@ export default function Sidebar() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.username}</p>
-              <p className="text-[11px] text-slate-400 truncate">{roleLabel(role)}</p>
+              <p className="text-[11px] text-slate-400 truncate">{roleLabel(role, t)}</p>
             </div>
           </div>
         )}
@@ -126,7 +128,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-colors"
         >
           <MdLogout className="text-xl" />
-          <span>Đăng xuất</span>
+          <span>{t('Đăng xuất')}</span>
         </button>
       </div>
     </aside>

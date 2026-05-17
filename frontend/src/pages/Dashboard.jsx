@@ -25,6 +25,7 @@ import {
 } from 'react-icons/md'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
+import { useTranslation } from '../context/LanguageContext'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
@@ -75,6 +76,7 @@ export default function Dashboard() {
 }
 
 function ManagerDashboard() {
+  const { t } = useTranslation()
   const [stats, setStats] = useState({ employees: 0, projects: 0, tasks: 0, todayAttendance: 0 })
   const [tasks, setTasks] = useState([])
   const [employees, setEmployees] = useState([])
@@ -119,7 +121,7 @@ function ManagerDashboard() {
   const completionRate = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0
 
   const taskStatusData = {
-    labels: ['Chờ xử lý', 'Đang thực hiện', 'Hoàn thành'],
+    labels: [t('Chờ xử lý'), t('Đang thực hiện'), t('Hoàn thành')],
     datasets: [
       {
         data: [
@@ -135,7 +137,7 @@ function ManagerDashboard() {
   }
 
   const deptMap = employees.reduce((acc, emp) => {
-    const dept = emp.department || 'Khác'
+    const dept = emp.department || t('Khác')
     acc[dept] = (acc[dept] || 0) + 1
     return acc
   }, {})
@@ -144,7 +146,7 @@ function ManagerDashboard() {
     labels: Object.keys(deptMap),
     datasets: [
       {
-        label: 'Số nhân viên',
+        label: t('Số nhân viên'),
         data: Object.values(deptMap),
         backgroundColor: '#6366f1',
         borderRadius: 8,
@@ -175,15 +177,18 @@ function ManagerDashboard() {
         <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-xl font-bold">Tổng quan hệ thống</h2>
+            <h2 className="text-xl font-bold">{t('Tổng quan hệ thống')}</h2>
             <p className="text-sm text-indigo-100 mt-1">
-              {tasks.length} công việc đã được tạo, {completedCount} đã hoàn thành
+              {t('{tasks} công việc đã được tạo, {done} đã hoàn thành', {
+                tasks: tasks.length,
+                done: completedCount,
+              })}
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5">
             <MdTrendingUp className="text-2xl" />
             <div>
-              <p className="text-xs text-indigo-100">Tỷ lệ hoàn thành</p>
+              <p className="text-xs text-indigo-100">{t('Tỷ lệ hoàn thành')}</p>
               <p className="text-2xl font-bold leading-tight">{completionRate}%</p>
             </div>
           </div>
@@ -194,28 +199,28 @@ function ManagerDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           icon={MdPeople}
-          label="Nhân viên"
+          label={t('Nhân viên')}
           value={stats.employees}
           gradient="from-indigo-500 to-blue-500"
           accent="bg-indigo-400"
         />
         <StatCard
           icon={MdFolder}
-          label="Dự án"
+          label={t('Dự án')}
           value={stats.projects}
           gradient="from-blue-500 to-cyan-500"
           accent="bg-blue-400"
         />
         <StatCard
           icon={MdCheckCircle}
-          label="Công việc"
+          label={t('Công việc')}
           value={stats.tasks}
           gradient="from-emerald-500 to-green-500"
           accent="bg-emerald-400"
         />
         <StatCard
           icon={MdAccessTime}
-          label="Chấm công hôm nay"
+          label={t('Chấm công hôm nay')}
           value={stats.todayAttendance}
           gradient="from-amber-500 to-orange-500"
           accent="bg-amber-400"
@@ -225,9 +230,9 @@ function ManagerDashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ChartCard
-          title="Phân bổ trạng thái công việc"
+          title={t('Phân bổ trạng thái công việc')}
           icon={MdOutlinePieChart}
-          empty={tasks.length === 0 ? 'Chưa có công việc' : null}
+          empty={tasks.length === 0 ? t('Chưa có công việc') : null}
         >
           <div className="flex justify-center">
             <div style={{ maxWidth: '280px', width: '100%' }}>
@@ -237,9 +242,9 @@ function ManagerDashboard() {
         </ChartCard>
 
         <ChartCard
-          title="Nhân viên theo phòng ban"
+          title={t('Nhân viên theo phòng ban')}
           icon={MdOutlineBarChart}
-          empty={Object.keys(deptMap).length === 0 ? 'Chưa có dữ liệu nhân viên' : null}
+          empty={Object.keys(deptMap).length === 0 ? t('Chưa có dữ liệu nhân viên') : null}
         >
           <Bar data={deptData} options={barOptions} />
         </ChartCard>
@@ -250,6 +255,7 @@ function ManagerDashboard() {
 
 function EmployeeDashboard() {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const [tasks, setTasks] = useState([])
   const [attendance, setAttendance] = useState([])
   const [loading, setLoading] = useState(true)
@@ -288,7 +294,7 @@ function EmployeeDashboard() {
   const attendanceThisMonth = attendance.filter((a) => (a.date || '').startsWith(monthPrefix)).length
 
   const myTaskStatusData = {
-    labels: ['Chờ xử lý', 'Đang thực hiện', 'Hoàn thành'],
+    labels: [t('Chờ xử lý'), t('Đang thực hiện'), t('Hoàn thành')],
     datasets: [
       {
         data: [pendingCount, inProgressCount, completedCount],
@@ -310,15 +316,18 @@ function EmployeeDashboard() {
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-xl font-bold">Xin chào, {user?.username}!</h2>
+            <h2 className="text-xl font-bold">{t('Xin chào, {name}!', { name: user?.username })}</h2>
             <p className="text-sm text-emerald-50 mt-1">
-              Bạn có {tasks.length} công việc được giao, {completedCount} đã hoàn thành.
+              {t('Bạn có {tasks} công việc được giao, {done} đã hoàn thành.', {
+                tasks: tasks.length,
+                done: completedCount,
+              })}
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5">
             <MdTrendingUp className="text-2xl" />
             <div>
-              <p className="text-xs text-emerald-50">Tỷ lệ hoàn thành</p>
+              <p className="text-xs text-emerald-50">{t('Tỷ lệ hoàn thành')}</p>
               <p className="text-2xl font-bold leading-tight">{completionRate}%</p>
             </div>
           </div>
@@ -326,14 +335,14 @@ function EmployeeDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={MdHourglassEmpty} label="Chờ xử lý" value={pendingCount} gradient="from-yellow-500 to-amber-500" accent="bg-yellow-400" />
-        <StatCard icon={MdPlayArrow} label="Đang thực hiện" value={inProgressCount} gradient="from-blue-500 to-indigo-500" accent="bg-blue-400" />
-        <StatCard icon={MdAssignmentTurnedIn} label="Đã hoàn thành" value={completedCount} gradient="from-emerald-500 to-green-500" accent="bg-emerald-400" />
-        <StatCard icon={MdEventAvailable} label="Chấm công tháng này" value={attendanceThisMonth} gradient="from-rose-500 to-pink-500" accent="bg-rose-400" />
+        <StatCard icon={MdHourglassEmpty} label={t('Chờ xử lý')} value={pendingCount} gradient="from-yellow-500 to-amber-500" accent="bg-yellow-400" />
+        <StatCard icon={MdPlayArrow} label={t('Đang thực hiện')} value={inProgressCount} gradient="from-blue-500 to-indigo-500" accent="bg-blue-400" />
+        <StatCard icon={MdAssignmentTurnedIn} label={t('Đã hoàn thành')} value={completedCount} gradient="from-emerald-500 to-green-500" accent="bg-emerald-400" />
+        <StatCard icon={MdEventAvailable} label={t('Chấm công tháng này')} value={attendanceThisMonth} gradient="from-rose-500 to-pink-500" accent="bg-rose-400" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Công việc của tôi theo trạng thái" icon={MdOutlinePieChart} empty={tasks.length === 0 ? 'Bạn chưa có công việc nào' : null}>
+        <ChartCard title={t('Công việc của tôi theo trạng thái')} icon={MdOutlinePieChart} empty={tasks.length === 0 ? t('Bạn chưa có công việc nào') : null}>
           <div className="flex justify-center">
             <div style={{ maxWidth: '280px', width: '100%' }}>
               <Pie data={myTaskStatusData} />
@@ -341,7 +350,7 @@ function EmployeeDashboard() {
           </div>
         </ChartCard>
 
-        <ChartCard title="Công việc sắp đến hạn" icon={MdAccessTime} empty={upcoming.length === 0 ? 'Không có công việc nào sắp đến hạn' : null}>
+        <ChartCard title={t('Công việc sắp đến hạn')} icon={MdAccessTime} empty={upcoming.length === 0 ? t('Không có công việc nào sắp đến hạn') : null}>
           <ul className="divide-y divide-gray-100">
             {upcoming.map((t) => (
               <li key={t.taskId ?? t.id} className="py-2 flex items-center justify-between">

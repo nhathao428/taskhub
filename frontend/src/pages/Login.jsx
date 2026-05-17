@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MdEmail, MdLock, MdWorkspaces, MdLogin } from 'react-icons/md'
 import { useAuth } from '../context/AuthContext'
+import { useTranslation } from '../context/LanguageContext'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -9,6 +11,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -22,7 +25,7 @@ export default function Login() {
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
+          t('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
       )
     } finally {
       setLoading(false)
@@ -36,13 +39,17 @@ export default function Login() {
       <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
 
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageSwitcher variant="dark" />
+      </div>
+
       <div className="relative bg-white/95 backdrop-blur rounded-3xl shadow-2xl w-full max-w-md mx-4 p-8">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-lg mb-4">
             <MdWorkspaces className="text-white text-3xl" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Chào mừng trở lại</h1>
-          <p className="text-gray-500 text-sm mt-1">Đăng nhập vào Task Manager</p>
+          <h1 className="text-2xl font-bold text-gray-800">{t('Chào mừng trở lại')}</h1>
+          <p className="text-gray-500 text-sm mt-1">{t('Đăng nhập vào Task Manager')}</p>
         </div>
 
         {error && (
@@ -69,7 +76,7 @@ export default function Login() {
           <div>
             <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1.5">
               <MdLock className="text-indigo-500" />
-              Mật khẩu
+              {t('Mật khẩu')}
             </label>
             <input
               type="password"
@@ -88,21 +95,21 @@ export default function Login() {
             {loading ? (
               <>
                 <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
-                Đang đăng nhập...
+                {t('Đang đăng nhập...')}
               </>
             ) : (
               <>
                 <MdLogin className="text-lg" />
-                Đăng nhập
+                {t('Đăng nhập')}
               </>
             )}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Chưa có tài khoản?{' '}
+          {t('Chưa có tài khoản?')}{' '}
           <Link to="/register" className="text-indigo-600 hover:text-purple-600 hover:underline font-semibold transition-colors">
-            Đăng ký ngay
+            {t('Đăng ký ngay')}
           </Link>
         </p>
       </div>

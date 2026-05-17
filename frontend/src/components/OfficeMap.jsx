@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer, Marker, Circle, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useTranslation } from '../context/LanguageContext'
 
 // Fix default Leaflet marker icons (Vite + react-leaflet path issue).
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
@@ -47,6 +48,7 @@ export default function OfficeMap({
   onSelectOffice,
   height = 360,
 }) {
+  const { t } = useTranslation()
   // Center mặc định: vị trí hiện tại > office đầu tiên > giữa TPHCM
   const fallbackCenter = [10.7769, 106.7009] // TP. HCM
   const center = currentPosition
@@ -78,8 +80,8 @@ export default function OfficeMap({
                 <p className="font-semibold mb-1">{o.name}</p>
                 {o.address && <p className="text-gray-600 mb-1">{o.address}</p>}
                 <p className="text-gray-500">
-                  Bán kính: <b>{o.radiusMeters}m</b>
-                  {' '}— Trạng thái: <b>{o.status}</b>
+                  {t('Bán kính')}: <b>{o.radiusMeters}m</b>
+                  {' '}— {t('Trạng thái')}: <b>{o.status}</b>
                 </p>
               </div>
             </Popup>
@@ -88,7 +90,7 @@ export default function OfficeMap({
 
         {currentPosition && (
           <Marker position={currentPosition} icon={meIcon}>
-            <Popup>Vị trí của bạn</Popup>
+            <Popup>{t('Vị trí của bạn')}</Popup>
           </Marker>
         )}
       </MapContainer>
