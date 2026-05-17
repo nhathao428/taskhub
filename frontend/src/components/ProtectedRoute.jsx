@@ -3,8 +3,9 @@ import Layout from './Layout'
 import { useAuth } from '../context/AuthContext'
 
 export default function ProtectedRoute({ children, allowedRoles }) {
-  const { isAuthenticated, user } = useAuth()
-  if (!isAuthenticated) {
+  const { isAuthenticated, isDemo, user } = useAuth()
+  // Chưa đăng nhập và cũng không ở chế độ dùng thử → về trang đăng nhập.
+  if (!isAuthenticated && !isDemo) {
     return <Navigate to="/login" replace />
   }
   if (allowedRoles && allowedRoles.length > 0) {

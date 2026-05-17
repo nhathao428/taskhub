@@ -50,7 +50,7 @@ function getInitials(username = '') {
 }
 
 export default function Sidebar() {
-  const { logout, user } = useAuth()
+  const { logout, user, isDemo } = useAuth()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const role = user?.role || 'EMPLOYEE'
@@ -63,7 +63,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
+    navigate(isDemo ? '/' : '/login')
   }
 
   return (
@@ -118,8 +118,8 @@ export default function Sidebar() {
               {getInitials(user.username)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user.username}</p>
-              <p className="text-[11px] text-slate-400 truncate">{roleLabel(role, t)}</p>
+              <p className="text-sm font-medium text-white truncate">{isDemo ? t('Khách dùng thử') : user.username}</p>
+              <p className="text-[11px] text-slate-400 truncate">{isDemo ? t('Chế độ dùng thử') : roleLabel(role, t)}</p>
             </div>
           </div>
         )}
@@ -128,7 +128,7 @@ export default function Sidebar() {
           className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-300 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-colors"
         >
           <MdLogout className="text-xl" />
-          <span>{t('Đăng xuất')}</span>
+          <span>{isDemo ? t('Thoát dùng thử') : t('Đăng xuất')}</span>
         </button>
       </div>
     </aside>

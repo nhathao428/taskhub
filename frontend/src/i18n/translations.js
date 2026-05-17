@@ -233,4 +233,41 @@ export const en = {
   'Ứng dụng gặp sự cố không mong muốn. Vui lòng tải lại trang.':
     'The application ran into an unexpected problem. Please reload the page.',
   'Tải lại trang': 'Reload page',
+
+  // --- Trang Landing & chế độ dùng thử ---
+  'Quản lý công việc thông minh cho doanh nghiệp nhỏ':
+    'Smart task management for small businesses',
+  'Giao việc, theo dõi tiến độ, chấm công GPS và để AI gợi ý nhân viên phù hợp — tất cả trong một hệ thống.':
+    'Assign work, track progress, GPS attendance, and let AI suggest the right people — all in one system.',
+  'Dùng thử ngay': 'Try it now',
+  'Chế độ dùng thử cho xem trước giao diện với dữ liệu mẫu — không cần tài khoản.':
+    'Demo mode previews the interface with sample data — no account needed.',
+  'Tính năng nổi bật': 'Key features',
+  'Sẵn sàng trải nghiệm hệ thống?': 'Ready to explore the system?',
+  'Đăng nhập để dùng đầy đủ, hoặc dùng thử ngay với dữ liệu mẫu.':
+    'Sign in for full access, or try it now with sample data.',
+  'Quản lý công việc & dự án': 'Task & project management',
+  'Giao việc, theo dõi tiến độ, hạn chót và trạng thái.':
+    'Assign work; track progress, deadlines and status.',
+  'AI gợi ý nhân viên': 'AI employee suggestions',
+  'Google Gemini phân tích và đề xuất người phù hợp nhất.':
+    'Google Gemini analyzes and recommends the best-fit people.',
+  'Chấm công GPS': 'GPS attendance',
+  'Xác thực vị trí bằng bản đồ, hạn chế chấm công gian lận.':
+    'Verify location on a map to reduce attendance fraud.',
+  'Phân quyền & bảo mật': 'Roles & security',
+  'Ba vai trò, xác thực JWT, dữ liệu được bảo vệ nhiều lớp.':
+    'Three roles, JWT authentication, multi-layer data protection.',
+  'Dashboard trực quan': 'Visual dashboard',
+  'Biểu đồ thống kê công việc và nhân sự theo thời gian thực.':
+    'Real-time charts of tasks and staff.',
+  'Song ngữ Việt / Anh': 'Vietnamese / English',
+  'Chuyển đổi ngôn ngữ giao diện tức thì, mọi lúc.':
+    'Switch the interface language instantly, anytime.',
+  'Chế độ dùng thử — bạn đang xem dữ liệu mẫu.':
+    'Demo mode — you are viewing sample data.',
+  'Đăng nhập để dùng đầy đủ': 'Sign in for full access',
+  'Khách dùng thử': 'Demo guest',
+  'Chế độ dùng thử': 'Demo mode',
+  'Thoát dùng thử': 'Exit demo',
 }

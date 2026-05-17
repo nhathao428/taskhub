@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { demoApiResponse } from '../demo/demoData'
 
 // Accept either a full URL ("https://api.example.com") or just a hostname
 // ("api.example.com" — useful for platforms like Render that expose
@@ -8,11 +9,33 @@ const baseURL = rawBase
   ? (/^https?:\/\//.test(rawBase) ? rawBase : `https://${rawBase}`)
   : 'http://localhost:5000'
 
+// Adapter mặc định của axios (xhr/http/fetch)
+const realAdapter = axios.getAdapter(axios.defaults.adapter)
+
+function isDemoMode() {
+  try {
+    return sessionStorage.getItem('demo') === '1'
+  } catch {
+    return false
+  }
+}
+
+// Ở chế độ dùng thử: trả dữ liệu mẫu thay vì gọi backend thật.
+// Riêng /api/auth/* vẫn gọi thật để khách có thể đăng nhập / đăng ký.
+function demoAwareAdapter(config) {
+  const url = config.url || ''
+  if (isDemoMode() && !url.includes('/api/auth/')) {
+    return demoApiResponse(config)
+  }
+  return realAdapter(config)
+}
+
 const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+  adapter: demoAwareAdapter,
 })
 
 api.interceptors.request.use(
