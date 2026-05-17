@@ -17,6 +17,7 @@ phù hợp cho từng task bằng AI**. Hệ thống có 3 vai trò: ADMIN, MANA
 - **CSDL:** PostgreSQL (H2 khi chạy thử local) · **Cache:** Redis
 - **AI:** Google Gemini (model `gemini-2.5-flash`)
 - Đóng gói bằng **Docker**.
+- Giao diện **song ngữ Việt/Anh** (i18n); đã **triển khai chạy thật trên AWS EC2**.
 
 Điểm nổi bật: thay vì dùng công thức tính điểm cố định, hệ thống để **LLM (Gemini)
 đánh giá định tính** và xếp hạng nhân viên, kèm lý do bằng tiếng Việt.
@@ -37,6 +38,7 @@ phù hợp cho từng task bằng AI**. Hệ thống có 3 vai trò: ADMIN, MANA
 | **Flutter** | Mobile | Một mã nguồn chạy cả Android lẫn iOS |
 | **Google Gemini** | AI gợi ý | Có gói miễn phí, hiểu tiếng Việt tốt, giải thích được quyết định |
 | **Docker** | Đóng gói | Chạy giống nhau ở mọi máy, không lo "máy tôi chạy được" |
+| **AWS EC2** | Máy chủ triển khai | Hạ tầng đám mây phổ biến, có gói dùng thử miễn phí; chạy ứng dụng công khai 24/7 |
 
 ---
 
@@ -84,6 +86,12 @@ khối văn bản khổng lồ, hiểu và sinh văn bản tự nhiên.
 **Rate limiting:** Giới hạn số request mỗi IP trong một khoảng thời gian, chống
 spam / dò mật khẩu (brute force). Ở đây: tối đa 20 lần/phút cho đăng nhập, 10 lần/phút
 cho gọi AI; vượt thì trả lỗi HTTP 429.
+
+**i18n (song ngữ):** Viết tắt của *internationalization* — cơ chế cho giao diện
+hiển thị được nhiều ngôn ngữ. Ở đây tự xây dựng: một từ điển dịch (chuỗi Việt → Anh)
+và một React Context cấp hàm `t()` để mọi component lấy chuỗi hiển thị. Đổi ngôn ngữ
+chỉ là đổi một biến trạng thái → React tự render lại, không tải lại trang, không gọi
+dịch vụ dịch bên ngoài (như Google Translate).
 
 ---
 
@@ -182,18 +190,65 @@ bằng công thức Haversine; nếu nằm trong bán kính cho phép mới hợ
 ứng viên trước (theo phòng ban/kỹ năng) rồi mới gửi nhóm nhỏ cho AI; hoặc dùng
 vector embedding để tìm kiếm ngữ nghĩa.
 
+**Q17. Tính năng song ngữ làm thế nào? Có dùng Google Translate không?**
+→ KHÔNG dùng Google Translate. Hệ thống tự xây dựng cơ chế i18n: một tệp từ điển
+ánh xạ chuỗi tiếng Việt → tiếng Anh, và một React Context (`LanguageContext`) cấp
+hàm `t()` cho mọi component lấy chuỗi hiển thị. Bấm nút cờ VI/EN → biến ngôn ngữ
+đổi → React tự render lại toàn bộ giao diện tức thì, không tải lại trang, chạy được
+cả khi offline. Lựa chọn ngôn ngữ lưu ở localStorage nên được nhớ ở lần sau.
+
+**Q18. Hệ thống được triển khai ở đâu, triển khai thế nào?**
+→ Đã triển khai thật trên **AWS EC2** (máy ảo Ubuntu 24.04). Toàn bộ stack
+(PostgreSQL, Redis, backend, frontend, Caddy) chạy bằng Docker Compose trên một máy
+chủ. Caddy làm reverse proxy: định tuyến `/api` về backend, các đường dẫn còn lại
+về frontend. Truy cập công khai qua một địa chỉ IP tĩnh (Elastic IP). Container đặt
+`restart: unless-stopped` nên server khởi động lại là ứng dụng tự bật lại.
+
+**Q19. Sao truy cập bằng HTTP mà chưa có HTTPS?**
+→ Vì hiện chưa đăng ký tên miền riêng — chứng chỉ HTTPS (Let's Encrypt) cấp theo
+tên miền, không cấp cho địa chỉ IP thuần. Hệ thống đã chuẩn bị sẵn cấu hình
+`docker-compose.prod.yml` + Caddy: chỉ cần trỏ một tên miền về server là Caddy tự
+xin và gia hạn HTTPS trong khoảng một phút. Đây là bước cấu hình, không phải hạn
+chế kỹ thuật.
+
+**Q20. Vì sao độ phủ kiểm thử (test coverage) còn thấp?**
+→ Thành thật: trong 12 tuần của Đồ án cơ sở, em ưu tiên hoàn thiện chức năng và
+kiểm thử hộp đen theo từng module (chạy thử thực tế mọi luồng). Unit test hiện tập
+trung ở tầng service và bảo mật — phần logic quan trọng nhất, hiện có 34 test đều
+đạt. Hướng tiếp theo là nâng độ phủ lên khoảng 70% bằng JUnit (backend), Vitest
+(frontend) và flutter_test (mobile).
+
+**Q21. Khi đăng xuất, token còn hiệu lực không?**
+→ Có — JWT là stateless nên token vẫn hợp lệ tới khi hết hạn (24h); đăng xuất chỉ
+xóa token ở phía client. Đây là đánh đổi của mô hình stateless. Hướng khắc phục:
+thêm refresh token và danh sách token bị thu hồi (blacklist) lưu trên Redis.
+
+**Q22. Chạy trên một server — lỡ server hỏng thì sao?**
+→ Đúng, hiện là một máy chủ duy nhất, phù hợp quy mô doanh nghiệp nhỏ và phạm vi
+đồ án. Dữ liệu nằm trên ổ đĩa bền (EBS) nên không mất khi container hay máy chủ
+khởi động lại. Khi cần độ sẵn sàng cao hơn: tách CSDL ra dịch vụ quản lý (AWS RDS),
+chạy nhiều bản backend sau bộ cân bằng tải, và sao lưu định kỳ.
+
+**Q23. Nhân viên dùng app giả GPS để gian lận chấm công thì sao?**
+→ App mobile đọc cờ `isMocked` của hệ điều hành; nếu phát hiện vị trí giả lập, hoặc
+vị trí nằm ngoài bán kính văn phòng, bản ghi không bị từ chối thẳng mà chuyển sang
+trạng thái **PENDING_REVIEW** để quản lý xem xét và duyệt thủ công. Cách này tránh
+chặn nhầm khi GPS sai số, đồng thời vẫn kiểm soát được gian lận.
+
 ---
 
 ## 6. Điểm mạnh — Điểm yếu — Hướng phát triển
 
 **Điểm mạnh:** kiến trúc 3 tầng rõ ràng; bảo mật nhiều lớp (JWT, BCrypt, phân quyền,
-rate limiting); tích hợp AI thực tế và giải thích được; chạy đa nền tảng (web + mobile).
+rate limiting); tích hợp AI thực tế và giải thích được; chạy đa nền tảng (web +
+mobile); giao diện song ngữ Việt/Anh; đã triển khai chạy thật trên đám mây AWS.
 
 **Điểm yếu (thẳng thắn nhận khi thầy hỏi):**
 - Phụ thuộc dịch vụ AI bên ngoài — mất mạng/hết hạn mức thì tính năng gợi ý ngừng.
 - Prompt dài thêm khi số nhân viên tăng → chậm, tốn token.
-- Cache để trong bộ nhớ/Redis một máy — chạy nhiều máy chủ cần cấu hình thêm.
 - Phân quyền mới ở mức vai trò, chưa chi tiết tới từng bản ghi.
+- Triển khai trên một máy chủ duy nhất; chưa bật HTTPS (do chưa có tên miền).
+- Độ phủ unit test còn thấp; chưa có refresh token / thu hồi token.
 
 **Hướng phát triển:** lọc ứng viên trước khi gửi AI; thêm mô hình AI dự phòng
 chạy nội bộ; thông báo realtime; báo cáo/thống kê nâng cao.
