@@ -1,0 +1,95 @@
+@startuml class-diagram-frontend
+!include _style.puml
+title Class Diagram — Kiến trúc Frontend (React + i18n song ngữ Việt/Anh)
+
+skinparam linetype ortho
+
+package "Khởi tạo ứng dụng" <<Frame>> {
+  class App {
+    Bọc các Provider + định tuyến
+  }
+}
+
+package "Context — Trạng thái toàn cục" <<Frame>> {
+  class AuthProvider <<context>> {
+    + user : User
+    + login() / logout()
+  }
+  class LanguageProvider <<context>> {
+    - lang : "vi" | "en"
+    + setLang(code)
+    + t(key, params) : string
+  }
+}
+
+package "i18n — Song ngữ Việt / Anh" <<Frame>> {
+  class translations <<data>> {
+    + en : Map<string, string>
+  }
+  class useTranslation <<hook>> {
+    + lang
+    + setLang(code)
+    + t(key, params)
+  }
+  class LanguageSwitcher <<component>> {
+    Nút cờ VI / EN
+  }
+}
+
+package "Bố cục & Điều hướng" <<Frame>> {
+  class ProtectedRoute <<component>>
+  class Layout <<component>>
+  class Sidebar <<component>>
+  class Modal <<component>>
+  class ErrorBoundary <<component>>
+}
+
+package "Trang (Pages)" <<Frame>> {
+  class "Login · Register" as AuthPages <<page>>
+  class "Dashboard" as Dashboard <<page>>
+  class "Employees · Projects · Tasks" as MgmtPages <<page>>
+  class "Attendance · OfficeLocations · Users" as AdminPages <<page>>
+  class "AiSuggestions" as AiPage <<page>>
+  class "MyTasks · MyAttendance" as EmpPages <<page>>
+}
+
+package "Hooks dữ liệu + API" <<Frame>> {
+  class "useEmployees · useProjects\nuseTasks · useAttendance · useUsers" as DataHooks <<hook>>
+  class "axios (JWT interceptor)" as Api <<infra>>
+}
+
+App --> AuthProvider
+App --> LanguageProvider
+App --> ProtectedRoute
+
+LanguageProvider --> translations : nạp từ điển EN
+useTranslation ..> LanguageProvider : useContext
+LanguageSwitcher --> useTranslation
+
+ProtectedRoute --> Layout
+Layout --> Sidebar
+Layout --> LanguageSwitcher
+Layout --> useTranslation
+
+AuthPages --> LanguageSwitcher
+AuthPages ..> useTranslation
+Dashboard ..> useTranslation
+MgmtPages ..> useTranslation
+AdminPages ..> useTranslation
+AiPage ..> useTranslation
+EmpPages ..> useTranslation
+Sidebar ..> useTranslation
+Modal ..> useTranslation
+
+MgmtPages --> DataHooks
+AdminPages --> DataHooks
+DataHooks --> Api
+AiPage --> Api
+
+note right of LanguageProvider
+  Đổi ngôn ngữ tức thì phía client,
+  lưu lựa chọn vào localStorage.
+  Mọi text gọi qua hàm t() — không
+  dùng dịch vụ dịch ngoài.
+end note
+@enduml

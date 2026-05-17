@@ -54,6 +54,12 @@ Sơ đồ phân tầng Spring Boot 3 lớp: Controller → Service → Repositor
 
 ![Class Diagram Kiến trúc](uml/png/class-diagram-kien-truc.png)
 
+### 2.3. Sơ đồ lớp Kiến trúc Frontend (React + i18n song ngữ)
+
+Sơ đồ cấu trúc giao diện React: `App` bọc các Provider (`AuthProvider`, `LanguageProvider`) rồi định tuyến tới các Page. Tầng **i18n** gồm từ điển `translations`, hook `useTranslation` và nút cờ `LanguageSwitcher` — cho phép chuyển ngôn ngữ Việt/Anh tức thì phía client (lưu lựa chọn ở `localStorage`, không dùng dịch vụ dịch ngoài). Mọi Page và component dùng chung đều lấy chuỗi hiển thị qua hàm `t()`.
+
+![Class Diagram Frontend](uml/png/class-diagram-frontend.png)
+
 ---
 
 ## 3. Sequence Diagram
@@ -132,6 +138,6 @@ Tạo, sửa, xóa (quyền MANAGER) và cập nhật trạng thái (mọi nhân
 
 ## 5. Kiến trúc tổng thể
 
-Sơ đồ component-style mô tả 3 tier (Client / Application / Data) và các kết nối: Web/Mobile/Tools → Spring Boot (JWT) → PostgreSQL + Redis + Gemini. Tất cả container chạy chung Docker network `taskmgmt_net`.
+Sơ đồ component-style mô tả 3 tier (Client / Application / Data) và các kết nối: Web/Mobile/Tools → Spring Boot (JWT) → PostgreSQL + Redis + Gemini. Web App hỗ trợ giao diện song ngữ Việt/Anh (i18n) ngay tại tầng Client. Tất cả container chạy chung Docker network `taskmgmt_net`.
 
 ![Architecture](uml/png/architecture.png)

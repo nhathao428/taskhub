@@ -10,7 +10,7 @@ skinparam ranksep 50
 actor "Người dùng" as User
 
 rectangle "TẦNG CLIENT" as ClientTier {
-  component "Web App\n(React 18 + Vite)" as Web
+  component "Web App\n(React 18 + Vite)\nGiao diện song ngữ Việt / Anh (i18n)" as Web
   component "Mobile App\n(Flutter 3.x)" as Mobile
 }
 
