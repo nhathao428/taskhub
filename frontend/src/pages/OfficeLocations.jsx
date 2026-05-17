@@ -4,6 +4,7 @@ import api from '../api/axios'
 import Modal from '../components/Modal'
 import OfficeMap from '../components/OfficeMap'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const emptyForm = {
   name: '',
@@ -140,7 +141,7 @@ export default function OfficeLocations() {
             </thead>
             <tbody>
               {items.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-8 text-gray-400">{t('Chưa có văn phòng nào.')}</td></tr>
+                <tr><td colSpan={6} className="py-4"><EmptyState text={t('Chưa có văn phòng nào.')} /></td></tr>
               ) : items.map((o, idx) => (
                 <tr key={o.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
                   <td className="px-6 py-4 font-medium text-gray-800">{o.name}</td>

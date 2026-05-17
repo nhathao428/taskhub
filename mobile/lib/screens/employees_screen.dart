@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/employee.dart';
 import '../widgets/loading_widget.dart';
@@ -122,7 +123,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                       context.read<DataProvider>().fetchEmployees(),
                 )
               : data.employees.isEmpty
-                  ? const Center(child: Text('Chưa có nhân viên nào'))
+                  ? const EmptyView('Chưa có nhân viên nào')
                   : RefreshIndicator(
                       onRefresh: () =>
                           context.read<DataProvider>().fetchEmployees(),

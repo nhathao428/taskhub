@@ -5,6 +5,7 @@ import api from '../api/axios'
 import { useAttendance } from '../hooks/useAttendance'
 import { useEmployees } from '../hooks/useEmployees'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 function reviewBadge(status, t) {
   if (status === 'APPROVED') {
@@ -123,7 +124,7 @@ export default function Attendance() {
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-gray-400">{t('Chưa có dữ liệu chấm công.')}</td>
+                  <td colSpan={8} className="py-4"><EmptyState text={t('Chưa có dữ liệu chấm công.')} /></td>
                 </tr>
               ) : (
                 records.map((rec, idx) => (

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/project.dart';
 import '../widgets/loading_widget.dart';
@@ -121,7 +122,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       context.read<DataProvider>().fetchProjects(),
                 )
               : data.projects.isEmpty
-                  ? const Center(child: Text('Chưa có dự án nào'))
+                  ? const EmptyView('Chưa có dự án nào')
                   : RefreshIndicator(
                       onRefresh: () =>
                           context.read<DataProvider>().fetchProjects(),

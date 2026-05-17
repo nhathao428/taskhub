@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MdManageAccounts } from 'react-icons/md'
 import { useUsers } from '../hooks/useUsers'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const roleLabel = { ADMIN: 'Quản trị viên', MANAGER: 'Quản lý', EMPLOYEE: 'Nhân viên' }
 const roleBadge = {
@@ -74,7 +75,7 @@ export default function Users() {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-400">{t('Chưa có người dùng nào.')}</td>
+                  <td colSpan={4} className="py-4"><EmptyState text={t('Chưa có người dùng nào.')} /></td>
                 </tr>
               ) : (
                 users.map((u, idx) => (

@@ -5,6 +5,7 @@ import { useTasks } from '../hooks/useTasks'
 import { useProjects } from '../hooks/useProjects'
 import { useEmployees } from '../hooks/useEmployees'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const emptyForm = {
   title: '',
@@ -164,7 +165,7 @@ export default function Tasks() {
               <tbody>
                 {tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-gray-400">{t('Chưa có công việc nào.')}</td>
+                    <td colSpan={7} className="py-4"><EmptyState text={t('Chưa có công việc nào.')} /></td>
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (

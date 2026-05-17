@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/task.dart';
 import '../widgets/loading_widget.dart';
@@ -193,7 +194,7 @@ class _TasksScreenState extends State<TasksScreen> {
                   onRetry: () => context.read<DataProvider>().fetchTasks(),
                 )
               : tasks.isEmpty
-                  ? const Center(child: Text('Không có công việc nào'))
+                  ? const EmptyView('Không có công việc nào')
                   : RefreshIndicator(
                       onRefresh: () =>
                           context.read<DataProvider>().fetchTasks(),

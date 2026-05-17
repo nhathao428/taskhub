@@ -4,6 +4,7 @@ import Modal from '../components/Modal'
 import { useProjects } from '../hooks/useProjects'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const emptyForm = { name: '', description: '', startDate: '', endDate: '', status: 'ACTIVE' }
 
@@ -131,7 +132,7 @@ export default function Projects() {
             <tbody>
               {projects.length === 0 ? (
                 <tr>
-                  <td colSpan={isManager ? 6 : 5} className="text-center py-8 text-gray-400">{t('Chưa có dự án nào.')}</td>
+                  <td colSpan={isManager ? 6 : 5} className="py-4"><EmptyState text={t('Chưa có dự án nào.')} /></td>
                 </tr>
               ) : (
                 projects.map((proj, idx) => (

@@ -270,4 +270,6 @@ export const en = {
   'Khách dùng thử': 'Demo guest',
   'Chế độ dùng thử': 'Demo mode',
   'Thoát dùng thử': 'Exit demo',
+  'Quản lý công việc, dự án và nhân sự — tích hợp AI.':
+    'Manage tasks, projects and staff — with AI built in.',
 }

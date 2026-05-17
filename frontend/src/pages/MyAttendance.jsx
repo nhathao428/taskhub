@@ -3,6 +3,7 @@ import api from '../api/axios'
 import { MdLogin, MdLogout, MdMyLocation, MdWarning, MdCheckCircle } from 'react-icons/md'
 import OfficeMap from '../components/OfficeMap'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 function formatDateTime(value, lang) {
   if (!value) return '-'
@@ -233,7 +234,7 @@ export default function MyAttendance() {
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-gray-400">{t('Chưa có bản ghi chấm công nào.')}</td>
+                  <td colSpan={6} className="py-4"><EmptyState text={t('Chưa có bản ghi chấm công nào.')} /></td>
                 </tr>
               ) : (
                 records.map((r, idx) => (

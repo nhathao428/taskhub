@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import { MdAssignmentTurnedIn, MdHourglassEmpty, MdPlayArrow } from 'react-icons/md'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const statusConfig = {
   pending: { label: 'Chờ xử lý', cls: 'bg-yellow-100 text-yellow-700' },
@@ -112,7 +113,7 @@ export default function MyTasks() {
               <tbody>
                 {tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-8 text-gray-400">{t('Bạn chưa được giao công việc nào.')}</td>
+                    <td colSpan={6} className="py-4"><EmptyState text={t('Bạn chưa được giao công việc nào.')} /></td>
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (

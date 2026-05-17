@@ -54,26 +54,12 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.brandGradient,
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppTheme.primary.withValues(alpha: 0.35),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.task_alt,
-                          color: Colors.white, size: 40),
-                    ),
+                  Image.asset(
+                    'assets/illustrations/workspace.png',
+                    height: 188,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 8),
                   const Text(
                     'Hệ thống Quản lý Công việc',
                     textAlign: TextAlign.center,

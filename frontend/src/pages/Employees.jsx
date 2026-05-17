@@ -3,6 +3,7 @@ import { MdAdd, MdEdit, MdDelete, MdSearch } from 'react-icons/md'
 import Modal from '../components/Modal'
 import { useEmployees } from '../hooks/useEmployees'
 import { useTranslation } from '../context/LanguageContext'
+import { EmptyState } from '../components/Illustrations'
 
 const emptyForm = { firstName: '', lastName: '', position: '', department: '', skills: '' }
 
@@ -121,8 +122,8 @@ export default function Employees() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-gray-400">
-                    {t('Không có nhân viên nào.')}
+                  <td colSpan={5} className="py-4">
+                    <EmptyState text={t('Không có nhân viên nào.')} />
                   </td>
                 </tr>
               ) : (
