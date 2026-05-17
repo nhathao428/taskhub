@@ -883,7 +883,6 @@ for s in [
     "Không bao gồm module kế toán, lương thưởng, hóa đơn, thuế.",
     "Không tích hợp với các phần mềm ERP / CRM bên ngoài.",
     "Không có tính năng video call hay chat nội bộ thời gian thực.",
-    "Không hỗ trợ đa ngôn ngữ ở giai đoạn này (chỉ tiếng Việt).",
     "Không có module hỗ trợ thiết bị chấm công vân tay/QR (chỉ chấm công thủ công).",
 ]:
     add_bullet(doc, s)
@@ -2924,6 +2923,54 @@ export default function AiSuggestions() {
 }
 """)
 
+add_h3(doc, "4.4.6. Hỗ trợ giao diện song ngữ Việt/Anh (i18n)")
+add_para(doc,
+    "Nhằm mở rộng khả năng sử dụng, frontend được bổ sung cơ chế đa ngôn "
+    "ngữ (internationalization – i18n) hỗ trợ song song tiếng Việt và tiếng "
+    "Anh. Cơ chế này được tự xây dựng hoàn toàn trong ứng dụng, không phụ "
+    "thuộc dịch vụ dịch bên ngoài (như Google Translate); toàn bộ chuỗi "
+    "hiển thị được dịch tức thì phía client.")
+add_para(doc,
+    "Giải pháp gồm ba thành phần chính: (1) tệp từ điển translations.js ánh "
+    "xạ mỗi chuỗi tiếng Việt gốc sang bản dịch tiếng Anh; (2) LanguageContext "
+    "– một React Context cung cấp ngôn ngữ hiện tại, hàm đổi ngôn ngữ "
+    "setLang() và hàm dịch t(); (3) component LanguageSwitcher hiển thị nút "
+    "cờ Việt Nam / Anh để người dùng chuyển đổi. Lựa chọn ngôn ngữ được lưu "
+    "vào localStorage nên được ghi nhớ ở những lần truy cập sau. Mọi trang "
+    "và component dùng chung đều lấy chuỗi hiển thị thông qua hàm t().")
+add_code(doc, """
+// LanguageContext.jsx - rut gon
+const LanguageContext = createContext(null);
+
+export function LanguageProvider({ children }) {
+  const [lang, setLang] = useState(
+    () => localStorage.getItem('app_lang') || 'vi');
+
+  // t(key): key chinh la chuoi tieng Viet goc
+  const t = useCallback((key, params) => {
+    let str = lang === 'en' ? (en[key] ?? key) : key;
+    if (params)
+      for (const [k, v] of Object.entries(params))
+        str = str.split('{' + k + '}').join(String(v));
+    return str;
+  }, [lang]);
+
+  return (
+    <LanguageContext.Provider value={{ lang, setLang, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export const useTranslation = () => useContext(LanguageContext);
+""")
+add_para(doc,
+    "Khi người dùng nhấn nút cờ, giá trị lang trong Context thay đổi, React "
+    "tự render lại toàn bộ giao diện với bản dịch tương ứng mà không cần "
+    "tải lại trang. Việc dùng chính chuỗi tiếng Việt làm khóa giúp giảm "
+    "công sức bảo trì: chế độ tiếng Việt luôn hiển thị đúng kể cả khi từ "
+    "điển tiếng Anh chưa bổ sung mục tương ứng.")
+
 
 add_h2(doc, "4.5. Triển khai ứng dụng Mobile Flutter")
 add_h3(doc, "4.5.1. pubspec.yaml")
@@ -3224,7 +3271,7 @@ add_h2(doc, "4.8. Triển khai và vận hành")
 add_h3(doc, "4.8.1. Triển khai môi trường phát triển")
 add_code(doc, """
 # Bước 1: Clone repository
-git clone https://github.com/nhathao152k5/task-management-system.git
+git clone https://github.com/nhathao428/task-management-system.git
 cd task-management-system
 
 # Bước 2: Tạo file .env từ mẫu
@@ -3263,6 +3310,40 @@ add_para(doc,
     "docker-compose -f docker-compose.prod.yml up -d. Caddy tự cấp "
     "chứng chỉ SSL trong khoảng 60 giây. Toàn bộ traffic sẽ qua "
     "HTTPS với HTTP/2 mặc định.")
+
+add_h3(doc, "4.8.3. Triển khai thực tế trên AWS EC2")
+add_para(doc,
+    "Để sản phẩm vận hành ổn định lâu dài và truy cập công khai qua "
+    "Internet, hệ thống được triển khai thực tế trên hạ tầng đám mây Amazon "
+    "Web Services (AWS) theo mô hình all-in-one: một máy chủ ảo EC2 chạy "
+    "toàn bộ stack thông qua Docker Compose.")
+add_para(doc, "Cấu hình triển khai cụ thể:")
+add_table(
+    doc,
+    headers=["Thành phần", "Cấu hình"],
+    rows=[
+        ("Máy chủ", "AWS EC2 t3.small (2 vCPU, 2 GB RAM), Ubuntu Server 24.04 LTS"),
+        ("Ổ lưu trữ", "20 GB EBS gp3"),
+        ("Địa chỉ truy cập", "Elastic IP tĩnh, gắn cố định với instance"),
+        ("Bảo mật mạng", "Security Group chỉ mở cổng 22 (SSH) và 80 (HTTP)"),
+        ("Thành phần chạy",
+         "docker-compose.aws.yml: PostgreSQL + Redis + backend + frontend + Caddy"),
+    ],
+    col_widths=[4.5, 11.0],
+)
+add_para(doc,
+    "Quy trình triển khai gồm các bước: tạo EC2 instance và Elastic IP, "
+    "cài Docker, tạo vùng nhớ swap 2 GB hỗ trợ quá trình build trên máy "
+    "RAM thấp, nạp mã nguồn, sinh các khóa bí mật (DB_PASSWORD, JWT_SECRET) "
+    "rồi khởi chạy bằng lệnh docker compose. Caddy đóng vai trò reverse "
+    "proxy: định tuyến các đường dẫn /api/* tới backend và các đường dẫn "
+    "còn lại tới frontend trên cùng một origin. Toàn bộ quy trình được tài "
+    "liệu hóa chi tiết trong tệp DEPLOY-AWS.md kèm theo mã nguồn.")
+add_para(doc,
+    "Ở giai đoạn này, hệ thống chạy qua giao thức HTTP với địa chỉ IP công "
+    "khai. Khi đăng ký được tên miền riêng, chỉ cần chuyển sang cấu hình "
+    "docker-compose.prod.yml để Caddy tự động cấp chứng chỉ HTTPS qua "
+    "Let's Encrypt.")
 
 
 # ==================================================================
@@ -4150,9 +4231,9 @@ cd task-management-system
 ./start.sh
 """)
 
-add_h3(doc, "5.7.3. Triển khai đóng gói cho production – Docker và Render")
+add_h3(doc, "5.7.3. Triển khai đóng gói cho production – Docker, AWS và Render")
 add_para(doc,
-    "Bên cạnh hai script dành cho dev, hệ thống còn có hai cách triển "
+    "Bên cạnh hai script dành cho dev, hệ thống còn có các cách triển "
     "khai sẵn sàng production để giảng viên hoặc người dùng cuối có "
     "thể chạy demo dài hạn mà không cần cài đặt tooling:")
 add_table(
@@ -4173,6 +4254,11 @@ add_table(
          "Override cấu hình prod, gắn HTTPS tự động qua Caddy + "
          "Let's Encrypt, reverse-proxy về backend và frontend.",
          "Tự host trên VPS có tên miền riêng."),
+        ("AWS EC2 + docker-compose.aws.yml",
+         "Triển khai thực tế trên máy chủ ảo AWS EC2 t3.small: chạy "
+         "toàn bộ stack qua Docker Compose, Caddy reverse-proxy, truy "
+         "cập công khai qua Elastic IP.",
+         "Chạy thật, lâu dài trên hạ tầng đám mây."),
     ],
     col_widths=[4.5, 8.0, 3.0],
 )
@@ -4240,6 +4326,7 @@ for s in [
     "Bổ sung tính năng xác thực chấm công bằng GPS + bản đồ Leaflet/OpenStreetMap: cấu hình đa văn phòng (office_locations), tính khoảng cách Haversine, đẩy bản ghi ngoài vùng / GPS mock sang PENDING_REVIEW cho quản lý duyệt. Mobile dùng `geolocator` + cờ `isMocked` để chống fake GPS.",
     "Redis cache trên Spring Cache giúp giảm thời gian phản hồi của module AI từ ~1450 ms xuống dưới 10 ms cho các request lặp lại trên cùng task, đồng thời tiết kiệm chi phí API.",
     "Đóng gói toàn bộ hệ thống bằng Docker Compose – cài đặt được trên bất kỳ máy có Docker chỉ với 1 câu lệnh.",
+    "Bổ sung giao diện song ngữ Việt/Anh (i18n) tự xây dựng: chuyển đổi ngôn ngữ tức thì phía client, ghi nhớ lựa chọn, không phụ thuộc dịch vụ dịch bên ngoài.",
 ]:
     add_bullet(doc, s)
 add_h3(doc, "6.1.2. Về mặt kỹ thuật")
@@ -4249,6 +4336,7 @@ for s in [
     "Hiệu năng: HikariCP connection pool, Redis cache, JPA JOIN FETCH chống N+1, indexing trên các cột truy vấn nhiều.",
     "Mã nguồn được tổ chức rõ ràng, đặt tên theo Java Code Conventions và Airbnb React Style Guide.",
     "Toàn bộ secret được đọc từ biến môi trường (.env), không hardcode trong code.",
+    "Triển khai hệ thống lên hạ tầng đám mây AWS EC2 (Ubuntu 24.04 + Docker Compose), chạy công khai qua Elastic IP – sản phẩm vận hành thực tế, không chỉ chạy cục bộ.",
 ]:
     add_bullet(doc, s)
 add_h3(doc, "6.1.3. Về mặt học thuật và quy trình")
@@ -4291,7 +4379,7 @@ for s in [
     "Unit test backend còn ít: mới có 5 unit test cho AiSuggestionService và AuthController. Tỷ lệ phủ code (test coverage) ước tính ~15%, chưa đạt mức 70% mong muốn.",
     "Tích hợp LLM còn đơn giản: mới gọi `chat/completions` với prompt tiếng Việt, chưa khai thác function calling, embeddings cho semantic search hay fine-tuning trên dữ liệu nội bộ.",
     "Chưa có cơ chế revoke token: khi user logout, JWT vẫn còn hợp lệ đến khi hết hạn. Cần triển khai blacklist hoặc dùng refresh token.",
-    "Giao diện chưa có dark mode, chưa hỗ trợ đa ngôn ngữ (chỉ tiếng Việt).",
+    "Giao diện chưa có chế độ tối (dark mode).",
     "Chưa có monitoring và logging tập trung (chưa tích hợp Prometheus, Grafana, ELK stack).",
 ]:
     add_bullet(doc, s)
