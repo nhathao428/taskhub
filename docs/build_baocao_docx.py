@@ -786,7 +786,7 @@ add_h3(doc, "1.4.2. Phân tích – thiết kế hệ thống")
 for s in [
     "Khảo sát hiện trạng tại 3 doanh nghiệp nhỏ ở TP.HCM (qua phỏng vấn online).",
     "Tổng hợp 14 yêu cầu chức năng và 8 yêu cầu phi chức năng.",
-    "Vẽ Use Case Diagram và đặc tả 14 use case theo mẫu Cockburn.",
+    "Vẽ Use Case Diagram (14 use case) và đặc tả chi tiết 3 use case tiêu biểu theo mẫu Cockburn.",
     "Thiết kế ERD với 6 bảng, mô tả chi tiết các trường và ràng buộc.",
     "Vẽ Class Diagram thể hiện mối quan hệ giữa các Entity và Service.",
     "Vẽ Sequence Diagram cho 5 luồng nghiệp vụ chính.",
@@ -1694,6 +1694,12 @@ add_para(doc,
     "các use case với nhau (include, extend).")
 add_uml_image(doc, "use-case-tong-the.png", width_cm=12.0)
 add_caption(doc, "Hình 3.1: Sơ đồ Use Case tổng thể của hệ thống", kind="figure")
+add_para(doc,
+    "Sơ đồ gồm 14 use case. Do nhiều use case thuộc nhóm CRUD (xem, thêm, "
+    "sửa, xóa) có cấu trúc tương tự nhau, phần dưới đặc tả chi tiết theo "
+    "mẫu Cockburn cho 3 use case tiêu biểu nhất — đại diện cho ba nhóm "
+    "chức năng quan trọng: đăng nhập (UC-01), tạo công việc và gán nhân "
+    "viên (UC-08), và AI gợi ý nhân viên (UC-11).")
 add_h3(doc, "3.4.2. Đặc tả use case UC-01: Đăng nhập")
 add_table(
     doc,
