@@ -1,0 +1,34 @@
+# Caddyfile cho chế độ AWS EC2 all-in-one, truy cập bằng IP công khai (HTTP).
+# Khi đã có domain: chuyển sang Caddyfile + docker-compose.prod.yml để bật HTTPS tự động.
+:80 {
+    encode gzip
+
+    # API → Spring Boot backend
+    handle /api/* {
+        reverse_proxy backend:5000
+    }
+
+    # Swagger / OpenAPI docs
+    handle /swagger-ui* {
+        reverse_proxy backend:5000
+    }
+    handle /api-docs* {
+        reverse_proxy backend:5000
+    }
+    handle /v3/api-docs* {
+        reverse_proxy backend:5000
+    }
+
+    # Mọi đường dẫn còn lại → React SPA (nginx)
+    handle {
+        reverse_proxy frontend:80
+    }
+
+    # Security headers (không gửi HSTS vì đang chạy HTTP)
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+}
