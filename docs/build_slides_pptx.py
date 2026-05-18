@@ -82,16 +82,20 @@ def text(s, x, y, w, h, content, size=18, color=INK, bold=False,
 
 def bullets(s, x, y, w, h, items, size=18, color=INK, gap=10,
             glyph_color=INDIGO):
-    tb = s.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-    tf = tb.text_frame
-    tf.word_wrap = True
+    # Mỗi gạch đầu dòng là một textbox riêng -> chạy hiệu ứng lần lượt được.
+    n = max(1, len(items))
+    ih = h / n
     for i, it in enumerate(items):
         if isinstance(it, tuple):
             txt, lvl = it
         else:
             txt, lvl = it, 0
-        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-        p.space_after = Pt(gap)
+        tb = s.shapes.add_textbox(Inches(x), Inches(y + i * ih),
+                                  Inches(w), Inches(ih))
+        tf = tb.text_frame
+        tf.word_wrap = True
+        tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+        p = tf.paragraphs[0]
         p.line_spacing = 1.12
         g = p.add_run()
         g.text = ("▸  " if lvl == 0 else "–  ")
@@ -104,9 +108,6 @@ def bullets(s, x, y, w, h, items, size=18, color=INK, gap=10,
         r.font.name = FONT
         r.font.size = Pt(size if lvl == 0 else size - 2)
         r.font.color.rgb = color
-        if lvl == 1:
-            p.level = 1
-    return tb
 
 
 def pic_fit(s, path, cx, cy, max_w, max_h):
@@ -122,7 +123,7 @@ def pic_fit(s, path, cx, cy, max_w, max_h):
 
 
 def transition(s):
-    """Thêm hiệu ứng chuyển slide (fade)."""
+    """Hiệu ứng chuyển slide — push (slide mới đẩy slide cũ sang trái)."""
     el = s._element
     tr = el.find(qn('p:transition'))
     if tr is None:
@@ -130,7 +131,8 @@ def transition(s):
     tr.set('spd', 'med')
     for c in list(tr):
         tr.remove(c)
-    etree.SubElement(tr, qn('p:fade'))
+    push = etree.SubElement(tr, qn('p:push'))
+    push.set('dir', 'l')
 
 
 def header(s, kicker, title, idx):
