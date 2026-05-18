@@ -294,7 +294,38 @@ transition(s)
 # ============================================================
 s = slide()
 header(s, "Phần 2 · Phân tích thiết kế", "Sơ đồ Use Case tổng thể", 7)
-pic_fit(s, "uml/png/use-case-tong-the.png", 6.66, 4.4, 12.2, 5.1)
+rect(s, 0.56, 1.6, 12.22, 0.58, LIGHT, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+text(s, 0.56, 1.7, 12.22, 0.4,
+     "3 vai trò:  Nhân viên (EMPLOYEE)  →  Quản lý (MANAGER)  →  Quản trị (ADMIN)"
+     "   —   vai trò cấp trên kế thừa toàn bộ quyền của cấp dưới",
+     size=12, color=INK, bold=True, align=PP_ALIGN.CENTER)
+uc_groups = [
+    ("Xác thực", INDIGO, [("UC-01", "Đăng nhập"), ("UC-02", "Đăng ký"),
+                          ("UC-03", "Đăng xuất")]),
+    ("Nhân viên & Dự án", PURPLE, [("UC-04", "Quản lý nhân viên"),
+                                   ("UC-05", "Quản lý dự án")]),
+    ("Công việc & Chấm công", CYAN, [("UC-06", "Xem công việc của tôi"),
+                                     ("UC-07", "Cập nhật trạng thái"),
+                                     ("UC-08", "Tạo & gán công việc"),
+                                     ("UC-09", "Chấm công vào / ra"),
+                                     ("UC-10", "Xem báo cáo chấm công")]),
+    ("AI Gợi ý", PINK, [("UC-11", "Gợi ý nhân viên bằng AI")]),
+    ("Quản trị", AMBER, [("UC-12", "Phân quyền tài khoản"),
+                         ("UC-13", "Xem logs hệ thống"),
+                         ("UC-14", "Quản lý cấu hình")]),
+]
+ux, ucw, ugap, uy, uch = 0.56, 2.32, 0.18, 2.42, 4.4
+for i, (gname, gc, ucs) in enumerate(uc_groups):
+    cx = ux + i * (ucw + ugap)
+    rect(s, cx, uy, ucw, uch, LIGHT, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+    rect(s, cx, uy, ucw, 0.12, gc)
+    text(s, cx + 0.16, uy + 0.26, ucw - 0.32, 0.72, gname, size=12.5,
+         color=gc, bold=True)
+    yy = uy + 0.96
+    for code, label in ucs:
+        text(s, cx + 0.16, yy, ucw - 0.32, 0.3, code, size=10, color=gc, bold=True)
+        text(s, cx + 0.16, yy + 0.2, ucw - 0.32, 0.55, label, size=11, color=INK)
+        yy += 0.66
 transition(s)
 
 # ============================================================
