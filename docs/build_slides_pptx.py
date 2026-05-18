@@ -381,13 +381,16 @@ transition(s)
 # SLIDE 12 — Demo giao diện
 # ============================================================
 s = slide()
-header(s, "Phần 3 · Sản phẩm", "Demo giao diện hệ thống", 12)
-pic_fit(s, "screenshots/03_dashboard.png", 3.6, 4.3, 6.0, 4.6)
-pic_fit(s, "screenshots/09_ai_result.png", 9.9, 4.3, 6.0, 4.6)
-text(s, 0.95, 6.75, 5.5, 0.4, "Dashboard quản lý", size=12, color=MUTED,
-     align=PP_ALIGN.CENTER, italic=True)
-text(s, 7.0, 6.75, 5.5, 0.4, "Kết quả AI gợi ý nhân viên", size=12, color=MUTED,
-     align=PP_ALIGN.CENTER, italic=True)
+header(s, "Phần 3 · Sản phẩm", "Video demo hệ thống", 12)
+s.shapes.add_movie(
+    os.path.join(HERE, "demo_video.mp4"),
+    Inches(2.07), Inches(1.66), Inches(9.2), Inches(5.18),
+    poster_frame_image=os.path.join(HERE, "demo_poster.png"),
+    mime_type="video/mp4",
+)
+text(s, 0.95, 6.95, 11.4, 0.4,
+     "Video tham quan các màn hình chính — bấm để phát khi thuyết trình",
+     size=11, color=MUTED, align=PP_ALIGN.CENTER, italic=True)
 transition(s)
 
 # ============================================================
