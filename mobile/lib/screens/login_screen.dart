@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/aurora_background.dart';
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(auth.error ?? 'Đăng nhập thất bại'),
+          content: Text(auth.error ?? context.trOnce('Đăng nhập thất bại')),
           backgroundColor: AppTheme.rose500,
         ),
       );
@@ -76,10 +77,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 18),
-                    const Text(
-                      'Chào mừng trở lại',
+                    Text(
+                      context.tr('Chào mừng trở lại'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -87,10 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Đăng nhập vào Task Manager',
+                    Text(
+                      context.tr('Đăng nhập vào Task Manager'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFFCBD5E1),
                         fontSize: 13.5,
                       ),
@@ -121,15 +122,17 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _emailCtrl,
                               keyboardType: TextInputType.emailAddress,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                prefixIcon: Icon(Icons.email_outlined),
+                              decoration: InputDecoration(
+                                labelText: context.tr('Email'),
+                                prefixIcon: const Icon(Icons.email_outlined),
                               ),
                               validator: (v) {
                                 if (v == null || v.trim().isEmpty) {
-                                  return 'Vui lòng nhập email';
+                                  return context.trOnce('Vui lòng nhập email');
                                 }
-                                if (!v.contains('@')) return 'Email không hợp lệ';
+                                if (!v.contains('@')) {
+                                  return context.trOnce('Email không hợp lệ');
+                                }
                                 return null;
                               },
                             ),
@@ -138,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _passwordCtrl,
                               obscureText: _obscurePassword,
                               decoration: InputDecoration(
-                                labelText: 'Mật khẩu',
+                                labelText: context.tr('Mật khẩu'),
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -153,14 +156,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               validator: (v) {
                                 if (v == null || v.isEmpty) {
-                                  return 'Vui lòng nhập mật khẩu';
+                                  return context.trOnce('Vui lòng nhập mật khẩu');
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 22),
                             GradientButton(
-                              label: 'Đăng nhập',
+                              label: context.tr('Đăng nhập'),
                               icon: Icons.login_rounded,
                               loading: loading,
                               onPressed: _submit,
@@ -173,9 +176,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Chưa có tài khoản?',
-                          style: TextStyle(
+                        Text(
+                          context.tr('Chưa có tài khoản?'),
+                          style: const TextStyle(
                             color: Color(0xFFCBD5E1),
                             fontSize: 13.5,
                           ),
@@ -190,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontSize: 13.5,
                             ),
                           ),
-                          child: const Text('Đăng ký ngay'),
+                          child: Text(context.tr('Đăng ký ngay')),
                         ),
                       ],
                     ),

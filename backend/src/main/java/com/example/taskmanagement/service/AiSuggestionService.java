@@ -65,12 +65,20 @@ public class AiSuggestionService {
         this.objectMapper = objectMapper;
     }
 
+    private static final int MAX_FIELD_LENGTH = 500;
+
     @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
     public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
         if (request == null || request.getTaskTitle() == null || request.getTaskTitle().isBlank()) {
             throw new IllegalArgumentException("Task title is required");
         }
         requireApiKey();
+
+        // Security H3: Sanitize user-controlled fields trước khi nhồi vào Gemini prompt.
+        // Strip control chars + markdown ngắt section + length cap → giảm prompt injection.
+        request.setTaskTitle(sanitizePromptInput(request.getTaskTitle()));
+        request.setTaskDescription(sanitizePromptInput(request.getTaskDescription()));
+        request.setRequiredSkills(sanitizePromptInput(request.getRequiredSkills()));
 
         List<Employee> employees = employeeRepository.findAll();
         if (employees.isEmpty()) {
@@ -100,6 +108,27 @@ public class AiSuggestionService {
         if (geminiApiKey == null || geminiApiKey.isBlank()) {
             throw new BusinessException("AI suggestion is unavailable: GEMINI_API_KEY is not configured");
         }
+    }
+
+    /**
+     * Loại bỏ control chars (newline/tab → space), section markers (===), backticks và
+     * trim độ dài. Giảm bề mặt prompt injection cho user-controlled fields trước khi
+     * concat vào prompt Gemini.
+     */
+    static String sanitizePromptInput(String raw) {
+        if (raw == null) return null;
+        // Newline/tab/CR → space; xoá control chars khác
+        String stripped = raw.replaceAll("[\\r\\n\\t]+", " ")
+                             .replaceAll("\\p{Cntrl}", "");
+        // Block các marker dễ bị abuse để giả lập section của prompt
+        stripped = stripped.replace("===", "≡≡≡")
+                           .replace("```", "ʼʼʼ");
+        // Trim trắng + giới hạn độ dài để cap input
+        stripped = stripped.trim();
+        if (stripped.length() > MAX_FIELD_LENGTH) {
+            stripped = stripped.substring(0, MAX_FIELD_LENGTH) + "…";
+        }
+        return stripped;
     }
 
     /** Aggregates per-employee historical stats: task progress, completion timing, attendance. */

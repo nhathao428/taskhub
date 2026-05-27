@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../providers/data_provider.dart';
 import '../models/employee_suggestion.dart';
 import '../theme/app_theme.dart';
@@ -39,7 +40,7 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
     final data = context.watch<DataProvider>();
     return Scaffold(
       backgroundColor: AppTheme.slate50,
-      appBar: AppBar(title: const Text('AI Gợi ý nhân viên')),
+      appBar: AppBar(title: Text(context.tr('AI Gợi ý nhân viên'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
         child: Column(
@@ -79,24 +80,24 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
                               color: Colors.white, size: 26),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'AI gợi ý nhân viên phù hợp',
-                                style: TextStyle(
+                                context.tr('AI gợi ý nhân viên phù hợp'),
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   letterSpacing: -0.2,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
-                                'Phân tích kỹ năng, hiệu suất và workload',
-                                style: TextStyle(
+                                context.tr('Phân tích kỹ năng, hiệu suất và workload'),
+                                style: const TextStyle(
                                     color: Color(0xFFCBD5E1), fontSize: 12),
                               ),
                             ],
@@ -126,20 +127,20 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
                   children: [
                     TextFormField(
                       controller: _titleCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Tiêu đề công việc',
-                        prefixIcon: Icon(Icons.assignment_outlined),
+                      decoration: InputDecoration(
+                        labelText: context.tr('Tiêu đề công việc'),
+                        prefixIcon: const Icon(Icons.assignment_outlined),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Vui lòng nhập tiêu đề'
+                          ? context.trOnce('Vui lòng nhập tiêu đề')
                           : null,
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
                       controller: _descCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Mô tả (tùy chọn)',
-                        prefixIcon: Icon(Icons.description_outlined),
+                      decoration: InputDecoration(
+                        labelText: context.tr('Mô tả (tùy chọn)'),
+                        prefixIcon: const Icon(Icons.description_outlined),
                         alignLabelWithHint: true,
                       ),
                       maxLines: 3,
@@ -158,8 +159,8 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
                           : const Icon(Icons.auto_awesome_rounded),
                       label: Text(
                         data.loadingSuggestions
-                            ? 'Đang phân tích...'
-                            : 'Phân tích bằng AI',
+                            ? context.tr('Đang phân tích...')
+                            : context.tr('Phân tích bằng AI'),
                       ),
                       onPressed: data.loadingSuggestions ? null : _search,
                       style: ElevatedButton.styleFrom(
@@ -180,7 +181,7 @@ class _AiSuggestionsScreenState extends State<AiSuggestionsScreen> {
 
             // Results
             if (data.loadingSuggestions)
-              const LoadingWidget(message: 'AI đang phân tích...')
+              LoadingWidget(message: context.tr('AI đang phân tích...'))
             else if (data.suggestionsError != null)
               Container(
                 padding: const EdgeInsets.all(14),

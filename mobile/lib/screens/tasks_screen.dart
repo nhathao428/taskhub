@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/task.dart';
@@ -41,7 +42,7 @@ class _TasksScreenState extends State<TasksScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Tạo công việc mới'),
+        title: Text(ctx.tr('Tạo công việc mới')),
         content: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -50,21 +51,21 @@ class _TasksScreenState extends State<TasksScreen> {
               children: [
                 TextFormField(
                   controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Tiêu đề *'),
+                  decoration: InputDecoration(labelText: ctx.tr('Tiêu đề *')),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Bắt buộc' : null,
+                      (v == null || v.trim().isEmpty) ? ctx.trOnce('Bắt buộc') : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: descCtrl,
-                  decoration: const InputDecoration(labelText: 'Mô tả'),
+                  decoration: InputDecoration(labelText: ctx.tr('Mô tả')),
                   maxLines: 3,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: dueDateCtrl,
-                  decoration: const InputDecoration(
-                      labelText: 'Hạn hoàn thành (YYYY-MM-DD)'),
+                  decoration: InputDecoration(
+                      labelText: ctx.tr('Hạn hoàn thành (YYYY-MM-DD)')),
                 ),
               ],
             ),
@@ -72,7 +73,7 @@ class _TasksScreenState extends State<TasksScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx), child: const Text('Huỷ')),
+              onPressed: () => Navigator.pop(ctx), child: Text(ctx.tr('Huỷ'))),
           ElevatedButton(
             onPressed: () async {
               if (!formKey.currentState!.validate()) return;
@@ -88,13 +89,13 @@ class _TasksScreenState extends State<TasksScreen> {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(result != null
-                    ? 'Đã tạo công việc "${result.title}"'
-                    : 'Tạo công việc thất bại'),
+                    ? context.trOnce('Đã tạo công việc "{title}"', {'title': result.title})
+                    : context.trOnce('Tạo công việc thất bại')),
                 backgroundColor:
                     result != null ? AppTheme.emerald500 : AppTheme.rose500,
               ));
             },
-            child: const Text('Tạo'),
+            child: Text(ctx.tr('Tạo')),
           ),
         ],
       ),
@@ -105,9 +106,9 @@ class _TasksScreenState extends State<TasksScreen> {
     final dataProvider = context.read<DataProvider>();
     const statuses = ['pending', 'in_progress', 'completed'];
     final labels = {
-      'pending': 'Chờ xử lý',
-      'in_progress': 'Đang làm',
-      'completed': 'Hoàn thành',
+      'pending': context.trOnce('Chờ xử lý'),
+      'in_progress': context.trOnce('Đang làm'),
+      'completed': context.trOnce('Hoàn thành'),
     };
 
     final selected = await showModalBottomSheet<String>(
@@ -133,8 +134,8 @@ class _TasksScreenState extends State<TasksScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Cập nhật trạng thái',
-                style: TextStyle(
+            Text(context.trOnce('Cập nhật trạng thái'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppTheme.slate900,
@@ -181,7 +182,9 @@ class _TasksScreenState extends State<TasksScreen> {
         await dataProvider.updateTask(task.taskId, {'status': selected});
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(success ? 'Đã cập nhật trạng thái' : 'Cập nhật thất bại'),
+      content: Text(success
+          ? context.trOnce('Đã cập nhật trạng thái')
+          : context.trOnce('Cập nhật thất bại')),
       backgroundColor:
           success ? AppTheme.emerald500 : AppTheme.rose500,
     ));
@@ -195,7 +198,7 @@ class _TasksScreenState extends State<TasksScreen> {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: const Text('Công việc'),
+        title: Text(context.tr('Công việc')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -214,26 +217,26 @@ class _TasksScreenState extends State<TasksScreen> {
               child: Row(
                 children: [
                   _FilterChip(
-                      label: 'Tất cả',
+                      label: context.tr('Tất cả'),
                       count: data.tasks.length,
                       selected: _filter == 'all',
                       onTap: () => setState(() => _filter = 'all')),
                   _FilterChip(
-                      label: 'Chờ xử lý',
+                      label: context.tr('Chờ xử lý'),
                       count: data.tasks
                           .where((t) => t.status == 'pending')
                           .length,
                       selected: _filter == 'pending',
                       onTap: () => setState(() => _filter = 'pending')),
                   _FilterChip(
-                      label: 'Đang làm',
+                      label: context.tr('Đang làm'),
                       count: data.tasks
                           .where((t) => t.status == 'in_progress')
                           .length,
                       selected: _filter == 'in_progress',
                       onTap: () => setState(() => _filter = 'in_progress')),
                   _FilterChip(
-                      label: 'Hoàn thành',
+                      label: context.tr('Hoàn thành'),
                       count: data.tasks
                           .where((t) => t.status == 'completed')
                           .length,
@@ -248,17 +251,17 @@ class _TasksScreenState extends State<TasksScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddDialog,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Tạo'),
+        label: Text(context.tr('Tạo')),
       ),
       body: data.loadingTasks
-          ? const LoadingWidget(message: 'Đang tải danh sách công việc...')
+          ? LoadingWidget(message: context.tr('Đang tải danh sách công việc...'))
           : data.tasksError != null
               ? _ErrorView(
                   error: data.tasksError!,
                   onRetry: () => context.read<DataProvider>().fetchTasks(),
                 )
               : tasks.isEmpty
-                  ? const EmptyView('Không có công việc nào')
+                  ? EmptyView(context.tr('Không có công việc nào'))
                   : RefreshIndicator(
                       color: AppTheme.brand600,
                       onRefresh: () =>
@@ -425,8 +428,8 @@ class _TaskCard extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onChangeStatus,
                 icon: const Icon(Icons.sync_rounded, size: 16),
-                label: const Text('Đổi trạng thái',
-                    style: TextStyle(fontSize: 12.5)),
+                label: Text(context.tr('Đổi trạng thái'),
+                    style: const TextStyle(fontSize: 12.5)),
                 style: TextButton.styleFrom(
                   foregroundColor: AppTheme.brand600,
                   padding: const EdgeInsets.symmetric(
@@ -509,7 +512,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Thử lại')),
+                label: Text(context.tr('Thử lại'))),
           ],
         ),
       ),

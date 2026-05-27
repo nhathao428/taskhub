@@ -60,7 +60,11 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair.fromSerializer(serializer));
 
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
+        // ai_suggestions: TTL ngắn (5 min) để mỗi gợi ý fresh theo data mới + chống cache spam (Security M5).
         cacheConfigs.put("ai_suggestions", defaultConfig.entryTtl(Duration.ofMinutes(5)));
+        // user_details: TTL rất ngắn (60s) — đủ giảm DB hit mỗi request (Security M7), vẫn cho phép
+        // role/delete propagate trong 1 phút.
+        cacheConfigs.put("user_details", defaultConfig.entryTtl(Duration.ofSeconds(60)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)

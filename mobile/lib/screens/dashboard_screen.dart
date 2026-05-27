@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/data_provider.dart';
 import '../theme/app_theme.dart';
@@ -62,31 +63,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
           selectedItemColor: AppTheme.brand600,
           unselectedItemColor: AppTheme.slate400,
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard_outlined),
-              activeIcon: Icon(Icons.dashboard_rounded),
-              label: 'Tổng quan',
+              icon: const Icon(Icons.dashboard_outlined),
+              activeIcon: const Icon(Icons.dashboard_rounded),
+              label: context.tr('Tổng quan'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline),
-              activeIcon: Icon(Icons.people_rounded),
-              label: 'Nhân viên',
+              icon: const Icon(Icons.people_outline),
+              activeIcon: const Icon(Icons.people_rounded),
+              label: context.tr('Nhân viên'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.folder_outlined),
-              activeIcon: Icon(Icons.folder_rounded),
-              label: 'Dự án',
+              icon: const Icon(Icons.folder_outlined),
+              activeIcon: const Icon(Icons.folder_rounded),
+              label: context.tr('Dự án'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.checklist_outlined),
-              activeIcon: Icon(Icons.checklist_rounded),
-              label: 'Công việc',
+              icon: const Icon(Icons.checklist_outlined),
+              activeIcon: const Icon(Icons.checklist_rounded),
+              label: context.tr('Công việc'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.access_time_outlined),
-              activeIcon: Icon(Icons.access_time_filled_rounded),
-              label: 'Chấm công',
+              icon: const Icon(Icons.access_time_outlined),
+              activeIcon: const Icon(Icons.access_time_filled_rounded),
+              label: context.tr('Chấm công'),
             ),
           ],
         ),
@@ -122,8 +123,24 @@ class _DashboardHome extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: const Text('Bảng điều khiển'),
+        title: Text(context.tr('Bảng điều khiển')),
         actions: [
+          // Toggle ngôn ngữ vi ↔ en (Principle III: UX consistency)
+          IconButton(
+            tooltip: context.tr('Đổi ngôn ngữ'),
+            icon: Text(
+              context.watch<LanguageProvider>().isVietnamese ? 'EN' : 'VI',
+              style: const TextStyle(
+                color: AppTheme.brand600,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+            onPressed: () {
+              final lp = context.read<LanguageProvider>();
+              lp.setLocale(lp.isVietnamese ? 'en' : 'vi');
+            },
+          ),
           IconButton(
             icon: Container(
               padding: const EdgeInsets.all(8),
@@ -134,7 +151,7 @@ class _DashboardHome extends StatelessWidget {
               child: const Icon(Icons.auto_awesome_rounded,
                   color: AppTheme.brand600, size: 18),
             ),
-            tooltip: 'AI Gợi ý',
+            tooltip: context.tr('AI Gợi ý'),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -149,13 +166,13 @@ class _DashboardHome extends StatelessWidget {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14)),
             itemBuilder: (_) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout_rounded, size: 18),
-                    SizedBox(width: 10),
-                    Text('Đăng xuất'),
+                    const Icon(Icons.logout_rounded, size: 18),
+                    const SizedBox(width: 10),
+                    Text(context.trOnce('Đăng xuất')),
                   ],
                 ),
               ),
@@ -164,7 +181,7 @@ class _DashboardHome extends StatelessWidget {
         ],
       ),
       body: isLoading
-          ? const LoadingWidget(message: 'Đang tải dữ liệu...')
+          ? LoadingWidget(message: context.tr('Đang tải dữ liệu...'))
           : RefreshIndicator(
               color: AppTheme.brand600,
               onRefresh: () async {
@@ -199,28 +216,28 @@ class _DashboardHome extends StatelessWidget {
                         icon: Icons.people_rounded,
                         color: AppTheme.brand600,
                         bgColor: AppTheme.brand50,
-                        title: 'Nhân viên',
+                        title: context.tr('Nhân viên'),
                         value: '${data.employees.length}',
                       ),
                       _StatCard(
                         icon: Icons.folder_rounded,
                         color: AppTheme.sky500,
                         bgColor: AppTheme.sky100,
-                        title: 'Dự án',
+                        title: context.tr('Dự án'),
                         value: '${data.projects.length}',
                       ),
                       _StatCard(
                         icon: Icons.checklist_rounded,
                         color: AppTheme.emerald500,
                         bgColor: AppTheme.emerald100,
-                        title: 'Công việc',
+                        title: context.tr('Công việc'),
                         value: '${data.tasks.length}',
                       ),
                       _StatCard(
                         icon: Icons.access_time_filled_rounded,
                         color: AppTheme.amber500,
                         bgColor: AppTheme.amber100,
-                        title: 'Chấm công hôm nay',
+                        title: context.tr('Chấm công hôm nay'),
                         value: '$attendanceToday',
                       ),
                     ],
@@ -275,9 +292,9 @@ class _HeroCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'Tổng quan hệ thống',
-                        style: TextStyle(
+                      Text(
+                        context.tr('Tổng quan hệ thống'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -286,7 +303,8 @@ class _HeroCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Xin chào, ${username.isEmpty ? 'bạn' : username}!',
+                        context.tr('Xin chào, {name}!',
+                            {'name': username.isEmpty ? context.tr('bạn') : username}),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.85),
                           fontSize: 13,
@@ -294,7 +312,8 @@ class _HeroCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$totalTasks công việc · $doneTasks đã hoàn thành',
+                        context.tr('{total} công việc · {done} đã hoàn thành',
+                            {'total': totalTasks, 'done': doneTasks}),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 12,
@@ -316,15 +335,15 @@ class _HeroCard extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      const Row(
+                      Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.trending_up_rounded,
+                          const Icon(Icons.trending_up_rounded,
                               color: Colors.white, size: 16),
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
-                            'HOÀN THÀNH',
-                            style: TextStyle(
+                            context.tr('HOÀN THÀNH'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
@@ -456,9 +475,9 @@ class _TaskBreakdownCard extends StatelessWidget {
                     color: AppTheme.brand600, size: 18),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'Phân bố trạng thái công việc',
-                style: TextStyle(
+              Text(
+                context.tr('Phân bố trạng thái công việc'),
+                style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                   color: AppTheme.slate900,
@@ -468,19 +487,19 @@ class _TaskBreakdownCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           _TaskStatusRow(
-              label: 'Chờ xử lý',
+              label: context.tr('Chờ xử lý'),
               count: pending,
               color: AppTheme.amber500,
               bgColor: AppTheme.amber100),
           const SizedBox(height: 8),
           _TaskStatusRow(
-              label: 'Đang thực hiện',
+              label: context.tr('Đang thực hiện'),
               count: progress,
               color: AppTheme.brand600,
               bgColor: AppTheme.brand50),
           const SizedBox(height: 8),
           _TaskStatusRow(
-              label: 'Hoàn thành',
+              label: context.tr('Hoàn thành'),
               count: done,
               color: AppTheme.emerald500,
               bgColor: AppTheme.emerald100),

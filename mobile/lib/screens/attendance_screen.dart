@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../models/attendance.dart';
 import '../models/office_location.dart';
 import '../providers/data_provider.dart';
@@ -43,6 +44,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _refreshPosition() async {
+    // Tra cứu tất cả message cần dùng trước khi await, vì context không thể
+    // dùng qua async gap (use_build_context_synchronously).
+    final msgService = context.trOnce('Vui lòng bật Dịch vụ Định vị (Location).');
+    final msgDenied = context.trOnce('Bạn từ chối quyền truy cập vị trí.');
+    final msgPermanent = context.trOnce('Quyền vị trí bị tắt vĩnh viễn. Hãy bật trong cài đặt.');
     setState(() {
       _gpsLoading = true;
       _gpsError = null;
@@ -50,17 +56,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw 'Vui lòng bật Dịch vụ Định vị (Location).';
+        throw msgService;
       }
       LocationPermission perm = await Geolocator.checkPermission();
       if (perm == LocationPermission.denied) {
         perm = await Geolocator.requestPermission();
       }
       if (perm == LocationPermission.denied) {
-        throw 'Bạn từ chối quyền truy cập vị trí.';
+        throw msgDenied;
       }
       if (perm == LocationPermission.deniedForever) {
-        throw 'Quyền vị trí bị tắt vĩnh viễn. Hãy bật trong cài đặt.';
+        throw msgPermanent;
       }
       final p = await Geolocator.getCurrentPosition(
         locationSettings:
@@ -126,6 +132,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> _doCheckInOut({required bool isCheckIn}) async {
+    // Tra cứu translation trước await để tránh use_build_context_synchronously
+    // ngay cả khi analyzer hiện chưa flag.
+    final baseKey = isCheckIn ? 'Check-in' : 'Check-out';
+    final msgSuccess = context.trOnce('$baseKey thành công');
+    final msgPending = context.trOnce('$baseKey thành công – chờ quản lý duyệt');
+    // Template "Lỗi: {error}" với placeholder marker để format lại sau catch.
+    const errMarker = '__ERR__';
+    final errorTemplate = context.trOnce('Lỗi: {error}', {'error': errMarker});
+    final scaffold = ScaffoldMessenger.of(context);
+    final dataProvider = context.read<DataProvider>();
+
     setState(() => _busy = true);
     try {
       Attendance? rec;
@@ -143,18 +160,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       }
       if (!mounted) return;
       final pending = rec.reviewStatus == 'PENDING_REVIEW';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(pending
-            ? '${isCheckIn ? "Check-in" : "Check-out"} thành công – chờ quản lý duyệt'
-            : '${isCheckIn ? "Check-in" : "Check-out"} thành công'),
+      scaffold.showSnackBar(SnackBar(
+        content: Text(pending ? msgPending : msgSuccess),
         backgroundColor:
             pending ? AppTheme.amber500 : AppTheme.emerald500,
       ));
-      context.read<DataProvider>().fetchAttendance();
+      dataProvider.fetchAttendance();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Lỗi: $e'),
+      scaffold.showSnackBar(SnackBar(
+        content: Text(errorTemplate.replaceFirst(errMarker, '$e')),
         backgroundColor: AppTheme.rose500,
       ));
     } finally {
@@ -176,7 +191,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: const Text('Chấm công'),
+        title: Text(context.tr('Chấm công')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -295,8 +310,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             size: 16, color: AppTheme.brand600),
                       ),
                       const SizedBox(width: 10),
-                      const Text('Vị trí GPS',
-                          style: TextStyle(
+                      Text(context.tr('Vị trí GPS'),
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             color: AppTheme.slate900,
                             fontSize: 14.5,
@@ -305,16 +320,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       TextButton.icon(
                         onPressed: _gpsLoading ? null : _refreshPosition,
                         icon: const Icon(Icons.refresh_rounded, size: 16),
-                        label: const Text('Cập nhật',
-                            style: TextStyle(fontSize: 12.5)),
+                        label: Text(context.tr('Cập nhật'),
+                            style: const TextStyle(fontSize: 12.5)),
                       ),
                     ],
                   ),
                   if (_gpsLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6, left: 42),
-                      child: Text('Đang lấy GPS…',
-                          style: TextStyle(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, left: 42),
+                      child: Text(context.tr('Đang lấy GPS…'),
+                          style: const TextStyle(
                               color: AppTheme.slate500, fontSize: 12.5)),
                     ),
                   if (_gpsError != null)
@@ -366,12 +381,17 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           Expanded(
                             child: Text(
                               near.within
-                                  ? '${near.office.name} – '
-                                      '${near.distance.round()}m (trong vùng)'
-                                  : '${near.office.name} – '
-                                      '${near.distance.round()}m / '
-                                      '${near.office.radiusMeters}m '
-                                      '(ngoài vùng, sẽ chờ duyệt)',
+                                  ? context.tr('{office} – {dist}m (trong vùng)', {
+                                      'office': near.office.name,
+                                      'dist': near.distance.round(),
+                                    })
+                                  : context.tr(
+                                      '{office} – {dist}m / {max}m (ngoài vùng, sẽ chờ duyệt)',
+                                      {
+                                        'office': near.office.name,
+                                        'dist': near.distance.round(),
+                                        'max': near.office.radiusMeters,
+                                      }),
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w600,
@@ -385,11 +405,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                       ),
                     ),
                   if (_offices.isEmpty && !_gpsLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8, left: 42),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8, left: 42),
                       child: Text(
-                          'Chưa có văn phòng nào được cấu hình. Liên hệ quản lý.',
-                          style: TextStyle(
+                          context.tr('Chưa có văn phòng nào được cấu hình. Liên hệ quản lý.'),
+                          style: const TextStyle(
                               color: AppTheme.slate500, fontSize: 12)),
                     ),
                 ],
@@ -437,22 +457,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
             _SectionHeader(
                 icon: Icons.today_rounded,
-                title: 'Chấm công hôm nay',
+                title: context.tr('Chấm công hôm nay'),
                 count: todayList.length),
             const SizedBox(height: 8),
             if (todayList.isEmpty)
-              _EmptyHint(text: 'Chưa có bản ghi hôm nay')
+              _EmptyHint(text: context.tr('Chưa có bản ghi hôm nay'))
             else
               ...todayList.map((a) => _AttendanceCard(attendance: a)),
 
             const SizedBox(height: 20),
             _SectionHeader(
                 icon: Icons.history_rounded,
-                title: 'Lịch sử chấm công',
+                title: context.tr('Lịch sử chấm công'),
                 count: data.attendance.length),
             const SizedBox(height: 8),
             if (data.attendance.isEmpty)
-              _EmptyHint(text: 'Chưa có dữ liệu chấm công')
+              _EmptyHint(text: context.tr('Không có dữ liệu chấm công'))
             else
               ...data.attendance.reversed
                   .take(20)
@@ -514,14 +534,14 @@ class _EmptyHint extends StatelessWidget {
         border:
             Border.all(color: AppTheme.slate200, style: BorderStyle.solid),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.inbox_outlined,
+          const Icon(Icons.inbox_outlined,
               size: 18, color: AppTheme.slate400),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
-            child: Text('Chưa có bản ghi',
-                style: TextStyle(color: AppTheme.slate500, fontSize: 13)),
+            child: Text(text,
+                style: const TextStyle(color: AppTheme.slate500, fontSize: 13)),
           ),
         ],
       ),
@@ -537,15 +557,15 @@ class _AttendanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color statusColor = AppTheme.emerald500;
     Color statusBg = AppTheme.emerald100;
-    String statusLabel = 'Đã duyệt';
+    String statusLabel = context.trOnce('Đã duyệt');
     if (attendance.reviewStatus == 'PENDING_REVIEW') {
       statusColor = AppTheme.amber500;
       statusBg = AppTheme.amber100;
-      statusLabel = 'Chờ duyệt';
+      statusLabel = context.trOnce('Chờ duyệt');
     } else if (attendance.reviewStatus == 'REJECTED') {
       statusColor = AppTheme.rose500;
       statusBg = AppTheme.rose500.withValues(alpha: 0.12);
-      statusLabel = 'Từ chối';
+      statusLabel = context.trOnce('Từ chối');
     }
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -580,7 +600,7 @@ class _AttendanceCard extends StatelessWidget {
               children: [
                 Text(
                   attendance.employeeName ??
-                      'Nhân viên #${attendance.employeeId}',
+                      context.trOnce('Nhân viên #{id}', {'id': attendance.employeeId}),
                   style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 13.5,

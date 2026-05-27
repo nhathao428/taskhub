@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/employee.dart';
@@ -34,7 +35,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Thêm nhân viên'),
+        title: Text(ctx.tr('Thêm nhân viên')),
         content: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -43,26 +44,26 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               children: [
                 TextFormField(
                   controller: firstNameCtrl,
-                  decoration: const InputDecoration(labelText: 'Họ *'),
+                  decoration: InputDecoration(labelText: ctx.tr('Họ *')),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Bắt buộc' : null,
+                      (v == null || v.trim().isEmpty) ? ctx.trOnce('Bắt buộc') : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: lastNameCtrl,
-                  decoration: const InputDecoration(labelText: 'Tên *'),
+                  decoration: InputDecoration(labelText: ctx.tr('Tên *')),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Bắt buộc' : null,
+                      (v == null || v.trim().isEmpty) ? ctx.trOnce('Bắt buộc') : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: positionCtrl,
-                  decoration: const InputDecoration(labelText: 'Chức vụ'),
+                  decoration: InputDecoration(labelText: ctx.tr('Chức vụ')),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: departmentCtrl,
-                  decoration: const InputDecoration(labelText: 'Phòng ban'),
+                  decoration: InputDecoration(labelText: ctx.tr('Phòng ban')),
                 ),
               ],
             ),
@@ -71,7 +72,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Huỷ'),
+            child: Text(ctx.tr('Huỷ')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -89,13 +90,13 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(result != null
-                    ? 'Đã thêm nhân viên ${result.fullName}'
-                    : 'Thêm thất bại'),
+                    ? context.trOnce('Đã thêm nhân viên {name}', {'name': result.fullName})
+                    : context.trOnce('Thêm thất bại')),
                 backgroundColor:
                     result != null ? AppTheme.emerald500 : AppTheme.rose500,
               ));
             },
-            child: const Text('Thêm'),
+            child: Text(ctx.tr('Thêm')),
           ),
         ],
       ),
@@ -108,7 +109,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: const Text('Nhân viên'),
+        title: Text(context.tr('Nhân viên')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -120,10 +121,10 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddDialog,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Thêm'),
+        label: Text(context.tr('Thêm')),
       ),
       body: data.loadingEmployees
-          ? const LoadingWidget(message: 'Đang tải danh sách nhân viên...')
+          ? LoadingWidget(message: context.tr('Đang tải danh sách nhân viên...'))
           : data.employeesError != null
               ? _ErrorView(
                   error: data.employeesError!,
@@ -131,7 +132,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                       context.read<DataProvider>().fetchEmployees(),
                 )
               : data.employees.isEmpty
-                  ? const EmptyView('Chưa có nhân viên nào')
+                  ? EmptyView(context.tr('Chưa có nhân viên nào'))
                   : RefreshIndicator(
                       color: AppTheme.brand600,
                       onRefresh: () =>
@@ -309,7 +310,8 @@ class _EmployeeCard extends StatelessWidget {
             if (employee.hiredAt != null)
               _DetailRow(
                   icon: Icons.calendar_today_outlined,
-                  label: 'Ngày vào: ${employee.hiredAt!.substring(0, 10)}'),
+                  label: context.trOnce('Ngày vào: {date}',
+                      {'date': employee.hiredAt!.substring(0, 10)})),
           ],
         ),
       ),
@@ -382,7 +384,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Thử lại')),
+                label: Text(context.tr('Thử lại'))),
           ],
         ),
       ),

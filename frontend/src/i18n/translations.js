@@ -206,7 +206,6 @@ export const en = {
   'Bán kính': 'Radius',
   'Chưa có văn phòng nào.': 'No offices yet.',
   'Sửa văn phòng': 'Edit office',
-  'Thêm văn phòng': 'Add office',
   'Tên *': 'Name *',
   'Bán kính (m)': 'Radius (m)',
   'Dùng vị trí hiện tại': 'Use current location',

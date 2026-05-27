@@ -104,7 +104,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({UsernameNotFoundException.class, AuthenticationException.class})
     public ResponseEntity<ErrorResponse> handleAuthentication(RuntimeException ex) {
-        log.warn("Authentication error: {}", ex.getMessage());
+        // Security M3: KHÔNG log ex.getMessage() vì UsernameNotFoundException chứa username
+        // → leak PII vào log. Chỉ log loại exception + outcome generic.
+        log.warn("Authentication failed: type={}", ex.getClass().getSimpleName());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Authentication failed", LocalDateTime.now()));

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'i18n/language_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/data_provider.dart';
 import 'screens/login_screen.dart';
@@ -18,11 +19,12 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => DataProvider()),
       ],
       child: MaterialApp(
-        title: 'Quản lý Công việc',
+        title: 'Task Manager',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         initialRoute: '/login',

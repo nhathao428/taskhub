@@ -11,4 +11,11 @@ export default defineConfig({
   optimizeDeps: {
     include: ['leaflet', 'react-leaflet', '@react-leaflet/core'],
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+    css: false,
+    exclude: ['node_modules', 'dist', 'demo'],
+  },
 })

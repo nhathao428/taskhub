@@ -12,7 +12,15 @@ public class SuggestionRequest {
     private String requiredSkills;
     private Long projectId;
 
+    /**
+     * Cache key normalize: lowercase + collapse whitespace + truncate.
+     * Cùng prompt với khoảng trắng/case khác nhau → cùng cache entry, tránh cache spam (Security M5).
+     */
     public String getCacheKey() {
-        return taskId != null ? "id-" + taskId : "title-" + taskTitle;
+        if (taskId != null) return "id-" + taskId;
+        String title = taskTitle == null ? "" : taskTitle;
+        String norm = title.toLowerCase().replaceAll("\\s+", " ").trim();
+        if (norm.length() > 200) norm = norm.substring(0, 200);
+        return "title-" + Integer.toHexString(norm.hashCode());
     }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../i18n/language_provider.dart';
 import '../widgets/empty_view.dart';
 import '../providers/data_provider.dart';
 import '../models/project.dart';
@@ -36,7 +37,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Thêm dự án'),
+        title: Text(ctx.tr('Thêm dự án')),
         content: Form(
           key: formKey,
           child: SingleChildScrollView(
@@ -46,23 +47,23 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 TextFormField(
                   controller: nameCtrl,
                   decoration:
-                      const InputDecoration(labelText: 'Tên dự án *'),
+                      InputDecoration(labelText: ctx.tr('Tên dự án *')),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Bắt buộc' : null,
+                      (v == null || v.trim().isEmpty) ? ctx.trOnce('Bắt buộc') : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: descCtrl,
-                  decoration: const InputDecoration(labelText: 'Mô tả'),
+                  decoration: InputDecoration(labelText: ctx.tr('Mô tả')),
                   maxLines: 3,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: startCtrl,
-                  decoration: const InputDecoration(
-                      labelText: 'Ngày bắt đầu (YYYY-MM-DD) *'),
+                  decoration: InputDecoration(
+                      labelText: ctx.tr('Ngày bắt đầu (YYYY-MM-DD) *')),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Bắt buộc' : null,
+                      (v == null || v.trim().isEmpty) ? ctx.trOnce('Bắt buộc') : null,
                 ),
               ],
             ),
@@ -71,7 +72,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Huỷ'),
+            child: Text(ctx.tr('Huỷ')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -88,13 +89,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(result != null
-                    ? 'Đã tạo dự án ${result.name}'
-                    : 'Tạo dự án thất bại'),
+                    ? context.trOnce('Đã tạo dự án {name}', {'name': result.name})
+                    : context.trOnce('Tạo dự án thất bại')),
                 backgroundColor:
                     result != null ? AppTheme.emerald500 : AppTheme.rose500,
               ));
             },
-            child: const Text('Tạo'),
+            child: Text(ctx.tr('Tạo')),
           ),
         ],
       ),
@@ -107,7 +108,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: const Text('Dự án'),
+        title: Text(context.tr('Dự án')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
@@ -119,10 +120,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddDialog,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Thêm'),
+        label: Text(context.tr('Thêm')),
       ),
       body: data.loadingProjects
-          ? const LoadingWidget(message: 'Đang tải danh sách dự án...')
+          ? LoadingWidget(message: context.tr('Đang tải danh sách dự án...'))
           : data.projectsError != null
               ? _ErrorView(
                   error: data.projectsError!,
@@ -130,7 +131,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       context.read<DataProvider>().fetchProjects(),
                 )
               : data.projects.isEmpty
-                  ? const EmptyView('Chưa có dự án nào')
+                  ? EmptyView(context.tr('Chưa có dự án nào'))
                   : RefreshIndicator(
                       color: AppTheme.brand600,
                       onRefresh: () =>
@@ -276,11 +277,11 @@ class _ProjectCard extends StatelessWidget {
             const SizedBox(height: 14),
             _DetailRow(
                 icon: Icons.calendar_today_outlined,
-                label: 'Bắt đầu: ${project.startDate}'),
+                label: context.trOnce('Bắt đầu: {date}', {'date': project.startDate})),
             if (project.endDate != null)
               _DetailRow(
                   icon: Icons.event_outlined,
-                  label: 'Kết thúc: ${project.endDate}'),
+                  label: context.trOnce('Kết thúc: {date}', {'date': project.endDate!})),
           ],
         ),
       ),
@@ -352,7 +353,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Thử lại')),
+                label: Text(context.tr('Thử lại'))),
           ],
         ),
       ),

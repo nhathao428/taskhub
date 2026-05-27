@@ -20,7 +20,7 @@ export default function Register() {
   }
 
   // Quy tắc mật khẩu trùng với @Pattern trong RegisterRequestV2.java — đổi 1 chỗ phải đổi cả 2.
-  const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?`~]).{8,100}$/
+  const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]).{8,100}$/
 
   const handleSubmit = async (e) => {
     e.preventDefault()

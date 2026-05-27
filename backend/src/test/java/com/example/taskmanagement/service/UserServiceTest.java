@@ -6,6 +6,7 @@ import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.exception.DuplicateResourceException;
 import com.example.taskmanagement.repository.UserRepository;
 import com.example.taskmanagement.security.JwtTokenProvider;
+import com.example.taskmanagement.security.LoginAttemptService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +38,9 @@ class UserServiceTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private LoginAttemptService loginAttemptService;
 
     @InjectMocks
     private UserService userService;

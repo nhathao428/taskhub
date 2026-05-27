@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +37,9 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // Strength 12: ~150-300ms/hash trên server hiện đại — cao hơn default 10 (4x cost).
+        // Đủ chống brute-force GPU trong khi vẫn dưới ngưỡng UX cho login.
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean
@@ -73,9 +76,11 @@ public class SecurityConfig {
                         // ApiVersionAliasFilter chỉ rewrite v1, không rewrite v2.
                         "/api/v2/auth/**",
                         "/api/version",
+                        // Swagger UI / OpenAPI docs — TURN OFF ở prod qua SWAGGER_ENABLED=false.
                         "/swagger-ui/**", "/swagger-ui.html",
-                        "/api-docs/**", "/v3/api-docs/**",
-                        "/h2-console/**"
+                        "/api-docs/**", "/v3/api-docs/**"
+                        // H2 console KHÔNG còn ở đây: chỉ enable trong dev qua profile,
+                        // tránh risk khi config drift (xem application-dev.properties nếu cần dev).
                 ).permitAll()
 
                 // Employee self-service endpoints — must come BEFORE the broader rules below
@@ -121,7 +126,30 @@ public class SecurityConfig {
 
                 .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .headers(headers -> headers
+                // Defense-in-depth headers (Security L3 + mitigate H2 XSS exfiltration).
+                .frameOptions(frame -> frame.sameOrigin())
+                // CSP rất chặt: chỉ cho phép script/style từ same-origin + Swagger CDN (khi enable).
+                // Giảm đáng kể bề mặt XSS — kể cả khi attacker inject HTML, browser chặn execute.
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                        "default-src 'self'; "
+                        + "script-src 'self' 'unsafe-inline'; "
+                        + "style-src 'self' 'unsafe-inline'; "
+                        + "img-src 'self' data: https:; "
+                        + "font-src 'self' data:; "
+                        + "connect-src 'self'; "
+                        + "frame-ancestors 'self'; "
+                        + "base-uri 'self'; "
+                        + "form-action 'self'"))
+                // HSTS: ép HTTPS 1 năm + preload. Chỉ có hiệu lực khi serve qua HTTPS.
+                .httpStrictTransportSecurity(hsts -> hsts
+                        .maxAgeInSeconds(31_536_000)
+                        .includeSubDomains(true)
+                        .preload(true))
+                .referrerPolicy(ref -> ref.policy(
+                        ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .contentTypeOptions(opts -> {})  // X-Content-Type-Options: nosniff
+            )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
