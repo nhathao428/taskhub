@@ -21,10 +21,10 @@ function isDemoMode() {
 }
 
 // Ở chế độ dùng thử: trả dữ liệu mẫu thay vì gọi backend thật.
-// Riêng /api/auth/* vẫn gọi thật để khách có thể đăng nhập / đăng ký.
+// Riêng /api/auth/* và /api/v{N}/auth/* vẫn gọi thật để khách có thể đăng nhập / đăng ký.
 function demoAwareAdapter(config) {
   const url = config.url || ''
-  if (isDemoMode() && !url.includes('/api/auth/')) {
+  if (isDemoMode() && !/\/api\/(v\d+\/)?auth\//.test(url)) {
     return demoApiResponse(config)
   }
   return realAdapter(config)

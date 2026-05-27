@@ -30,6 +30,11 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD required}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       CORS_ORIGINS: https://${DOMAIN:?DOMAIN required}
+      # Tắt Swagger UI ở prod để không lộ API surface
+      SWAGGER_ENABLED: "false"
+      DDL_AUTO: validate
+      # Caddy strip X-Forwarded-For từ client → backend có thể tin header này
+      RATELIMIT_TRUST_FORWARDED: "true"
 
   frontend:
     restart: unless-stopped

@@ -50,15 +50,15 @@ export default function Layout({ children }) {
   })
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-slate-50">
       {isDemo && <DemoBanner />}
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+          <header className="bg-white border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between flex-shrink-0">
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
-              <p className="text-xs text-gray-500 capitalize">{today}</p>
+              <h2 className="text-lg font-semibold text-slate-900 tracking-tight">{title}</h2>
+              <p className="text-xs text-slate-500 capitalize mt-0.5">{today}</p>
             </div>
             <LanguageSwitcher />
           </header>

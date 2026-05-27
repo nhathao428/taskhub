@@ -22,20 +22,35 @@ frontend/node_modules/
 # Office temp / lock files
 ~$*
 
-# PlantUML jar (download riêng – xem docs/uml/README.md)
+# PlantUML jar (download rieng - xem docs/uml/README.md)
 docs/uml/plantuml.jar
 
 # start.sh / start.ps1 runtime artefacts
 .start_pids
 .start_pids.txt
 .logs/
+.start.log
+.start.err
+.backend.log
+.backend.err
 
-# Cấu hình công cụ / editor cá nhân – không thuộc sản phẩm đồ án
+# .env typo / bien the - KHONG commit cau hinh moi truong that
+.evn
+
+# Video demo / backup dung luong lon - luu ngoai repo
+docs/*.mp4
+docs/*.mp4.bak
+docs/_*.mp4
+
+# Figma source backup (file .fig nang, khong can version control)
+docs/figma_backup/
+
+# Cau hinh cong cu / editor ca nhan - khong thuoc san pham do an
 .claude/
 CLAUDE.md
 
-# Phiếu .docx sinh tự động (build lại từ docs/build_phieu_docx.py) — không commit.
-# Riêng báo cáo chính (.docx) và sơ đồ UML (png) được commit để xem trực tiếp
-# trên GitHub; vẫn build lại được từ source khi cần.
+# Phieu .docx sinh tu dong (build lai tu docs/build_phieu_docx.py) - khong commit.
+# Rieng bao cao chinh (.docx) va so do UML (png) duoc commit de xem truc tiep
+# tren GitHub; van build lai duoc tu source khi can.
 docs/*.docx
 !docs/BAO_CAO_DO_AN_CO_SO.docx

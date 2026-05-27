@@ -47,7 +47,8 @@ export function AuthProvider({ children }) {
   }
 
   const register = async (username, email, password) => {
-    const response = await api.post('/api/auth/register', { username, email, password })
+    // v2: yêu cầu mật khẩu có chữ + số + ký tự đặc biệt (xem validate ở Register.jsx)
+    const response = await api.post('/api/v2/auth/register', { username, email, password })
     return response.data
   }
 

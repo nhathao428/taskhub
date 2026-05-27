@@ -67,8 +67,9 @@ class ApiService {
 
   static Future<Map<String, dynamic>> register(
       String username, String email, String password) async {
+    // v2: yêu cầu mật khẩu có chữ + số + ký tự đặc biệt (validate phía client trong register_screen.dart).
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/auth/register'),
+      Uri.parse('$_baseUrl/api/v2/auth/register'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'email': email, 'password': password}),
     );

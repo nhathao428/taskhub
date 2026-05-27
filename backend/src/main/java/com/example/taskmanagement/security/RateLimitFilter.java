@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * instance cần chuyển sang Redis. Chạy trước Spring Security để chặn sớm.
  */
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
@@ -39,6 +39,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     @Value("${app.ratelimit.ai:10}")
     private int aiLimit;
+
+    // Chỉ bật khi chạy sau reverse proxy tin cậy (Caddy/Nginx). Nếu false (default),
+    // dùng remoteAddr — tránh bị spoof X-Forwarded-For để vượt rate limit.
+    @Value("${app.ratelimit.trust-forwarded-header:false}")
+    private boolean trustForwardedHeader;
 
     private final ObjectMapper objectMapper;
     private final Map<String, Window> windows = new ConcurrentHashMap<>();
@@ -63,10 +68,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    /** Trả về tên nhóm giới hạn, hoặc null nếu endpoint không bị giới hạn. */
+    /**
+     * Trả về tên nhóm giới hạn, hoặc null nếu endpoint không bị giới hạn.
+     * Normalize prefix /api/v{N}/ về /api/ để áp cùng quota cho mọi phiên bản —
+     * tránh attacker bypass rate limit bằng cách đổi sang /api/v2/auth/...
+     * (ApiVersionAliasFilter đã rewrite /api/v1/, nhưng v2+ phải tự handle).
+     */
     private String bucketFor(String uri) {
-        if (uri.startsWith("/api/auth/")) return "auth";
-        if (uri.startsWith("/api/suggestions/")) return "ai";
+        String normalized = uri.replaceFirst("^/api/v\\d+/", "/api/");
+        if (normalized.startsWith("/api/auth/")) return "auth";
+        if (normalized.startsWith("/api/suggestions/")) return "ai";
         return null;
     }
 
@@ -79,11 +90,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return window.count.incrementAndGet() <= limit;
     }
 
-    /** Lấy IP thật, ưu tiên X-Forwarded-For khi chạy sau reverse proxy (Caddy). */
+    /**
+     * Lấy IP thật. Chỉ đọc X-Forwarded-For khi `trustForwardedHeader=true` (sau reverse
+     * proxy tin cậy đã strip header từ client). Mặc định false để chống spoof.
+     */
     private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
+        if (trustForwardedHeader) {
+            String forwarded = request.getHeader("X-Forwarded-For");
+            if (forwarded != null && !forwarded.isBlank()) {
+                return forwarded.split(",")[0].trim();
+            }
         }
         return request.getRemoteAddr();
     }

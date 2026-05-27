@@ -36,10 +36,10 @@ const RANK_THEMES = {
 }
 
 const DEFAULT_THEME = {
-  avatar: 'bg-gradient-to-br from-indigo-400 to-purple-500',
-  ring: 'border border-gray-100',
-  quoteBg: 'from-indigo-50 to-blue-50',
-  quoteIcon: 'text-indigo-200',
+  avatar: 'bg-brand-600',
+  ring: 'ring-1 ring-slate-200/70',
+  quoteBg: 'from-brand-50 to-sky-50',
+  quoteIcon: 'text-brand-200',
 }
 
 function getInitials(first = '', last = '') {
@@ -48,19 +48,19 @@ function getInitials(first = '', last = '') {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-6">
       <div className="flex items-start gap-4 mb-4">
-        <div className="h-12 w-12 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="h-12 w-12 bg-slate-200 rounded-xl animate-pulse" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 bg-gray-100 rounded w-12 animate-pulse" />
-          <div className="h-5 bg-gray-200 rounded w-32 animate-pulse" />
-          <div className="h-3 bg-gray-100 rounded w-20 animate-pulse" />
+          <div className="h-3 bg-slate-100 rounded w-12 animate-pulse" />
+          <div className="h-5 bg-slate-200 rounded w-32 animate-pulse" />
+          <div className="h-3 bg-slate-100 rounded w-20 animate-pulse" />
         </div>
       </div>
-      <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-        <div className="h-3 bg-gray-200 rounded w-full animate-pulse" />
-        <div className="h-3 bg-gray-200 rounded w-5/6 animate-pulse" />
-        <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse" />
+      <div className="bg-slate-50 rounded-xl p-4 space-y-2">
+        <div className="h-3 bg-slate-200 rounded w-full animate-pulse" />
+        <div className="h-3 bg-slate-200 rounded w-5/6 animate-pulse" />
+        <div className="h-3 bg-slate-200 rounded w-3/4 animate-pulse" />
       </div>
     </div>
   )
@@ -72,29 +72,29 @@ function SuggestionCard({ emp, index }) {
 
   return (
     <div
-      className={`relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-6 h-full flex flex-col animate-fade-in-up ${
-        isTop ? theme.ring : 'border border-gray-100'
+      className={`relative bg-white rounded-2xl shadow-soft hover:shadow-soft-lg transition-all duration-300 hover:-translate-y-1 p-6 h-full flex flex-col animate-fade-in-up ${
+        isTop ? theme.ring : 'ring-1 ring-slate-200/70'
       }`}
       style={{ animationDelay: `${index * 70}ms` }}
     >
       {isTop && (
-        <div className="absolute -top-3 -right-3 bg-white rounded-full p-1.5 shadow-md">
+        <div className="absolute -top-3 -right-3 bg-white rounded-full p-1.5 shadow-soft-md">
           <MdEmojiEvents className={`text-2xl ${theme.medal}`} />
         </div>
       )}
 
       <div className="flex items-start gap-4 mb-4">
         <div
-          className={`flex-shrink-0 w-12 h-12 rounded-xl ${theme.avatar} flex items-center justify-center text-white font-bold shadow-sm`}
+          className={`flex-shrink-0 w-12 h-12 rounded-xl ${theme.avatar} flex items-center justify-center text-white font-bold shadow-soft ring-1 ring-white/10`}
         >
           {getInitials(emp.firstName, emp.lastName)}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-gray-400 mb-0.5">#{emp.rank}</div>
-          <h3 className="text-lg font-bold text-gray-800 truncate">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-[0.12em] mb-0.5">#{emp.rank}</div>
+          <h3 className="text-lg font-bold text-slate-900 truncate tracking-tight">
             {emp.firstName} {emp.lastName}
           </h3>
-          {emp.department && <p className="text-sm text-gray-500 truncate">{emp.department}</p>}
+          {emp.department && <p className="text-sm text-slate-500 truncate">{emp.department}</p>}
         </div>
       </div>
 
@@ -102,7 +102,7 @@ function SuggestionCard({ emp, index }) {
         className={`relative rounded-xl p-4 flex-1 bg-gradient-to-br ${theme.quoteBg}`}
       >
         <MdFormatQuote className={`absolute top-2 left-2 text-3xl ${theme.quoteIcon}`} />
-        <p className="relative text-sm text-gray-700 leading-relaxed pl-7 whitespace-pre-line">
+        <p className="relative text-sm text-slate-700 leading-relaxed pl-7 whitespace-pre-line">
           {emp.reasoning}
         </p>
       </div>
@@ -138,16 +138,19 @@ export default function AiSuggestions() {
   return (
     <div>
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-8 mb-6 shadow-lg">
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-        <div className="relative flex items-center gap-3 text-white">
-          <div className="bg-white/20 backdrop-blur p-2.5 rounded-xl">
+      <div className="relative overflow-hidden rounded-2xl p-8 mb-6 text-white shadow-brand-glow bg-slate-900">
+        {/* Aurora mesh */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(99,102,241,0.85),transparent_55%),radial-gradient(ellipse_at_top_right,_rgba(217,70,239,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(56,189,248,0.45),transparent_55%)]" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-fuchsia-500/30 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-brand-500/30 rounded-full blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:32px_32px]" />
+        <div className="relative flex items-center gap-3">
+          <div className="bg-white/15 backdrop-blur p-2.5 rounded-xl ring-1 ring-white/20">
             <MdAutoAwesome className="text-3xl" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{t('AI Gợi ý nhân viên')}</h1>
-            <p className="text-sm text-indigo-100 mt-0.5">
+            <h1 className="text-2xl font-bold tracking-tight">{t('AI Gợi ý nhân viên')}</h1>
+            <p className="text-sm text-brand-100 mt-0.5">
               {t('Phân tích lịch sử và đề xuất người phù hợp nhất')}
             </p>
           </div>
@@ -155,11 +158,11 @@ export default function AiSuggestions() {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-6 mb-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <MdAssignment className="text-indigo-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+              <MdAssignment className="text-brand-600" />
               {t('Tiêu đề công việc')}
             </label>
             <input
@@ -167,28 +170,28 @@ export default function AiSuggestions() {
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
             />
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-              <MdDescription className="text-indigo-500" />
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+              <MdDescription className="text-brand-600" />
               {t('Mô tả công việc')}
-              <span className="text-gray-400 font-normal text-xs">{t('tùy chọn')}</span>
+              <span className="text-slate-400 font-normal text-xs">{t('tùy chọn')}</span>
             </label>
             <textarea
               value={taskDescription}
               onChange={(e) => setTaskDescription(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all resize-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading || !taskTitle.trim()}
-            className="group flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+            className="group flex items-center justify-center gap-2 w-full sm:w-auto bg-brand-600 hover:bg-brand-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-brand-glow disabled:shadow-none transition-colors"
           >
             {loading ? (
               <>
@@ -226,11 +229,11 @@ export default function AiSuggestions() {
       {/* Empty */}
       {!loading && searched && !error && results.length === 0 && (
         <div className="text-center py-16">
-          <div className="inline-flex w-20 h-20 rounded-full bg-gray-100 items-center justify-center mb-4">
-            <MdSearchOff className="text-4xl text-gray-400" />
+          <div className="inline-flex w-20 h-20 rounded-full bg-slate-100 items-center justify-center mb-4">
+            <MdSearchOff className="text-4xl text-slate-400" />
           </div>
-          <p className="font-medium text-gray-700">{t('Không tìm thấy nhân viên phù hợp')}</p>
-          <p className="text-sm text-gray-500 mt-1">{t('Hãy thử mô tả task chi tiết hơn')}</p>
+          <p className="font-medium text-slate-700">{t('Không tìm thấy nhân viên phù hợp')}</p>
+          <p className="text-sm text-slate-500 mt-1">{t('Hãy thử mô tả task chi tiết hơn')}</p>
         </div>
       )}
 

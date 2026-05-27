@@ -64,7 +64,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 
 # Cấu hình JWT (bắt buộc set qua env, không có default)
 app.jwt.secret=${JWT_SECRET}
-app.jwt.expiration=86400000
+app.jwt.expiration=7200000
 
 # Cổng máy chủ (project chạy trên 5000)
 server.port=5000

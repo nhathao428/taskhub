@@ -16,7 +16,7 @@ Sơ đồ tổng thể gồm 14 use case chia thành 5 nhóm chức năng (Xác 
 
 ### 1.2. Use Case — Xác thực
 
-Đăng ký, đăng nhập, đăng xuất — tất cả đều `<<include>>` use case "Kiểm tra JWT". Token có hiệu lực 24 giờ, chứa username + role.
+Đăng ký, đăng nhập, đăng xuất — tất cả đều `<<include>>` use case "Kiểm tra JWT". Token có hiệu lực 2 giờ, chứa username + role.
 
 ![Use Case Xác thực](uml/png/use-case-xac-thuc.png)
 

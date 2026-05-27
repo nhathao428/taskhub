@@ -10,7 +10,7 @@ start
 
 if (username tồn tại trong DB?) then (Yes)
   if (BCrypt.matches(pwd, hash)?) then (Yes)
-    :Tạo JWT (username + role + exp = 24h);
+    :Tạo JWT (username + role + exp = 2h);
     :Lưu token vào localStorage;
     :Điều hướng đến /dashboard;
     stop

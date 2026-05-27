@@ -77,10 +77,10 @@ export default function Employees() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">{t('Nhân viên')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Nhân viên')}</h1>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow transition-colors"
         >
           <MdAdd className="text-xl" /> {t('Thêm nhân viên')}
         </button>
@@ -90,33 +90,33 @@ export default function Employees() {
         <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-4 mb-4">
         <div className="relative">
-          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
           <input
             type="text"
             placeholder={t('Tìm kiếm theo tên, phòng ban...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Họ')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tên')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Chức vụ')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Phòng ban')}</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Họ')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Tên')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Chức vụ')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Phòng ban')}</th>
+                <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Hành động')}</th>
               </tr>
             </thead>
             <tbody>
@@ -130,22 +130,22 @@ export default function Employees() {
                 filtered.map((emp, idx) => (
                   <tr
                     key={emp.employeeId ?? emp.id}
-                    className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}
+                    className={idx % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/60 hover:bg-slate-100'}
                   >
-                    <td className="px-6 py-4 text-gray-800">{emp.firstName}</td>
-                    <td className="px-6 py-4 text-gray-800">{emp.lastName}</td>
-                    <td className="px-6 py-4 text-gray-600">{emp.position}</td>
-                    <td className="px-6 py-4 text-gray-600">{emp.department}</td>
+                    <td className="px-6 py-4 text-slate-900">{emp.firstName}</td>
+                    <td className="px-6 py-4 text-slate-900">{emp.lastName}</td>
+                    <td className="px-6 py-4 text-slate-600">{emp.position}</td>
+                    <td className="px-6 py-4 text-slate-600">{emp.department}</td>
                     <td className="px-6 py-4 text-center">
                       <button
                         onClick={() => openEdit(emp)}
-                        className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm"
+                        className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-700 mr-3 text-sm"
                       >
                         <MdEdit /> {t('Sửa')}
                       </button>
                       <button
                         onClick={() => handleDelete(emp.employeeId ?? emp.id)}
-                        className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
+                        className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-sm"
                       >
                         <MdDelete /> {t('Xóa')}
                       </button>
@@ -169,71 +169,71 @@ export default function Employees() {
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Họ')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Họ')}</label>
               <input
                 type="text"
                 value={form.firstName}
                 onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                 required
                 placeholder={t('Họ')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Tên')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Tên')}</label>
               <input
                 type="text"
                 value={form.lastName}
                 onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                 required
                 placeholder={t('Tên')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Chức vụ')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Chức vụ')}</label>
             <input
               type="text"
               value={form.position}
               onChange={(e) => setForm({ ...form, position: e.target.value })}
               placeholder={t('VD: Kỹ sư phần mềm')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Phòng ban')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Phòng ban')}</label>
             <input
               type="text"
               value={form.department}
               onChange={(e) => setForm({ ...form, department: e.target.value })}
               placeholder={t('VD: IT, Kế toán, Nhân sự')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Kỹ năng')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Kỹ năng')}</label>
             <textarea
               value={form.skills}
               onChange={(e) => setForm({ ...form, skills: e.target.value })}
               rows={2}
               placeholder={t('VD: Java, Spring Boot, PostgreSQL, React')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
             />
-            <p className="text-xs text-gray-500 mt-1">{t('Quản lý nhập tự do, ngăn cách bởi dấu phẩy. AI sẽ dùng để đối chiếu khi gợi ý.')}</p>
+            <p className="text-xs text-slate-500 mt-1">{t('Quản lý nhập tự do, ngăn cách bởi dấu phẩy. AI sẽ dùng để đối chiếu khi gợi ý.')}</p>
           </div>
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+              className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50"
             >
               {t('Hủy')}
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow disabled:shadow-none"
             >
               {saving ? t('Đang lưu...') : t('Lưu')}
             </button>

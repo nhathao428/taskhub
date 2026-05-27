@@ -25,8 +25,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks() {
-        return ResponseEntity.ok(ApiResponse.ok(taskService.getAllTasks()));
+    public ResponseEntity<ApiResponse<List<Task>>> getAllTasks(Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.getAllTasks(auth)));
     }
 
     @GetMapping("/me")
@@ -35,8 +35,8 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Task>> getTask(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.ok(taskService.getTaskById(id)));
+    public ResponseEntity<ApiResponse<Task>> getTask(@PathVariable Long id, Authentication auth) {
+        return ResponseEntity.ok(ApiResponse.ok(taskService.getTaskById(id, auth)));
     }
 
     @PatchMapping("/{id}/status")

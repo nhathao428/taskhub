@@ -27,4 +27,4 @@ java -jar docs/uml/plantuml.jar -charset UTF-8 -tpng -o "../png" docs/uml/src/er
 
 ## Style
 
-Style chung dùng cho mọi sơ đồ nằm ở `src/_style.puml` (Times-like Arial 13, viền xanh `#2C5282`, nền trắng, không đổ bóng) — mỗi `.puml` `!include _style.puml` ngay sau `@startuml` để có look StarUML đồng nhất.
+Style chung dùng cho mọi sơ đồ nằm ở `src/_style.puml` — tái hiện look StarUML cổ điển: thân vàng nhạt `#FFFFC8`, viền đen `#000000`, góc vuông, font Arial 12, visibility hiển thị dạng ký tự (`-` / `+` / `#` / `~`). Mỗi `.puml` `!include _style.puml` ngay sau `@startuml`.

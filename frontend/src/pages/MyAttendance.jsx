@@ -34,7 +34,7 @@ function reviewBadge(status, t) {
       </span>
     )
   }
-  return <span className="text-gray-400 text-xs">-</span>
+  return <span className="text-slate-400 text-xs">-</span>
 }
 
 export default function MyAttendance() {
@@ -137,8 +137,8 @@ export default function MyAttendance() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">{t('Chấm công của tôi')}</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">{t('Chấm công của tôi')}</h1>
+      <p className="text-sm text-slate-500 mb-6">
         {t('Hệ thống dùng GPS để xác minh vị trí. Nếu nằm ngoài vùng cho phép, bản ghi sẽ chuyển sang')}
         <span className="font-medium text-amber-600"> {t('trạng thái chờ quản lý duyệt')}</span>.
       </p>
@@ -151,21 +151,21 @@ export default function MyAttendance() {
 
         {/* Action card */}
         <div className="flex flex-col gap-3">
-          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 ring-1 ring-slate-200/70 shadow-soft">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-gray-700">{t('Vị trí hiện tại')}</p>
+              <p className="text-sm font-semibold text-slate-700">{t('Vị trí hiện tại')}</p>
               <button
                 onClick={requestLocation}
                 disabled={posLoading}
-                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-50"
+                className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 disabled:opacity-50"
               >
                 <MdMyLocation /> {t('Cập nhật')}
               </button>
             </div>
-            {posLoading && <p className="text-xs text-gray-500">{t('Đang lấy GPS…')}</p>}
+            {posLoading && <p className="text-xs text-slate-500">{t('Đang lấy GPS…')}</p>}
             {posError && <p className="text-xs text-rose-600">{posError}</p>}
             {position && (
-              <p className="text-xs text-gray-600 break-all">
+              <p className="text-xs text-slate-600 break-all">
                 {position[0].toFixed(6)}, {position[1].toFixed(6)}
               </p>
             )}
@@ -182,7 +182,7 @@ export default function MyAttendance() {
               </div>
             )}
             {!nearest && offices.length === 0 && (
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-slate-400 mt-2">
                 {t('Chưa có văn phòng nào được cấu hình. Liên hệ quản lý.')}
               </p>
             )}
@@ -191,7 +191,7 @@ export default function MyAttendance() {
           <button
             onClick={checkIn}
             disabled={busy}
-            className="flex items-center justify-center gap-3 px-6 py-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold shadow-md hover:shadow-lg transition-shadow disabled:opacity-60"
+            className="flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-soft-md hover:shadow-soft-lg transition-shadow disabled:opacity-60"
           >
             <MdLogin className="text-2xl" />
             <span>{t('Vào ca (Check-in)')}</span>
@@ -199,7 +199,7 @@ export default function MyAttendance() {
           <button
             onClick={checkOut}
             disabled={busy}
-            className="flex items-center justify-center gap-3 px-6 py-5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-md hover:shadow-lg transition-shadow disabled:opacity-60"
+            className="flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-semibold shadow-soft-md hover:shadow-soft-lg transition-shadow disabled:opacity-60"
           >
             <MdLogout className="text-2xl" />
             <span>{t('Tan ca (Check-out)')}</span>
@@ -214,21 +214,21 @@ export default function MyAttendance() {
         <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600" />
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ vào')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ ra')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Văn phòng')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Khoảng cách')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Ngày')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Giờ vào')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Giờ ra')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Văn phòng')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Khoảng cách')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Trạng thái')}</th>
               </tr>
             </thead>
             <tbody>
@@ -238,12 +238,12 @@ export default function MyAttendance() {
                 </tr>
               ) : (
                 records.map((r, idx) => (
-                  <tr key={r.attendanceId ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
-                    <td className="px-6 py-4 text-gray-800">{r.date ? String(r.date).split('T')[0] : '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkIn, lang)}</td>
-                    <td className="px-6 py-4 text-gray-600">{formatDateTime(r.checkOut, lang)}</td>
-                    <td className="px-6 py-4 text-gray-600">{r.checkInOffice?.name || '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">
+                  <tr key={r.attendanceId ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/60 hover:bg-slate-100'}>
+                    <td className="px-6 py-4 text-slate-900">{r.date ? String(r.date).split('T')[0] : '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{formatDateTime(r.checkIn, lang)}</td>
+                    <td className="px-6 py-4 text-slate-600">{formatDateTime(r.checkOut, lang)}</td>
+                    <td className="px-6 py-4 text-slate-600">{r.checkInOffice?.name || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">
                       {r.checkInDistanceMeters != null ? `${r.checkInDistanceMeters}m` : '-'}
                     </td>
                     <td className="px-6 py-4">{reviewBadge(r.reviewStatus, t)}</td>

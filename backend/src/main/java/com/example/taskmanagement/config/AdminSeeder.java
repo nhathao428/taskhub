@@ -28,7 +28,8 @@ public class AdminSeeder implements ApplicationRunner {
     @Value("${app.admin.email:admin@example.com}")
     private String adminEmail;
 
-    @Value("${app.admin.password:Admin@12345}")
+    // Không có default — phải set qua biến môi trường ADMIN_PASSWORD (xem check trong run()).
+    @Value("${app.admin.password:}")
     private String adminPassword;
 
     public AdminSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -41,6 +42,10 @@ public class AdminSeeder implements ApplicationRunner {
         if (userRepository.existsByEmail(adminEmail)) {
             log.info("Admin account already exists — skipping seed.");
             return;
+        }
+        if (adminPassword == null || adminPassword.isBlank()) {
+            throw new IllegalStateException(
+                    "ADMIN_PASSWORD environment variable is required to seed the admin account");
         }
         User admin = new User();
         admin.setUsername(adminUsername);

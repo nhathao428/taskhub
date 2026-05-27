@@ -18,7 +18,7 @@ const statusConfig = {
 
 function StatusBadge({ status }) {
   const { t } = useTranslation()
-  const cfg = statusConfig[status] || { label: status, cls: 'bg-gray-100 text-gray-600' }
+  const cfg = statusConfig[status] || { label: status, cls: 'bg-slate-100 text-slate-600' }
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cfg.cls}`}>
       {statusConfig[status] ? t(cfg.label) : cfg.label}
@@ -95,11 +95,11 @@ export default function Projects() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">{t('Dự án')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Dự án')}</h1>
         {isManager && (
           <button
             onClick={openAdd}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow transition-colors"
           >
             <MdAdd className="text-xl" /> {t('Thêm dự án')}
           </button>
@@ -110,22 +110,22 @@ export default function Projects() {
         <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tên dự án')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Mô tả')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày bắt đầu')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày kết thúc')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Tên dự án')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Mô tả')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Ngày bắt đầu')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Ngày kết thúc')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Trạng thái')}</th>
                 {isManager && (
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Hành động')}</th>
                 )}
               </tr>
             </thead>
@@ -136,23 +136,23 @@ export default function Projects() {
                 </tr>
               ) : (
                 projects.map((proj, idx) => (
-                  <tr key={proj.projectId ?? proj.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
-                    <td className="px-6 py-4 font-medium text-gray-800">{proj.name}</td>
-                    <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{proj.description}</td>
-                    <td className="px-6 py-4 text-gray-600">{proj.startDate ? proj.startDate.split('T')[0] : '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{proj.endDate ? proj.endDate.split('T')[0] : '-'}</td>
+                  <tr key={proj.projectId ?? proj.id} className={idx % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/60 hover:bg-slate-100'}>
+                    <td className="px-6 py-4 font-medium text-slate-900">{proj.name}</td>
+                    <td className="px-6 py-4 text-slate-600 max-w-xs truncate">{proj.description}</td>
+                    <td className="px-6 py-4 text-slate-600">{proj.startDate ? proj.startDate.split('T')[0] : '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{proj.endDate ? proj.endDate.split('T')[0] : '-'}</td>
                     <td className="px-6 py-4"><StatusBadge status={proj.status} /></td>
                     {isManager && (
                       <td className="px-6 py-4 text-center">
                         <button
                           onClick={() => openEdit(proj)}
-                          className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm"
+                          className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-700 mr-3 text-sm"
                         >
                           <MdEdit /> {t('Sửa')}
                         </button>
                         <button
                           onClick={() => handleDelete(proj.projectId ?? proj.id)}
-                          className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm"
+                          className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-sm"
                         >
                           <MdDelete /> {t('Xóa')}
                         </button>
@@ -170,52 +170,52 @@ export default function Projects() {
         <form onSubmit={handleSave} className="space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Tên dự án')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Tên dự án')}</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
               placeholder={t('Nhập tên dự án')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Mô tả')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Mô tả')}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
               placeholder={t('Mô tả ngắn về dự án')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Ngày bắt đầu')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Ngày bắt đầu')}</label>
               <input
                 type="date"
                 value={form.startDate}
                 onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Ngày kết thúc')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Ngày kết thúc')}</label>
               <input
                 type="date"
                 value={form.endDate}
                 onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Trạng thái')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Trạng thái')}</label>
             <select
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="ACTIVE">{t('Hoạt động')}</option>
               <option value="ON_TRACK">{t('Đúng tiến độ')}</option>
@@ -225,8 +225,8 @@ export default function Projects() {
             </select>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">{t('Hủy')}</button>
-            <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50">{t('Hủy')}</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow disabled:shadow-none">
               {saving ? t('Đang lưu...') : t('Lưu')}
             </button>
           </div>

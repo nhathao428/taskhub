@@ -10,9 +10,9 @@ import com.example.taskmanagement.repository.EmployeeRepository;
 import com.example.taskmanagement.repository.ProjectRepository;
 import com.example.taskmanagement.repository.TaskRepository;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,17 +37,46 @@ public class TaskService {
         this.currentUserService = currentUserService;
     }
 
-    @Cacheable("tasks")
     @Transactional(readOnly = true)
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<Task> getAllTasks(Authentication auth) {
+        if (isManagerOrAdmin(auth)) {
+            return taskRepository.findAll();
+        }
+        // EMPLOYEE chỉ thấy task được giao cho mình hoặc thuộc project cùng group.
+        Employee me = currentUserService.getCurrentEmployee(auth);
+        return taskRepository.findAll().stream()
+                .filter(t -> isOwnedOrSameGroup(t, me))
+                .toList();
     }
 
-    @Cacheable(value = "tasks", key = "#id")
     @Transactional(readOnly = true)
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id)
+    public Task getTaskById(Long id, Authentication auth) {
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task", "id", id));
+        if (isManagerOrAdmin(auth)) {
+            return task;
+        }
+        Employee me = currentUserService.getCurrentEmployee(auth);
+        if (!isOwnedOrSameGroup(task, me)) {
+            throw new AccessDeniedException("You can only view tasks assigned to you or in your group");
+        }
+        return task;
+    }
+
+    private boolean isManagerOrAdmin(Authentication auth) {
+        if (auth == null) return false;
+        return auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_MANAGER"))
+                || auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+    }
+
+    private boolean isOwnedOrSameGroup(Task task, Employee me) {
+        boolean assignedToMe = task.getAssignedTo() != null
+                && me.getEmployeeId().equals(task.getAssignedTo().getEmployeeId());
+        boolean sameGroup = task.getProject() != null
+                && me.getGroup() != null
+                && !me.getGroup().isBlank()
+                && me.getGroup().equals(task.getProject().getGroup());
+        return assignedToMe || sameGroup;
     }
 
     @Transactional

@@ -17,7 +17,7 @@ function reviewBadge(status, t) {
   if (status === 'REJECTED') {
     return <span className="px-2 py-0.5 text-[11px] rounded-full bg-rose-100 text-rose-700 font-medium">{t('Từ chối')}</span>
   }
-  return <span className="text-gray-400 text-xs">-</span>
+  return <span className="text-slate-400 text-xs">-</span>
 }
 
 const emptyForm = { employee: '', date: '', checkIn: '', checkOut: '' }
@@ -71,10 +71,10 @@ export default function Attendance() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">{t('Chấm công')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Chấm công')}</h1>
         <button
           onClick={() => { setForm(emptyForm); setError(''); setModalOpen(true) }}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow transition-colors"
         >
           <MdAdd className="text-xl" /> {t('Ghi nhận chấm công')}
         </button>
@@ -84,13 +84,13 @@ export default function Attendance() {
         <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{fetchError}</div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md p-4 mb-4">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-4 mb-4">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('Lọc theo nhân viên:')}</label>
+          <label className="text-sm font-medium text-slate-700 whitespace-nowrap">{t('Lọc theo nhân viên:')}</label>
           <select
             value={filterEmpId}
             onChange={handleFilterChange}
-            className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="flex-1 max-w-xs px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             <option value="">{t('Tất cả nhân viên')}</option>
             {employees.map((emp) => (
@@ -102,23 +102,23 @@ export default function Attendance() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Nhân viên')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Ngày')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ vào')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Giờ ra')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Văn phòng')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Khoảng cách')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Nhân viên')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Ngày')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Giờ vào')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Giờ ra')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Văn phòng')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Khoảng cách')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Trạng thái')}</th>
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Hành động')}</th>
               </tr>
             </thead>
             <tbody>
@@ -128,13 +128,13 @@ export default function Attendance() {
                 </tr>
               ) : (
                 records.map((rec, idx) => (
-                  <tr key={rec.attendanceId ?? rec.id ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
-                    <td className="px-6 py-4 font-medium text-gray-800">{getEmpName(rec)}</td>
-                    <td className="px-6 py-4 text-gray-600">{rec.date ? rec.date.split('T')[0] : '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{rec.checkIn || '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{rec.checkOut || '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">{rec.checkInOffice?.name || '-'}</td>
-                    <td className="px-6 py-4 text-gray-600">
+                  <tr key={rec.attendanceId ?? rec.id ?? idx} className={idx % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/60 hover:bg-slate-100'}>
+                    <td className="px-6 py-4 font-medium text-slate-900">{getEmpName(rec)}</td>
+                    <td className="px-6 py-4 text-slate-600">{rec.date ? rec.date.split('T')[0] : '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{rec.checkIn || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{rec.checkOut || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">{rec.checkInOffice?.name || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">
                       {rec.checkInDistanceMeters != null ? `${rec.checkInDistanceMeters}m` : '-'}
                     </td>
                     <td className="px-6 py-4">{reviewBadge(rec.reviewStatus, t)}</td>
@@ -158,7 +158,7 @@ export default function Attendance() {
                             className="p-1.5 rounded-md bg-rose-100 hover:bg-rose-200 text-rose-700"
                           ><MdClose /></button>
                         </div>
-                      ) : <span className="text-gray-300 text-xs">—</span>}
+                      ) : <span className="text-slate-300 text-xs">—</span>}
                     </td>
                   </tr>
                 ))
@@ -172,12 +172,12 @@ export default function Attendance() {
         <form onSubmit={handleSave} className="space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Nhân viên')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Nhân viên')}</label>
             <select
               value={form.employee}
               onChange={(e) => setForm({ ...form, employee: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">{t('-- Chọn nhân viên --')}</option>
               {employees.map((emp) => (
@@ -188,38 +188,38 @@ export default function Attendance() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Ngày')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Ngày')}</label>
             <input
               type="date"
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Giờ vào')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Giờ vào')}</label>
               <input
                 type="time"
                 value={form.checkIn}
                 onChange={(e) => setForm({ ...form, checkIn: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Giờ ra')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Giờ ra')}</label>
               <input
                 type="time"
                 value={form.checkOut}
                 onChange={(e) => setForm({ ...form, checkOut: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">{t('Hủy')}</button>
-            <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50">{t('Hủy')}</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow disabled:shadow-none">
               {saving ? t('Đang lưu...') : t('Lưu')}
             </button>
           </div>

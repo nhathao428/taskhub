@@ -425,6 +425,11 @@ add_footer_page_number(sec1, show=False)
 # 1) TRANG BÌA CHÍNH
 # ==================================================================
 def add_cover_page(doc, is_main=True):
+    logo_p = doc.add_paragraph()
+    logo_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    logo_p.paragraph_format.space_after = Pt(6)
+    logo_p.add_run().add_picture("hutech_logo.png", width=Cm(2.8))
+
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(0)
@@ -443,8 +448,7 @@ def add_cover_page(doc, is_main=True):
     run = p.add_run("KHOA CÔNG NGHỆ THÔNG TIN")
     set_run(run, size=13, bold=True)
 
-    add_p(doc, "", space_after=12)
-    add_p(doc, "─" * 50, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=24)
+    add_p(doc, "─" * 50, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=20)
 
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -457,8 +461,6 @@ def add_cover_page(doc, is_main=True):
     p.paragraph_format.space_after = Pt(24)
     run = p.add_run("ĐỒ ÁN CƠ SỞ")
     set_run(run, size=20, bold=True)
-
-    add_p(doc, "", space_after=12)
 
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -474,11 +476,9 @@ def add_cover_page(doc, is_main=True):
 
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.paragraph_format.space_after = Pt(36)
+    p.paragraph_format.space_after = Pt(20)
     run = p.add_run("CHO DOANH NGHIỆP NHỎ ĐA NGÀNH TÍCH HỢP AI")
     set_run(run, size=18, bold=True)
-
-    add_p(doc, "", space_after=12)
 
     # Khối thông tin
     info_lines = [
@@ -487,7 +487,6 @@ def add_cover_page(doc, is_main=True):
         ("Giảng viên hướng dẫn:", "ThS. DƯƠNG THÀNH PHẾT"),
         ("Sinh viên thực hiện:", "NGUYỄN NHẬT HẢO"),
         ("Mã số sinh viên:", "2380612688"),
-        ("Lớp:", "23DTHC1"),
     ]
     for label, value in info_lines:
         p = doc.add_paragraph()
@@ -500,7 +499,7 @@ def add_cover_page(doc, is_main=True):
         r2 = p.add_run(value)
         set_run(r2, size=14, bold=True)
 
-    add_p(doc, "", space_after=36)
+    add_p(doc, "", space_after=18)
 
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -553,7 +552,7 @@ add_p(doc, "Nguyễn Nhật Hảo",
 add_h1(doc, "LỜI MỞ ĐẦU")
 
 opening = [
-    "Trong bối cảnh cách mạng công nghiệp lần thứ tư đang diễn ra mạnh mẽ trên phạm vi toàn cầu, công nghệ thông tin đã trở thành động lực then chốt thúc đẩy sự phát triển kinh tế – xã hội của mọi quốc gia. Tại Việt Nam, Chính phủ đã ban hành nhiều chính sách quan trọng nhằm thúc đẩy chuyển đổi số trong các doanh nghiệp, đặc biệt là doanh nghiệp nhỏ và vừa – khu vực kinh tế chiếm hơn 97% tổng số doanh nghiệp và đóng góp khoảng 45% GDP cả nước.",
+    "Trong bối cảnh cách mạng công nghiệp lần thứ tư đang diễn ra mạnh mẽ trên phạm vi toàn cầu, công nghệ thông tin đã trở thành động lực then chốt thúc đẩy sự phát triển kinh tế – xã hội của mọi quốc gia. Tại Việt Nam, Chính phủ đã ban hành nhiều chính sách quan trọng nhằm thúc đẩy chuyển đổi số trong các doanh nghiệp, đặc biệt là doanh nghiệp nhỏ và vừa – khu vực kinh tế chiếm gần 98% tổng số doanh nghiệp và đóng góp khoảng 45% GDP cả nước.",
     "Tuy nhiên, một thực tế đáng quan tâm là phần lớn doanh nghiệp nhỏ và vừa, đặc biệt là các doanh nghiệp nhỏ đa ngành, vẫn đang sử dụng các phương pháp quản lý truyền thống như bảng tính Excel, sổ ghi chép tay hoặc các nhóm chat trên các ứng dụng nhắn tin để quản lý công việc, phân công nhân sự và theo dõi tiến độ. Cách làm này dẫn đến nhiều bất cập như thiếu minh bạch, phân công không tối ưu, khó tổng hợp dữ liệu, không có cơ sở khoa học để ra quyết định và đặc biệt là chưa tận dụng được sức mạnh của trí tuệ nhân tạo trong việc gợi ý nhân viên phù hợp cho từng công việc.",
     "Nhận thức được những vấn đề thực tế đó, đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI” được lựa chọn nhằm xây dựng một nền tảng phần mềm toàn diện, hiện đại, đáp ứng các nhu cầu cốt lõi của doanh nghiệp nhỏ trong việc quản lý nhân viên, dự án, công việc và chấm công. Đặc biệt, hệ thống tích hợp module AI gợi ý nhân viên dùng Google Gemini gemini-2.5-flash xếp hạng định tính theo kỹ năng, tiến độ, đúng hạn và chấm công, cho phép người quản lý nhanh chóng tìm được nhân sự phù hợp nhất cho từng công việc cụ thể.",
     "Đồ án được thực hiện trong khuôn khổ môn học Đồ án cơ sở thuộc chương trình đào tạo Công nghệ thông tin của Khoa Công nghệ Thông tin. Báo cáo này được tổ chức thành 6 chương, trình bày một cách có hệ thống từ tổng quan đề tài, cơ sở lý thuyết, phân tích – thiết kế hệ thống, triển khai ứng dụng đến kiểm thử, demo và kết luận. Toàn bộ mã nguồn, tài liệu kỹ thuật và sản phẩm cuối cùng đều được công bố tại kho lưu trữ của tác giả để phục vụ mục đích học tập và phát triển tiếp theo.",
@@ -701,8 +700,8 @@ add_h1(doc, "CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI")
 
 add_h2(doc, "1.1. Đặt vấn đề")
 for t in [
-    "Trong xu thế hội nhập kinh tế quốc tế và cuộc cách mạng công nghiệp lần thứ tư (Industry 4.0), chuyển đổi số đã trở thành yêu cầu tất yếu đối với mọi doanh nghiệp, không phân biệt quy mô lớn nhỏ hay lĩnh vực kinh doanh. Theo báo cáo của Bộ Kế hoạch và Đầu tư năm 2024, Việt Nam có hơn 920.000 doanh nghiệp đang hoạt động, trong đó doanh nghiệp nhỏ và vừa (Small and Medium-sized Enterprise – SME) chiếm tới 97,5% và đóng góp khoảng 45% GDP, 31% tổng thu ngân sách Nhà nước, đồng thời tạo ra hơn 5 triệu việc làm.",
-    "Tuy đóng vai trò quan trọng như vậy, nhưng các doanh nghiệp nhỏ tại Việt Nam – đặc biệt là doanh nghiệp nhỏ đa ngành – vẫn đang gặp rất nhiều khó khăn trong việc ứng dụng công nghệ thông tin vào quản lý hoạt động nội bộ. Khảo sát của Phòng Thương mại và Công nghiệp Việt Nam (VCCI) năm 2023 cho thấy chỉ có khoảng 31% doanh nghiệp nhỏ sử dụng phần mềm chuyên dụng để quản lý công việc, còn lại đại đa số vẫn dùng bảng tính Excel, sổ ghi chép tay, các nhóm chat trên Zalo hoặc Facebook Messenger để phân công công việc, theo dõi tiến độ và quản lý nhân sự.",
+    "Trong xu thế hội nhập kinh tế quốc tế và cuộc cách mạng công nghiệp lần thứ tư (Industry 4.0), chuyển đổi số đã trở thành yêu cầu tất yếu đối với mọi doanh nghiệp, không phân biệt quy mô lớn nhỏ hay lĩnh vực kinh doanh. Theo số liệu của Bộ Kế hoạch và Đầu tư, tính đến ngày 31/12/2024, cả nước có khoảng 940.000 doanh nghiệp đang hoạt động, trong đó doanh nghiệp nhỏ và vừa (Small and Medium-sized Enterprise – SME) chiếm gần 98%. Khu vực này đóng góp khoảng 45% GDP và thu hút khoảng 5,5 triệu lao động, giữ vai trò quan trọng đối với nền kinh tế.",
+    "Tuy đóng vai trò quan trọng như vậy, nhưng các doanh nghiệp nhỏ tại Việt Nam – đặc biệt là doanh nghiệp nhỏ đa ngành – vẫn đang gặp rất nhiều khó khăn trong việc ứng dụng công nghệ thông tin vào quản lý hoạt động nội bộ. Khảo sát của Phòng Thương mại và Công nghiệp Việt Nam (VCCI) trên 1.000 doanh nghiệp nhỏ và vừa cho thấy phần mềm kế toán là loại được ứng dụng phổ biến nhất với 748/1.000 doanh nghiệp, trong khi phần mềm quản lý nhân sự chỉ có 146/1.000 doanh nghiệp sử dụng, và gần như không doanh nghiệp nào dùng hệ thống quản lý công việc hay phê duyệt nội bộ. Phần lớn doanh nghiệp nhỏ vẫn dựa vào bảng tính Excel, sổ ghi chép tay và các nhóm chat trên Zalo, Facebook Messenger để phân công công việc, theo dõi tiến độ và quản lý nhân sự.",
     "Việc quản lý theo phương pháp truyền thống dẫn đến hàng loạt bất cập nghiêm trọng, ảnh hưởng trực tiếp đến năng suất lao động và khả năng cạnh tranh của doanh nghiệp:",
 ]:
     add_para(doc, t)
@@ -784,7 +783,7 @@ for s in [
     add_bullet(doc, s)
 add_h3(doc, "1.4.2. Phân tích – thiết kế hệ thống")
 for s in [
-    "Khảo sát hiện trạng tại 3 doanh nghiệp nhỏ ở TP.HCM (qua phỏng vấn online).",
+    "Khảo sát hiện trạng quản lý công việc tại doanh nghiệp nhỏ Việt Nam qua số liệu thống kê, khảo sát ngành và tài liệu chuyên ngành.",
     "Tổng hợp 14 yêu cầu chức năng và 8 yêu cầu phi chức năng.",
     "Vẽ Use Case Diagram (14 use case) và đặc tả chi tiết 3 use case tiêu biểu theo mẫu Cockburn.",
     "Thiết kế ERD với 6 bảng, mô tả chi tiết các trường và ràng buộc.",
@@ -803,7 +802,7 @@ for s in [
     "Triển khai thuật toán AiSuggestionService với cache Redis.",
     "Tích hợp Gemini API trực tiếp trong AiSuggestionService qua RestClient của Spring.",
     "Viết Dockerfile cho từng service và file docker-compose.yml.",
-    "Kiểm thử với 35 test cases: 15 cho Auth/Employee, 10 cho Task/Project, 5 cho Attendance, 5 cho AI.",
+    "Kiểm thử với 42 test cases bao phủ 9 module nghiệp vụ: Auth, Employee, Project, Task, Attendance, AI Suggestion, Dashboard, Self-service và Geofence.",
     "Viết tài liệu API bằng Swagger UI và tài liệu kỹ thuật bằng Markdown.",
 ]:
     add_bullet(doc, s)
@@ -822,13 +821,15 @@ add_para(doc,
     "Documentation). Đồng thời tham khảo các sách chuyên ngành về kỹ thuật phần mềm, "
     "kiến trúc phần mềm và trí tuệ nhân tạo. Các bài báo khoa học trên Google Scholar "
     "về hệ thống gợi ý đa tiêu chí cũng được khảo cứu để xây dựng thuật toán phù hợp.")
-add_h3(doc, "1.5.2. Phương pháp khảo sát thực tế")
+add_h3(doc, "1.5.2. Phương pháp khảo sát hiện trạng")
 add_para(doc,
-    "Tiến hành phỏng vấn online 3 nhà quản lý doanh nghiệp nhỏ đa ngành ở TP.HCM "
-    "(thuộc các lĩnh vực: thiết kế đồ họa kết hợp marketing, công ty xây dựng dân "
-    "dụng, công ty phần mềm gia công) để hiểu thực tế quy trình quản lý công việc "
-    "của họ. Mỗi cuộc phỏng vấn kéo dài 45–60 phút, tập trung vào các câu hỏi: hiện "
-    "tại đang dùng công cụ gì, đang gặp vấn đề gì, kỳ vọng gì ở một phần mềm quản lý.")
+    "Khảo sát hiện trạng quản lý công việc tại các doanh nghiệp nhỏ đa ngành ở "
+    "Việt Nam thông qua nghiên cứu tài liệu thứ cấp: số liệu thống kê của Bộ Kế "
+    "hoạch và Đầu tư, khảo sát của Phòng Thương mại và Công nghiệp Việt Nam (VCCI) "
+    "về mức độ ứng dụng phần mềm, cùng các bài viết chuyên ngành về chuyển đổi số "
+    "trong doanh nghiệp nhỏ và vừa. Đồng thời tiến hành so sánh, phân tích các công "
+    "cụ quản lý công việc đang phổ biến (Excel, Trello, phần mềm ERP) nhằm xác định "
+    "khoảng trống mà đề tài hướng tới giải quyết.")
 add_h3(doc, "1.5.3. Phương pháp phân tích thiết kế hướng đối tượng")
 add_para(doc,
     "Sử dụng ngôn ngữ mô hình hóa thống nhất (UML) để phân tích và thiết kế hệ thống. "
@@ -845,7 +846,7 @@ add_para(doc,
 add_h3(doc, "1.5.5. Phương pháp kiểm thử thực nghiệm")
 add_para(doc,
     "Sau khi triển khai xong, hệ thống được kiểm thử theo phương pháp hộp đen "
-    "(black-box testing) với 35 test cases bao phủ tất cả các luồng nghiệp vụ "
+    "(black-box testing) với 42 test cases bao phủ tất cả các luồng nghiệp vụ "
     "chính. Sử dụng Postman để kiểm thử API và trình duyệt Chrome để kiểm thử "
     "giao diện. Kết quả kiểm thử được ghi nhận và phân tích trong Chương 5.")
 
@@ -913,7 +914,7 @@ chapters_overview = [
     ("Chương 4 – Xây dựng ứng dụng",
      "Trình bày chi tiết quá trình triển khai backend, frontend, mobile, tích hợp Redis, Gemini và đóng gói bằng Docker."),
     ("Chương 5 – Kiểm thử và đánh giá kết quả",
-     "Trình bày kế hoạch kiểm thử, 35 test cases, kết quả kiểm thử, demo giao diện thực tế (web + mobile) và quy trình khởi chạy hệ thống trên mọi nền tảng."),
+     "Trình bày kế hoạch kiểm thử, 42 test cases, kết quả kiểm thử, demo giao diện thực tế (web + mobile) và quy trình khởi chạy hệ thống trên mọi nền tảng."),
     ("Chương 6 – Kết luận và hướng phát triển",
      "Tổng kết kết quả đạt được, các hạn chế của đề tài và đề xuất hướng phát triển trong tương lai."),
 ]
@@ -1111,7 +1112,7 @@ add_para(doc,
 add_h3(doc, "2.4.3. Quy trình xác thực JWT trong hệ thống")
 for s in [
     "Bước 1: Client gửi POST /api/auth/login với username và password.",
-    "Bước 2: Server xác thực credential. Nếu hợp lệ, Server tạo JWT chứa các claim (sub=username, roles, exp=24h sau) ký bằng HMAC-SHA256 với secret key.",
+    "Bước 2: Server xác thực credential. Nếu hợp lệ, Server tạo JWT chứa các claim (sub=username, roles, exp=2h sau) ký bằng HMAC-SHA256 với secret key.",
     "Bước 3: Server trả JWT cho Client. Client lưu vào localStorage hoặc SecureStorage (mobile).",
     "Bước 4: Mỗi request sau đó, Client gắn JWT vào header Authorization: Bearer <token>.",
     "Bước 5: JwtAuthenticationFilter ở backend đọc header, giải mã JWT, kiểm tra signature và thời hạn.",
@@ -1555,34 +1556,36 @@ add_para(doc,
 add_h1(doc, "CHƯƠNG 3. PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG")
 
 add_h2(doc, "3.1. Khảo sát hiện trạng")
-add_h3(doc, "3.1.1. Đối tượng khảo sát")
+add_h3(doc, "3.1.1. Nguồn dữ liệu khảo sát")
 add_para(doc,
     "Để hiểu rõ thực trạng quản lý công việc tại các doanh nghiệp nhỏ "
-    "đa ngành ở Việt Nam, tác giả đã tiến hành phỏng vấn online 3 nhà "
-    "quản lý/chủ doanh nghiệp ở TP.HCM, thuộc 3 lĩnh vực khác nhau:")
+    "đa ngành ở Việt Nam, đề tài tiến hành khảo sát dựa trên các nguồn "
+    "dữ liệu thứ cấp đã được công bố:")
 for s in [
-    "Doanh nghiệp A: Công ty thiết kế đồ họa và marketing số, 8 nhân viên. Cung cấp dịch vụ thiết kế logo, làm video, chạy quảng cáo Facebook/Google cho khách hàng B2B.",
-    "Doanh nghiệp B: Công ty xây dựng dân dụng nhỏ, 12 nhân viên. Nhận thầu sửa chữa nhà, thiết kế nội thất, thi công công trình quy mô nhỏ.",
-    "Doanh nghiệp C: Công ty phần mềm gia công, 15 nhân viên. Phát triển website, ứng dụng mobile, hệ thống quản trị nội bộ theo yêu cầu khách hàng.",
+    "Số liệu thống kê chính thức: báo cáo tình hình đăng ký doanh nghiệp và các công bố của Bộ Kế hoạch và Đầu tư, phản ánh quy mô và đặc điểm của khu vực doanh nghiệp nhỏ và vừa.",
+    "Khảo sát ngành: kết quả khảo sát của Phòng Thương mại và Công nghiệp Việt Nam (VCCI) về mức độ ứng dụng phần mềm quản lý trong doanh nghiệp nhỏ và vừa.",
+    "Bài viết và báo cáo chuyên ngành về thực trạng chuyển đổi số của doanh nghiệp nhỏ tại Việt Nam, đăng trên các tạp chí và báo điện tử uy tín.",
 ]:
     add_bullet(doc, s)
 add_h3(doc, "3.1.2. Phương pháp khảo sát")
 add_para(doc,
-    "Mỗi cuộc phỏng vấn online qua Google Meet kéo dài 45–60 phút. Câu "
-    "hỏi tập trung vào các chủ đề: hiện tại doanh nghiệp đang dùng công "
-    "cụ nào để quản lý công việc, gặp khó khăn gì, kỳ vọng gì ở một "
-    "phần mềm chuyên dụng. Ngoài ra, tác giả còn quan sát thực tế quy "
-    "trình làm việc tại doanh nghiệp C (công ty phần mềm) trong 2 ngày, "
-    "ghi chú lại các điểm chạm (touchpoints) giữa quản lý và nhân viên.")
+    "Đề tài sử dụng phương pháp nghiên cứu tài liệu thứ cấp (desk "
+    "research): thu thập, tổng hợp và phân tích các số liệu, báo cáo nêu "
+    "trên để rút ra đặc điểm chung về cách thức quản lý công việc tại "
+    "doanh nghiệp nhỏ. Bên cạnh đó, đề tài so sánh trực tiếp các công cụ "
+    "quản lý công việc hiện có (bảng tính Excel, sổ ghi chép, Trello, "
+    "phần mềm ERP) trên các tiêu chí: chi phí, mức độ trực quan, khả năng "
+    "hỗ trợ nghiệp vụ nhân sự – chấm công và độ phù hợp với doanh nghiệp "
+    "nhỏ tại Việt Nam.")
 add_h3(doc, "3.1.3. Kết quả khảo sát")
-add_para(doc, "Tổng hợp các phát hiện chính từ 3 doanh nghiệp:")
+add_para(doc, "Tổng hợp các phát hiện chính từ quá trình khảo sát:")
 for s in [
-    "Cả 3 doanh nghiệp đều dùng Excel kết hợp Zalo/Messenger để giao việc; không có công cụ chuyên dụng nào được sử dụng nhất quán.",
-    "Cả 3 nhà quản lý đều phàn nàn về việc khó nắm bắt khối lượng công việc thực tế của từng nhân viên – dẫn đến phân công không công bằng.",
-    "Doanh nghiệp A và C có nhân viên đa kỹ năng (multi-skill) và phải thường xuyên xáo trộn nhân sự giữa các dự án.",
-    "Tất cả đều quản lý chấm công bằng giấy hoặc Excel – tốn thời gian tổng hợp cuối tháng.",
-    "Cả 3 đều bày tỏ quan tâm đến tính năng AI gợi ý nhân viên nếu phần mềm có chi phí thấp và dễ sử dụng.",
-    "Yêu cầu phổ biến: dễ sử dụng (không cần đào tạo), chạy được trên cả web và điện thoại, hỗ trợ tiếng Việt, tốc độ phản hồi nhanh.",
+    "Phần lớn doanh nghiệp nhỏ vẫn dùng bảng tính Excel kết hợp Zalo/Messenger để giao việc; rất ít doanh nghiệp sử dụng phần mềm quản lý công việc chuyên dụng một cách nhất quán.",
+    "Người quản lý khó nắm bắt khối lượng công việc thực tế của từng nhân viên, dẫn đến việc phân công thiếu cân đối.",
+    "Tại các doanh nghiệp nhỏ đa ngành, nhân viên thường kiêm nhiệm nhiều kỹ năng (multi-skill) và bị xáo trộn giữa các dự án, khiến việc bố trí nhân sự trở nên phức tạp.",
+    "Việc chấm công chủ yếu được thực hiện thủ công bằng giấy hoặc Excel, tốn thời gian tổng hợp vào cuối tháng.",
+    "Doanh nghiệp nhỏ quan tâm đến các tính năng ứng dụng AI hỗ trợ ra quyết định, với điều kiện chi phí thấp và dễ sử dụng.",
+    "Yêu cầu phổ biến đối với một phần mềm quản lý: dễ sử dụng (không cần đào tạo), chạy được trên cả web và điện thoại, hỗ trợ tiếng Việt, tốc độ phản hồi nhanh.",
 ]:
     add_bullet(doc, s)
 add_table(
@@ -1658,7 +1661,7 @@ add_table(
         ("NF-01", "Hiệu năng",
          "API thông thường phản hồi trong 500ms; API AI Gợi ý ≤ 2 giây với 100 nhân viên."),
         ("NF-02", "Bảo mật",
-         "Mật khẩu băm BCrypt cost=10; JWT HS256 expires 24h; HTTPS cho production; CORS giới hạn; "
+         "Mật khẩu băm BCrypt cost=10; JWT HS256 expires 2h; HTTPS cho production; CORS giới hạn; "
          "rate limiting theo IP chống spam/brute-force."),
         ("NF-03", "Khả dụng",
          "Hệ thống hoạt động 99% thời gian; phục hồi sau lỗi container trong 1 phút."),
@@ -2317,7 +2320,7 @@ server:
 
 jwt:
   secret: ${JWT_SECRET:bXlfc3VwZXJfc2VjcmV0X2tleV9mb3JfaGFvX2Jhb19jYW9fZG9fYW5fY29fc28=}
-  expiration: 86400000          # 24h
+  expiration: 7200000           # 2h
 
 gemini:
   api:
@@ -4271,7 +4274,7 @@ add_para(doc,
     "Khi demo cho giảng viên, tác giả áp dụng kịch bản 7 bước dưới đây "
     "– toàn bộ kịch bản đã được chạy thử lại trên cả Windows và "
     "Ubuntu để đảm bảo lặp lại được. Mỗi bước kèm dữ liệu seed đã có "
-    "sẵn trong tài khoản admin (`admin` / `Admin@12345`), không cần "
+    "sẵn trong tài khoản admin (username/password cấu hình qua biến môi trường ADMIN_USERNAME / ADMIN_PASSWORD), không cần "
     "nhập thủ công từ đầu.")
 for i, s in enumerate([
     "Khởi động một lệnh: chạy `./start.sh` (hoặc `start.ps1`) – chờ "
@@ -4361,7 +4364,7 @@ add_table(
         ("AI gợi ý nhân viên (Google Gemini gemini-2.5-flash, ranking định tính)", "100% – hoàn thành"),
         ("Redis cache cho AI Suggestion", "100% – hoàn thành"),
         ("Docker Compose toàn bộ stack (PostgreSQL + Redis + backend + frontend)", "100% – hoàn thành"),
-        ("Kiểm thử tối thiểu 30 test cases", "123% – 37/30 test cases"),
+        ("Kiểm thử tối thiểu 30 test cases", "140% – 42/30 test cases"),
         ("Tài liệu hoàn chỉnh theo mẫu Khoa Công nghệ Thông tin", "100% – hoàn thành"),
     ],
     col_widths=[8.5, 7.0],
@@ -4497,11 +4500,19 @@ refs = [
      'Springer International Publishing, 2016.'),
     ('[27] Thomas L. Saaty, "The Analytic Hierarchy Process: Planning, Priority '
      'Setting, Resource Allocation", McGraw-Hill, New York, 1980.'),
-    ('[28] Phòng Thương mại và Công nghiệp Việt Nam (VCCI), "Báo cáo PCI 2023 – '
-     'Chỉ số năng lực cạnh tranh cấp tỉnh của Việt Nam", Hà Nội, 2024.'),
-    ('[29] Bộ Kế hoạch và Đầu tư, "Sách trắng doanh nghiệp Việt Nam năm 2024", '
-     'Nhà xuất bản Thống kê, Hà Nội, 2024.'),
+    ('[28] Báo Đầu tư, "Chiếm gần 98% tổng số doanh nghiệp, doanh nghiệp nhỏ và vừa '
+     'đang ở đâu trong nền kinh tế", '
+     'https://baodautu.vn/chiem-gan-98-tong-so-doanh-nghiep-doanh-nghiep-nho-va-vua-dang-o-dau-trong-nen-kinh-te-d249574.html, '
+     'truy cập tháng 5/2026.'),
+    ('[29] Cổng thông tin quốc gia về đăng ký doanh nghiệp – Bộ Kế hoạch và Đầu tư, '
+     '"Báo cáo tình hình đăng ký doanh nghiệp năm 2024", '
+     'https://dangkykinhdoanh.gov.vn/vn/tin-tuc/597/6818/bao-cao-tinh-hinh-dang-ky-doanh-nghiep-nam-2024.aspx, '
+     'truy cập tháng 5/2026.'),
     ('[30] Sam Newman, "Building Microservices, 2nd Edition", O\'Reilly Media, 2021.'),
+    ('[31] Tạp chí Công Thương, "Giải pháp chuyển đổi số trong các doanh nghiệp nhỏ '
+     'và vừa ở Việt Nam", '
+     'https://tapchicongthuong.vn/giai-phap-chuyen-doi-so-trong-cac-doanh-nghiep-nho-va-vua-o-viet-nam-133175.htm, '
+     'truy cập tháng 5/2026.'),
 ]
 for r in refs:
     p = doc.add_paragraph()

@@ -69,6 +69,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         "/api/auth/**",
+                        // v2 auth (strict password validation) — phải permit riêng vì
+                        // ApiVersionAliasFilter chỉ rewrite v1, không rewrite v2.
+                        "/api/v2/auth/**",
+                        "/api/version",
                         "/swagger-ui/**", "/swagger-ui.html",
                         "/api-docs/**", "/v3/api-docs/**",
                         "/h2-console/**"

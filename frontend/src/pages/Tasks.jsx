@@ -33,7 +33,7 @@ function StatusBadge({ status }) {
   const { t } = useTranslation()
   const cfg = statusConfig[status]
   const label = cfg ? t(cfg.label) : status
-  const cls = cfg ? cfg.cls : 'bg-gray-100 text-gray-600'
+  const cls = cfg ? cfg.cls : 'bg-slate-100 text-slate-600'
   return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{label}</span>
 }
 
@@ -130,10 +130,10 @@ export default function Tasks() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">{t('Công việc')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Công việc')}</h1>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow transition-colors"
         >
           <MdAdd className="text-xl" /> {t('Thêm công việc')}
         </button>
@@ -143,23 +143,23 @@ export default function Tasks() {
         <div className="p-3 mb-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{taskError}</div>
       )}
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600" />
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Tiêu đề')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Mô tả')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Hạn chót')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Trạng thái')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Dự án')}</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">{t('Phân công')}</th>
-                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">{t('Hành động')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Tiêu đề')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Mô tả')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Hạn chót')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Trạng thái')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Dự án')}</th>
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Phân công')}</th>
+                  <th className="px-6 py-3 text-center text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Hành động')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -169,18 +169,18 @@ export default function Tasks() {
                   </tr>
                 ) : (
                   tasks.map((task, idx) => (
-                    <tr key={task.taskId ?? task.id} className={idx % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
-                      <td className="px-6 py-4 font-medium text-gray-800">{task.title}</td>
-                      <td className="px-6 py-4 text-gray-600 max-w-xs truncate">{task.description}</td>
-                      <td className="px-6 py-4 text-gray-600">{task.dueDate ? task.dueDate.split('T')[0] : '-'}</td>
+                    <tr key={task.taskId ?? task.id} className={idx % 2 === 0 ? 'bg-white hover:bg-slate-50' : 'bg-slate-50/60 hover:bg-slate-100'}>
+                      <td className="px-6 py-4 font-medium text-slate-900">{task.title}</td>
+                      <td className="px-6 py-4 text-slate-600 max-w-xs truncate">{task.description}</td>
+                      <td className="px-6 py-4 text-slate-600">{task.dueDate ? task.dueDate.split('T')[0] : '-'}</td>
                       <td className="px-6 py-4"><StatusBadge status={task.status} /></td>
-                      <td className="px-6 py-4 text-gray-600">{getProjectName(task)}</td>
-                      <td className="px-6 py-4 text-gray-600">{getAssigneeName(task)}</td>
+                      <td className="px-6 py-4 text-slate-600">{getProjectName(task)}</td>
+                      <td className="px-6 py-4 text-slate-600">{getAssigneeName(task)}</td>
                       <td className="px-6 py-4 text-center">
-                        <button onClick={() => openEdit(task)} className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 mr-3 text-sm">
+                        <button onClick={() => openEdit(task)} className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-700 mr-3 text-sm">
                           <MdEdit /> {t('Sửa')}
                         </button>
-                        <button onClick={() => handleDelete(task.taskId ?? task.id)} className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 text-sm">
+                        <button onClick={() => handleDelete(task.taskId ?? task.id)} className="inline-flex items-center gap-1 text-rose-500 hover:text-rose-700 text-sm">
                           <MdDelete /> {t('Xóa')}
                         </button>
                       </td>
@@ -197,53 +197,53 @@ export default function Tasks() {
         <form onSubmit={handleSave} className="space-y-4">
           {error && <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">{error}</div>}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Tiêu đề')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Tiêu đề')}</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
               placeholder={t('Nhập tiêu đề công việc')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Mô tả')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Mô tả')}</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={2}
               placeholder={t('Mô tả công việc')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Kỹ năng yêu cầu')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Kỹ năng yêu cầu')}</label>
             <input
               type="text"
               value={form.requiredSkills}
               onChange={(e) => setForm({ ...form, requiredSkills: e.target.value })}
               placeholder={t('VD: Java, Spring Boot, PostgreSQL')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-            <p className="text-xs text-gray-500 mt-1">{t('Quản lý nhập tự do, AI sẽ đối chiếu với kỹ năng của nhân viên khi gợi ý.')}</p>
+            <p className="text-xs text-slate-500 mt-1">{t('Quản lý nhập tự do, AI sẽ đối chiếu với kỹ năng của nhân viên khi gợi ý.')}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Hạn chót')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Hạn chót')}</label>
               <input
                 type="date"
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t('Trạng thái')}</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t('Trạng thái')}</label>
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               >
                 <option value="PENDING">{t('Chờ xử lý')}</option>
                 <option value="IN_PROGRESS">{t('Đang thực hiện')}</option>
@@ -252,11 +252,11 @@ export default function Tasks() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Dự án')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Dự án')}</label>
             <select
               value={form.project || ''}
               onChange={(e) => setForm({ ...form, project: e.target.value || null })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">{t('-- Chọn dự án --')}</option>
               {projects.map((p) => (
@@ -265,11 +265,11 @@ export default function Tasks() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('Phân công cho')}</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('Phân công cho')}</label>
             <select
               value={form.assignedTo || ''}
               onChange={(e) => setForm({ ...form, assignedTo: e.target.value || null })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">{t('-- Chọn nhân viên --')}</option>
               {employees.map((emp) => (
@@ -278,8 +278,8 @@ export default function Tasks() {
             </select>
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50">{t('Hủy')}</button>
-            <button type="submit" disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 px-4 py-2 border border-slate-200 text-slate-700 rounded-lg text-sm hover:bg-slate-50">{t('Hủy')}</button>
+            <button type="submit" disabled={saving} className="flex-1 bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-brand-glow disabled:shadow-none">
               {saving ? t('Đang lưu...') : t('Lưu')}
             </button>
           </div>

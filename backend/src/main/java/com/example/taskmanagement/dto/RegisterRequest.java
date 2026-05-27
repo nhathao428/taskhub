@@ -5,6 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * v1 register payload — KHÔNG đổi validate, app cũ trên thiết bị (Mobile/Frontend
+ * phiên bản trước) đang dựa vào quy tắc 6+ ký tự. Đổi sẽ làm app cũ bị 400.
+ * Validate mạnh hơn nằm ở {@link RegisterRequestV2} cho /api/v2/auth/register.
+ */
 @Data
 public class RegisterRequest {
     @NotBlank(message = "Username is required")
@@ -16,6 +21,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     private String password;
 }

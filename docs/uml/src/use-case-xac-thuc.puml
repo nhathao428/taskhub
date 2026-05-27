@@ -23,6 +23,6 @@ UC_Logout ..> UC_Verify : <<include>>
 
 note right of UC_Login
   Trả về JWT chứa username + role,
-  có hiệu lực 24 giờ.
+  có hiệu lực 2 giờ.
 end note
 @enduml

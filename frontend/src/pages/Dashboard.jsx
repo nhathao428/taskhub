@@ -29,20 +29,25 @@ import { useTranslation } from '../context/LanguageContext'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title)
 
-function StatCard({ icon: Icon, label, value, gradient, accent }) {
+function StatCard({ icon: Icon, label, value, color = 'brand' }) {
+  const palette = {
+    brand:   { bg: 'bg-brand-600',   tint: 'bg-brand-100',   ring: 'ring-brand-100' },
+    sky:     { bg: 'bg-sky-600',     tint: 'bg-sky-100',     ring: 'ring-sky-100' },
+    emerald: { bg: 'bg-emerald-600', tint: 'bg-emerald-100', ring: 'ring-emerald-100' },
+    amber:   { bg: 'bg-amber-500',   tint: 'bg-amber-100',   ring: 'ring-amber-100' },
+    rose:    { bg: 'bg-rose-500',    tint: 'bg-rose-100',    ring: 'ring-rose-100' },
+    indigo:  { bg: 'bg-indigo-600',  tint: 'bg-indigo-100',  ring: 'ring-indigo-100' },
+  }[color] || { bg: 'bg-brand-600', tint: 'bg-brand-100', ring: 'ring-brand-100' }
   return (
-    <div className="relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-      <div
-        className={`absolute -top-4 -right-4 w-24 h-24 rounded-full opacity-10 blur-2xl ${accent}`}
-      />
-      <div className="relative flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+    <div className="relative overflow-hidden bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-5 hover:shadow-soft-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em] mb-2">
             {label}
           </p>
-          <p className="text-3xl font-bold text-gray-800">{value}</p>
+          <p className="text-3xl font-bold text-slate-900 leading-none">{value}</p>
         </div>
-        <div className={`p-2.5 rounded-xl bg-gradient-to-br ${gradient} shadow-md`}>
+        <div className={`p-2.5 rounded-xl ${palette.bg} ring-4 ${palette.ring}`}>
           <Icon className="text-white text-xl" />
         </div>
       </div>
@@ -52,13 +57,13 @@ function StatCard({ icon: Icon, label, value, gradient, accent }) {
 
 function ChartCard({ title, icon: Icon, children, empty }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div className="bg-white rounded-2xl shadow-soft ring-1 ring-slate-200/70 p-6">
       <div className="flex items-center gap-2 mb-4">
-        <Icon className="text-indigo-500 text-xl" />
-        <h2 className="text-base font-semibold text-gray-700">{title}</h2>
+        <Icon className="text-brand-600 text-xl" />
+        <h2 className="text-base font-semibold text-slate-800">{title}</h2>
       </div>
       {empty ? (
-        <p className="text-gray-400 text-center py-10 text-sm">{empty}</p>
+        <p className="text-slate-400 text-center py-10 text-sm">{empty}</p>
       ) : (
         children
       )}
@@ -172,23 +177,26 @@ function ManagerDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome + completion banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-6 text-white shadow-lg">
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-brand-glow bg-slate-900">
+        {/* Aurora mesh */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(99,102,241,0.85),transparent_55%),radial-gradient(ellipse_at_top_right,_rgba(217,70,239,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(56,189,248,0.45),transparent_55%)]" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-fuchsia-500/30 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-brand-500/30 rounded-full blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:32px_32px]" />
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-xl font-bold">{t('Tổng quan hệ thống')}</h2>
-            <p className="text-sm text-indigo-100 mt-1">
+            <h2 className="text-xl font-bold tracking-tight">{t('Tổng quan hệ thống')}</h2>
+            <p className="text-sm text-brand-100 mt-1.5">
               {t('{tasks} công việc đã được tạo, {done} đã hoàn thành', {
                 tasks: tasks.length,
                 done: completedCount,
               })}
             </p>
           </div>
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5 ring-1 ring-white/20">
             <MdTrendingUp className="text-2xl" />
             <div>
-              <p className="text-xs text-indigo-100">{t('Tỷ lệ hoàn thành')}</p>
+              <p className="text-[11px] text-brand-100 uppercase tracking-wider font-semibold">{t('Tỷ lệ hoàn thành')}</p>
               <p className="text-2xl font-bold leading-tight">{completionRate}%</p>
             </div>
           </div>
@@ -197,34 +205,10 @@ function ManagerDashboard() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={MdPeople}
-          label={t('Nhân viên')}
-          value={stats.employees}
-          gradient="from-indigo-500 to-blue-500"
-          accent="bg-indigo-400"
-        />
-        <StatCard
-          icon={MdFolder}
-          label={t('Dự án')}
-          value={stats.projects}
-          gradient="from-blue-500 to-cyan-500"
-          accent="bg-blue-400"
-        />
-        <StatCard
-          icon={MdCheckCircle}
-          label={t('Công việc')}
-          value={stats.tasks}
-          gradient="from-emerald-500 to-green-500"
-          accent="bg-emerald-400"
-        />
-        <StatCard
-          icon={MdAccessTime}
-          label={t('Chấm công hôm nay')}
-          value={stats.todayAttendance}
-          gradient="from-amber-500 to-orange-500"
-          accent="bg-amber-400"
-        />
+        <StatCard icon={MdPeople}      label={t('Nhân viên')}         value={stats.employees}       color="brand" />
+        <StatCard icon={MdFolder}      label={t('Dự án')}             value={stats.projects}        color="sky" />
+        <StatCard icon={MdCheckCircle} label={t('Công việc')}         value={stats.tasks}           color="emerald" />
+        <StatCard icon={MdAccessTime}  label={t('Chấm công hôm nay')} value={stats.todayAttendance} color="amber" />
       </div>
 
       {/* Charts */}
@@ -312,22 +296,25 @@ function EmployeeDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-500 p-6 text-white shadow-lg">
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+      <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-soft-lg bg-slate-900">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(16,185,129,0.85),transparent_55%),radial-gradient(ellipse_at_top_right,_rgba(20,184,166,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(56,189,248,0.45),transparent_55%)]" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-teal-500/30 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-emerald-500/30 rounded-full blur-3xl" />
+        <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:32px_32px]" />
         <div className="relative flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h2 className="text-xl font-bold">{t('Xin chào, {name}!', { name: user?.username })}</h2>
-            <p className="text-sm text-emerald-50 mt-1">
+            <h2 className="text-xl font-bold tracking-tight">{t('Xin chào, {name}!', { name: user?.username })}</h2>
+            <p className="text-sm text-emerald-50 mt-1.5">
               {t('Bạn có {tasks} công việc được giao, {done} đã hoàn thành.', {
                 tasks: tasks.length,
                 done: completedCount,
               })}
             </p>
           </div>
-          <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5">
+          <div className="flex items-center gap-3 bg-white/15 backdrop-blur rounded-xl px-4 py-2.5 ring-1 ring-white/20">
             <MdTrendingUp className="text-2xl" />
             <div>
-              <p className="text-xs text-emerald-50">{t('Tỷ lệ hoàn thành')}</p>
+              <p className="text-[11px] text-emerald-50 uppercase tracking-wider font-semibold">{t('Tỷ lệ hoàn thành')}</p>
               <p className="text-2xl font-bold leading-tight">{completionRate}%</p>
             </div>
           </div>
@@ -335,10 +322,10 @@ function EmployeeDashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={MdHourglassEmpty} label={t('Chờ xử lý')} value={pendingCount} gradient="from-yellow-500 to-amber-500" accent="bg-yellow-400" />
-        <StatCard icon={MdPlayArrow} label={t('Đang thực hiện')} value={inProgressCount} gradient="from-blue-500 to-indigo-500" accent="bg-blue-400" />
-        <StatCard icon={MdAssignmentTurnedIn} label={t('Đã hoàn thành')} value={completedCount} gradient="from-emerald-500 to-green-500" accent="bg-emerald-400" />
-        <StatCard icon={MdEventAvailable} label={t('Chấm công tháng này')} value={attendanceThisMonth} gradient="from-rose-500 to-pink-500" accent="bg-rose-400" />
+        <StatCard icon={MdHourglassEmpty}     label={t('Chờ xử lý')}            value={pendingCount}        color="amber" />
+        <StatCard icon={MdPlayArrow}          label={t('Đang thực hiện')}       value={inProgressCount}     color="brand" />
+        <StatCard icon={MdAssignmentTurnedIn} label={t('Đã hoàn thành')}        value={completedCount}      color="emerald" />
+        <StatCard icon={MdEventAvailable}     label={t('Chấm công tháng này')}  value={attendanceThisMonth} color="rose" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

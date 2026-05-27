@@ -38,14 +38,16 @@ services:
       SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://postgres:5432/task_management_db
       DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      # Sync with postgres service: cùng đọc từ $DB_PASSWORD trong .env
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       CACHE_TYPE: redis
-      JWT_SECRET: ${JWT_SECRET:-myProductionSecretKeyThatIsAtLeast256BitsLong1234567890}
+      # Bắt buộc set qua .env — không có default để tránh dùng key yếu trên prod
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@12345}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
     ports:
       - "5000:5000"
     depends_on:

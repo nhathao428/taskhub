@@ -10,9 +10,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Seeds a MANAGER account on startup if none exists yet.
- * Default credentials: manager1 / Manager@12345
- * Configure via env vars MANAGER_USERNAME / MANAGER_EMAIL / MANAGER_PASSWORD.
+ * Seeds a MANAGER account on startup, only when {@code MANAGER_PASSWORD} is set.
+ *
+ * Không có default password — nếu thiếu MANAGER_PASSWORD thì bỏ qua bước seed
+ * (tránh tạo tài khoản backdoor với mật khẩu yếu, ai cũng đoán được).
+ * Cấu hình thêm qua env: MANAGER_USERNAME (mặc định "manager1") và
+ * MANAGER_EMAIL (mặc định "manager1@example.com").
+ *
+ * Khi cần manager mới ở prod: ADMIN có thể đăng ký user thường rồi nâng vai trò
+ * qua PATCH /api/users/{id}/role.
  */
 @Component
 public class ManagerSeeder implements ApplicationRunner {
@@ -29,8 +35,16 @@ public class ManagerSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        String managerPassword = System.getenv("MANAGER_PASSWORD");
+        if (managerPassword == null || managerPassword.isBlank()) {
+            log.info("MANAGER_PASSWORD not set — skipping manager seed. "
+                    + "Set MANAGER_PASSWORD env var to seed a manager account, "
+                    + "or promote an EMPLOYEE via PATCH /api/users/{id}/role.");
+            return;
+        }
+
         String managerEmail = System.getenv("MANAGER_EMAIL");
-        if (managerEmail == null) {
+        if (managerEmail == null || managerEmail.isBlank()) {
             managerEmail = "manager1@example.com";
         }
 
@@ -40,13 +54,8 @@ public class ManagerSeeder implements ApplicationRunner {
         }
 
         String managerUsername = System.getenv("MANAGER_USERNAME");
-        if (managerUsername == null) {
+        if (managerUsername == null || managerUsername.isBlank()) {
             managerUsername = "manager1";
-        }
-
-        String managerPassword = System.getenv("MANAGER_PASSWORD");
-        if (managerPassword == null) {
-            managerPassword = "Manager@12345";
         }
 
         User manager = new User();

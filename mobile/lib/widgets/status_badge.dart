@@ -1,56 +1,60 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class StatusBadge extends StatelessWidget {
   final String status;
 
   const StatusBadge({super.key, required this.status});
 
-  Color get _color {
+  ({Color fg, Color bg, String label}) get _theme {
     switch (status.toLowerCase()) {
       case 'completed':
-        return Colors.green;
-      case 'in_progress':
-        return Colors.orange;
-      case 'pending':
-        return Colors.blueGrey;
-      case 'ongoing':
-        return Colors.blue;
       case 'done':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String get _label {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'Hoàn thành';
+        return (
+          fg: AppTheme.emerald500,
+          bg: AppTheme.emerald100,
+          label: status.toLowerCase() == 'done' ? 'Xong' : 'Hoàn thành',
+        );
       case 'in_progress':
-        return 'Đang làm';
+        return (
+          fg: AppTheme.brand600,
+          bg: AppTheme.brand50,
+          label: 'Đang làm',
+        );
       case 'pending':
-        return 'Chờ xử lý';
+        return (
+          fg: AppTheme.amber500,
+          bg: AppTheme.amber100,
+          label: 'Chờ xử lý',
+        );
       case 'ongoing':
-        return 'Đang triển khai';
-      case 'done':
-        return 'Xong';
+        return (
+          fg: AppTheme.sky500,
+          bg: AppTheme.sky100,
+          label: 'Đang triển khai',
+        );
       default:
-        return status;
+        return (fg: AppTheme.slate500, bg: AppTheme.slate100, label: status);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final t = _theme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.15),
-        border: Border.all(color: _color),
-        borderRadius: BorderRadius.circular(12),
+        color: t.bg,
+        borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        _label,
-        style: TextStyle(color: _color, fontSize: 12, fontWeight: FontWeight.w600),
+        t.label,
+        style: TextStyle(
+          color: t.fg,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }

@@ -308,23 +308,37 @@ def main():
             goto("/#/register", wait_ms=5000)
             shot("m02_register.png")
 
-            # 3) Login qua UI: toạ độ form trong viewport 412x915
-            #    Email field center  ≈ y=448
-            #    Password field      ≈ y=535
-            #    Button "Đăng nhập"  ≈ y=625
-            goto("/#/login", wait_ms=5000)
-            page.touchscreen.tap(206, 448)
-            page.wait_for_timeout(400)
-            page.keyboard.type("manager@hutech.edu.vn", delay=20)
-            page.wait_for_timeout(300)
-            page.touchscreen.tap(206, 535)
-            page.wait_for_timeout(400)
-            page.keyboard.type("password123", delay=20)
-            page.wait_for_timeout(300)
-            # Button "Đăng nhập" center ≈ y=590 (đo từ ảnh m03_dashboard.png
-            # ở lần chạy trước: btn nằm trong khoảng y=1130–1240 ở ảnh 2x).
-            page.touchscreen.tap(206, 590)
-            page.wait_for_timeout(5500)
+            # 3) Pre-seed SharedPreferences trong localStorage để bypass form login.
+            # Flutter web shared_preferences lưu với prefix "flutter."
+            # Cách hoạt động: AuthProvider._restoreSession() chạy async ở
+            # constructor. AuthGate watch state → khi token được đọc xong,
+            # notifyListeners fire → AuthGate tự redirect /login → /dashboard.
+            # Vì vậy cần (a) set localStorage, (b) full reload, (c) vào /#/login
+            # và chờ AuthGate redirect.
+            # Flutter shared_preferences_web JSON-encodes giá trị
+            # → string phải được wrap trong quotes thêm 1 lần.
+            page.evaluate("""
+                () => {
+                    localStorage.setItem('flutter.jwt_token', JSON.stringify('demo.jwt.mobile.token'));
+                    localStorage.setItem('flutter.username', JSON.stringify('manager'));
+                    localStorage.setItem('flutter.email', JSON.stringify('manager@hutech.edu.vn'));
+                }
+            """)
+            # Full reload với URL khác để Flutter chắc chắn boot lại
+            page.goto(f"http://127.0.0.1:{WEB_PORT}/?reload=1",
+                      wait_until="domcontentloaded", timeout=60000)
+            try:
+                page.wait_for_function(
+                    "document.querySelector('flutter-view') !== null || "
+                    "document.querySelector('flt-glass-pane') !== null",
+                    timeout=60000,
+                )
+            except Exception:
+                pass
+            # Flutter mặc định route '/' = LoginScreen wrap trong AuthGate.
+            # AuthGate sẽ redirect /dashboard sau khi _restoreSession xong.
+            # Chờ đủ lâu cho restore async + redirect + render dashboard.
+            page.wait_for_timeout(9000)
             shot("m03_dashboard.png")
 
             # 4) BOTTOM NAV: 5 tabs đều x = (i+0.5) * 412/5
@@ -353,22 +367,23 @@ def main():
             page.wait_for_timeout(3500)
             shot("m08_ai_suggestions.png")
 
-            # 6) Form AI – đo từ m08_ai_suggestions.png (image 824x1830, 2x):
-            #    "Tiêu đề"  input center: image y≈445  → logical y≈222
-            #    "Mô tả"    input center: image y≈640  → logical y≈320
-            #    Button     center      : image y≈815  → logical y≈407
-            tap(206, 222)
+            # 6) Form AI sau redesign:
+            #    Hero 130px + AppBar 56 + 16+16 margin → form card top ~y=222
+            #    Form padding 18 → title field center ≈ y=252
+            #    + 12 spacing + textarea (3 lines ≈ 96) → desc center ≈ y=340
+            #    + 16 spacing + button (50) → button center ≈ y=435
+            tap(206, 252)
             page.wait_for_timeout(400)
             page.keyboard.type(
                 "Backend RESTful API hệ thống đặt hàng", delay=10)
             page.wait_for_timeout(300)
-            tap(206, 320)
+            tap(206, 340)
             page.wait_for_timeout(400)
             page.keyboard.type(
                 "Cần dev backend Java Spring Boot 3.x, PostgreSQL, JWT, Redis.",
                 delay=10)
             page.wait_for_timeout(300)
-            tap(206, 407)
+            tap(206, 435)
             page.wait_for_timeout(5500)
             shot("m09_ai_result.png")
 

@@ -1,88 +1,149 @@
-' Style chung – làm các sơ đồ trông giống StarUML xuất ra:
-'   - màu nền trắng, không đổ bóng
-'   - viền rõ, font Arial
-'   - mũi tên đường thẳng, màu xám đậm
+' Style chung – tái hiện look StarUML cổ điển:
+'   - thân hình chữ nhật / oval / lifeline header màu vàng nhạt #FFFFC8
+'   - viền đen #000000, góc vuông (roundCorner 0), không đổ bóng
+'   - font Arial 12, mũi tên đen, visibility hiển thị dạng ký tự (- + # ~)
 skinparam backgroundColor #FFFFFF
 skinparam shadowing false
-skinparam roundCorner 6
+skinparam roundCorner 0
 skinparam DefaultFontName Arial
-skinparam DefaultFontSize 13
-skinparam ArrowColor #333333
-skinparam ArrowFontColor #333333
+skinparam DefaultFontSize 12
+skinparam DefaultFontColor #000000
+skinparam ArrowColor #000000
+skinparam ArrowFontColor #000000
+skinparam ArrowThickness 1
+skinparam classAttributeIconSize 0
 
 skinparam Class {
-  BackgroundColor #FFFFFF
-  BorderColor #2C5282
-  HeaderBackgroundColor #BEE3F8
-  AttributeFontColor #2D3748
-  AttributeFontSize 12
-  FontStyle plain
-}
-
-skinparam Object {
-  BackgroundColor #FFFFFF
-  BorderColor #2C5282
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  HeaderBackgroundColor #FFFFC8
+  FontColor #000000
+  FontStyle bold
+  AttributeFontColor #000000
+  AttributeFontSize 11
+  StereotypeFontColor #555555
+  BorderThickness 1
 }
 
 skinparam Entity {
-  BackgroundColor #FFFFFF
-  BorderColor #2C5282
-  HeaderBackgroundColor #BEE3F8
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  HeaderBackgroundColor #FFFFC8
+  FontColor #000000
+  FontStyle bold
+  AttributeFontColor #000000
+  AttributeFontSize 11
+}
+
+skinparam Object {
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+}
+
+skinparam Interface {
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+  FontStyle bold
 }
 
 skinparam Usecase {
-  BackgroundColor #E6F3FB
-  BorderColor #2C5282
-  FontSize 13
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+  FontSize 12
+  BorderThickness 1
 }
 
 skinparam Actor {
   BackgroundColor #FFFFFF
-  BorderColor #2C5282
+  BorderColor #000000
+  FontColor #000000
   FontSize 12
   FontStyle bold
 }
 
 skinparam Sequence {
-  ArrowColor #333333
-  LifeLineBorderColor #2C5282
-  LifeLineBackgroundColor #EBF8FF
-  ParticipantBackgroundColor #BEE3F8
-  ParticipantBorderColor #2C5282
+  ArrowColor #000000
+  ArrowFontColor #000000
+  LifeLineBorderColor #000000
+  LifeLineBackgroundColor #FFFFFF
+  ParticipantBackgroundColor #FFFFC8
+  ParticipantBorderColor #000000
   ParticipantFontStyle bold
+  ParticipantFontColor #000000
   ActorBackgroundColor #FFFFFF
-  ActorBorderColor #2C5282
-  GroupBackgroundColor #F7FAFC
-  GroupBorderColor #2C5282
+  ActorBorderColor #000000
+  ActorFontColor #000000
+  GroupBackgroundColor #FAFAF0
+  GroupBorderColor #000000
+  GroupHeaderFontColor #000000
+  BoxBackgroundColor #FAFAF0
+  BoxBorderColor #000000
+  DividerBackgroundColor #FFFFC8
+  DividerBorderColor #000000
+  DividerFontColor #000000
 }
 
 skinparam Activity {
-  BackgroundColor #E6F3FB
-  BorderColor #2C5282
-  StartColor #2C5282
-  EndColor #2C5282
-  DiamondBackgroundColor #FEF9E7
-  DiamondBorderColor #B7791F
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+  StartColor #000000
+  EndColor #000000
+  BarColor #000000
+  ArrowColor #000000
+  DiamondBackgroundColor #FFFFC8
+  DiamondBorderColor #000000
+  DiamondFontColor #000000
 }
 
 skinparam Note {
-  BackgroundColor #FEF9E7
-  BorderColor #B7791F
+  BackgroundColor #FBFBE0
+  BorderColor #888888
+  FontColor #000000
 }
 
 skinparam Package {
-  BackgroundColor #F7FAFC
-  BorderColor #2C5282
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  FontColor #000000
   FontStyle bold
+  BorderThickness 1
 }
 
 skinparam Component {
-  BackgroundColor #BEE3F8
-  BorderColor #2C5282
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+  FontStyle bold
+}
+
+skinparam Database {
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+  FontStyle bold
+}
+
+skinparam Cloud {
+  BackgroundColor #FFFFC8
+  BorderColor #000000
+  FontColor #000000
+}
+
+skinparam Node {
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  FontColor #000000
+  FontStyle bold
 }
 
 skinparam Rectangle {
-  BackgroundColor #F7FAFC
-  BorderColor #2C5282
+  BackgroundColor #FFFFFF
+  BorderColor #000000
+  FontColor #000000
   FontStyle bold
+  BorderThickness 1
 }

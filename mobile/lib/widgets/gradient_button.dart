@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Nút chính bo tròn, nền gradient thương hiệu, hỗ trợ trạng thái loading.
+/// Nút chính brand: nền brand-600 solid + brand-glow shadow (khớp web).
+/// Tên giữ nguyên là GradientButton vì để tương thích với code cũ.
 class GradientButton extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -19,21 +20,14 @@ class GradientButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onPressed != null && !loading;
-    return Opacity(
-      opacity: enabled ? 1 : 0.6,
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 150),
+      opacity: enabled ? 1 : 0.55,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          gradient: AppTheme.brandGradient,
+          color: AppTheme.brand600,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: enabled
-              ? [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ]
-              : null,
+          boxShadow: enabled ? AppTheme.brandGlow : null,
         ),
         child: Material(
           color: Colors.transparent,
@@ -64,8 +58,9 @@ class GradientButton extends StatelessWidget {
                             label,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
+                              fontSize: 15,
                               fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
                             ),
                           ),
                         ],
