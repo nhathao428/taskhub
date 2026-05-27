@@ -636,6 +636,8 @@ table_list = [
     ("Bảng 5.6", "Tổng hợp kết quả kiểm thử 42 test cases", "122"),
     ("Bảng 5.7", "Kịch bản kiểm thử module Geofence (GPS chấm công)", "123"),
     ("Bảng 5.8", "Lược đồ dữ liệu mở rộng cho xác thực chấm công GPS", "125"),
+    ("Bảng 5.9", "Bộ test tự động trên 3 tầng (backend + frontend + mobile)", "—"),
+    ("Bảng 5.10", "Kết quả security audit trước/sau hardening", "—"),
 ]
 add_table(doc, headers=["Số hiệu", "Tên bảng", "Trang"],
           rows=table_list, col_widths=[2.5, 11.0, 2.0])
@@ -4310,6 +4312,129 @@ add_para(doc,
     "JVM / trình duyệt hiện đại\" như mục tiêu ban đầu đặt ra.")
 
 
+add_h2(doc, "5.8. Mở rộng kiểm thử tự động và rà soát theo Constitution")
+add_para(doc,
+    "Bên cạnh 42 test cases hộp đen (Postman + thủ công trình duyệt) ở các "
+    "mục trước, ở giai đoạn hoàn thiện đề tài đã bổ sung một bộ kiểm thử tự "
+    "động đầy đủ trên cả ba tầng (backend, frontend, mobile) và áp dụng "
+    "quy trình rà soát tuân thủ \"Constitution\" — một văn bản nguyên tắc "
+    "kỹ thuật do nhóm tự đặt ra, đóng vai trò \"hiến pháp\" cho dự án.")
+
+add_h3(doc, "5.8.1. Constitution — văn bản nguyên tắc kỹ thuật")
+add_para(doc,
+    "Sau khi triển khai cốt lõi xong, nhóm soạn `.specify/memory/"
+    "constitution.md` (theo chuẩn GitHub Spec Kit) liệt kê 4 nguyên tắc "
+    "ràng buộc cho mọi commit về sau:")
+for s in [
+    "I. Code Quality — bắt buộc lint/build pass; mọi endpoint phải dùng `ApiResponse<T>`; phân quyền REST thông qua `@PreAuthorize` HOẶC URL-pattern rules trong SecurityFilterChain (tương đương); không hardcode secret.",
+    "II. Testing Standards (NON-NEGOTIABLE) — mọi service/controller phải có unit test; endpoint có phân quyền phải có test 401/403; integration test JPA phải chạy thật trên PostgreSQL (qua Testcontainers).",
+    "III. UX Consistency — chung token màu/typography giữa React và Flutter; React Router v6 (cấm `useHistory`); pattern loading/success/error thống nhất; i18n bắt buộc cho cả frontend và mobile (không hardcode chuỗi tiếng Việt).",
+    "IV. Performance Requirements — read API ≤ 200 ms p95, write ≤ 400 ms, AI ≤ 3 s; cấm N+1 query; @Cacheable cho read endpoint stable; bundle frontend ≤ 250 KB gzipped; mobile cold start ≤ 2 s.",
+]:
+    add_bullet(doc, s)
+add_para(doc,
+    "Văn bản này được phiên bản hoá (semantic versioning) — bản hiện tại là "
+    "v1.1.0 sau một lần amendment chính thức để chấp nhận URL-pattern "
+    "authorization như phương án tương đương `@PreAuthorize`.")
+
+add_h3(doc, "5.8.2. Bộ test tự động trên 3 tầng")
+add_table(
+    doc,
+    headers=["Tầng", "Framework", "Số test pass", "Phạm vi"],  # Bảng 5.9
+
+    rows=[
+        ("Backend",
+         "JUnit 5 + Mockito + Spring Security Test + Testcontainers",
+         "56 pass + 2 skip*",
+         "Service (40): TaskService, EmployeeService, ProjectService, UserService, GeofenceService, JwtTokenProvider, smoke test context. Controller + Auth (16): TaskController, EmployeeController, AuthController với @WithMockUser cho 3 roles + happy path + 401/403. Repository integration (2 skipped vì máy build không có Docker — chạy thật trên CI/máy có Docker)."),
+        ("Frontend",
+         "Vitest + @testing-library/react + jsdom",
+         "11 pass",
+         "ProtectedRoute (5): redirect /login khi chưa auth, role gate deny/allow, demo mode, demo MANAGER role tự động. Axios JWT interceptor (4): gắn Bearer token, không gắn khi không có token, clear token + redirect khi 401, pass-through cho 5xx. Demo mode adapter (2): trả demo data cho GET, block POST với `isDemoBlock`."),
+        ("Mobile",
+         "flutter_test",
+         "16 pass",
+         "Model (5): Task.fromJson/toJson, EmployeeSuggestion. Widget (4): StatusBadge cho 4 trạng thái. i18n (5+2): hàm translate() vi/en/fallback/interpolation/multi-placeholder, language_provider."),
+        ("TỔNG", "—", "83 tests pass", "Toàn bộ pass trên Windows 11 + JDK 17 + Node 22 + Flutter 3.x."),
+    ],
+    col_widths=[2.5, 4.5, 2.5, 6.0],
+)
+add_caption(doc, "Bảng 5.9: Bộ test tự động trên 3 tầng (backend + frontend + mobile)", kind="table")
+add_para(doc,
+    "* Hai test repository integration được thiết kế dùng `@Testcontainers"
+    "(disabledWithoutDocker = true)` — bỏ qua an toàn khi máy build không có "
+    "Docker, tự chạy đầy đủ trên môi trường CI/máy dev có Docker (PostgreSQL "
+    "16-alpine).")
+add_para(doc,
+    "Lệnh chạy tổng hợp: `mvn test` cho backend, `npm test` cho frontend, "
+    "`flutter test` cho mobile. Tổng thời gian chạy < 30 giây trên máy phát "
+    "triển — đủ nhanh để chạy sau mỗi commit.")
+
+add_h3(doc, "5.8.3. Rà soát Code Review tự động (skill code-reviewer)")
+add_para(doc,
+    "Sử dụng skill `code-reviewer` (thuộc bộ Antigravity Awesome Skills) để "
+    "tự rà soát các thay đổi trong giai đoạn hoàn thiện. Skill phát hiện "
+    "tổng cộng 26 findings: 2 HIGH (test name sai lệch + thiếu `@EntityGraph` "
+    "trên 1 method), 12 MEDIUM (chủ yếu về testability/cleanup), 12 LOW "
+    "(polish). Đã fix 11/26 — phần còn lại được phân tích và bỏ qua có "
+    "lý do (nhiều cái thực ra là false positive hoặc trade-off chấp nhận).")
+
+add_h3(doc, "5.8.4. Security audit và hardening")
+add_para(doc,
+    "Sử dụng skill `security-auditor` để rà soát toàn bộ backend theo các "
+    "khía cạnh: JWT implementation, authentication/authorization, input "
+    "validation, CORS, secrets management, rate limit, AI integration, "
+    "token storage, demo mode. Báo cáo tổng cộng 15 findings (0 Critical, "
+    "4 High, 7 Medium, 4 Low). Sau khi fix:")
+add_table(
+    doc,
+    headers=["Mức độ", "Trước fix", "Sau fix", "Ghi chú"],
+    rows=[
+        ("Critical", "0", "0", "Không có lỗ hổng nghiêm trọng — không có auth bypass, SQL injection, hay RCE."),
+        ("High", "4", "0", "3 đã fix triệt để (H1 swagger, H3 prompt injection, H4 CORS PATCH); 1 (H2 JWT localStorage) đã mitigate qua CSP header và document."),
+        ("Medium", "7", "1", "6 fix triệt để; 1 (H2 demoted) còn lại với mitigation plan."),
+        ("Low", "4", "1", "3 fix; L2 (refresh token) defer chính thức kèm tài liệu."),
+        ("Open", "15", "2 documented", "Còn 2 \"residual risk\" được ghi vào `docs/SECURITY_RESIDUAL_RISKS.md` kèm phương án xử lý khi đưa lên production thực sự."),
+    ],
+    col_widths=[2.5, 2.5, 2.5, 8.0],
+)
+add_caption(doc, "Bảng 5.10: Kết quả security audit trước/sau hardening", kind="table")
+add_para(doc,
+    "Các biện pháp hardening tiêu biểu đã áp dụng trong giai đoạn này:")
+for s in [
+    "BCrypt strength nâng từ 10 lên 12 (4× cost) – chống brute-force GPU hiệu quả hơn.",
+    "Security headers đầy đủ: Content-Security-Policy (chống XSS), HSTS 1 năm + includeSubDomains, X-Content-Type-Options nosniff, Referrer-Policy strict-origin.",
+    "Per-account login lockout: 5 lần fail → khoá 15 phút (LoginAttemptService) — chống brute-force phân tán mà rate-limit IP không bắt được.",
+    "Per-user UserDetails cache 60 s (Redis) — giảm DB hit mỗi request đồng thời vẫn cho phép revoke trong 1 phút khi role thay đổi.",
+    "Anti-enumeration: thông báo đăng ký trùng generic, không tiết lộ \"username/email nào đã tồn tại\".",
+    "Username KHÔNG còn ghi vào log auth failure — giảm rò rỉ PII trong file log.",
+    "Sanitize input cho prompt AI: strip control chars + section markers + cap 500 ký tự — giảm bề mặt prompt injection.",
+    "Swagger UI mặc định TẮT ở prod (bật explicit qua biến môi trường); bỏ `/h2-console/**` khỏi permitAll.",
+    "CORS bổ sung method PATCH (trước thiếu, browser bị block một số endpoint admin).",
+    "Validation chặt hơn cho /api/suggestions/feedback (DTO + `@Size(max=2000)`).",
+]:
+    add_bullet(doc, s)
+
+add_h3(doc, "5.8.5. Cải tiến hiệu năng và quy trình schema")
+add_para(doc,
+    "Đồng thời với việc bổ sung test, các tối ưu kỹ thuật quan trọng đã "
+    "được áp dụng:")
+for s in [
+    "Frontend code-splitting bằng `React.lazy` cho 10 routes — bundle chính từ ~300 KB raw xuống còn 89 KB gzipped (dưới ngưỡng 250 KB theo nguyên tắc IV của Constitution). Chart.js và Leaflet được tách thành chunk riêng, chỉ load khi cần.",
+    "Chống N+1 query triệt để bằng `@EntityGraph(attributePaths = …)` trên 4 repository (Task, Attendance, Employee, Suggestion); kết hợp tắt `spring.jpa.open-in-view=false` — Hibernate không còn lazy-load lén trong giai đoạn serialize JSON.",
+    "Flyway migration baseline: tạo `db/migration/V1__baseline_schema.sql` chứa toàn bộ schema 7 bảng + indexes phục vụ production; cấu hình `baseline-on-migrate=true` để DB đang chạy không bị xáo trộn; dev local vẫn dùng H2 với `ddl-auto=update` cho tiện debug.",
+    "ESLint setup cho frontend (eslint + plugin-react + plugin-react-hooks) — `npm run lint` báo 0 warning, là gate trước khi merge theo Nguyên tắc I.",
+    "Mobile i18n hoàn chỉnh: `lib/i18n/translations.dart` (~90 cặp key vi→en) + `language_provider.dart` (Provider + SharedPreferences); chuyển đổi ngôn ngữ thời gian thực qua nút toggle trên AppBar Dashboard. Toàn bộ 8 screen đã convert (login, register, dashboard, tasks, employees, projects, attendance, ai_suggestions).",
+]:
+    add_bullet(doc, s)
+add_para(doc,
+    "Sau khi hoàn thành các thay đổi trên, toàn bộ 83 test tự động vẫn pass, "
+    "build cả 3 tier thành công, và `flutter analyze` cùng `npm run lint` "
+    "đều không có warning. Việc đạt được trạng thái \"toàn xanh\" trên một "
+    "codebase ba tầng là một bằng chứng cụ thể cho việc quy trình "
+    "constitution-driven hoạt động hiệu quả.")
+
+
 # ==================================================================
 # CHƯƠNG 6: KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
 # ==================================================================
@@ -4335,9 +4460,11 @@ for s in [
 add_h3(doc, "6.1.2. Về mặt kỹ thuật")
 for s in [
     "Áp dụng đầy đủ các thực hành tốt: kiến trúc tầng (Controller–Service–Repository), Dependency Injection, DTO–Entity pattern, Global Exception Handler.",
-    "Bảo mật: BCrypt cost=10 cho mật khẩu, JWT HS256 với secret 256-bit, CORS giới hạn origin, Spring Security stateless, phân quyền @PreAuthorize.",
-    "Hiệu năng: HikariCP connection pool, Redis cache, JPA JOIN FETCH chống N+1, indexing trên các cột truy vấn nhiều.",
-    "Mã nguồn được tổ chức rõ ràng, đặt tên theo Java Code Conventions và Airbnb React Style Guide.",
+    "Bảo mật nhiều lớp sau audit chuyên sâu: BCrypt strength 12, JWT HS256 với secret 256-bit, CORS giới hạn origin (bao gồm method PATCH), Spring Security stateless, phân quyền URL-pattern + chống enumeration + login lockout 5 fail/15 phút, security headers (CSP, HSTS, X-Content-Type-Options, Referrer-Policy), sanitize input cho prompt AI.",
+    "Hiệu năng: HikariCP connection pool, Redis cache (kết quả AI 5 phút, user details 60 s), JPA `@EntityGraph` chống N+1 trên 4 repository, indexing trên các cột truy vấn nhiều, frontend code-splitting với React.lazy (bundle chính 89 KB gzipped).",
+    "Schema quản lý qua Flyway (V1__baseline_schema.sql) ở môi trường production; dev local vẫn linh hoạt với Hibernate ddl-auto cho H2.",
+    "Áp dụng quy trình \"Constitution-driven\": 4 nguyên tắc kỹ thuật (Code Quality, Testing, UX, Performance) được phiên bản hoá; mọi thay đổi đều phải đối chiếu trước khi merge.",
+    "Mã nguồn được tổ chức rõ ràng, đặt tên theo Java Code Conventions và Airbnb React Style Guide; ESLint gate 0-warning cho frontend.",
     "Toàn bộ secret được đọc từ biến môi trường (.env), không hardcode trong code.",
     "Triển khai hệ thống lên hạ tầng đám mây AWS EC2 (Ubuntu 24.04 + Docker Compose), chạy công khai qua Elastic IP – sản phẩm vận hành thực tế, không chỉ chạy cục bộ.",
 ]:
@@ -4364,7 +4491,7 @@ add_table(
         ("AI gợi ý nhân viên (Google Gemini gemini-2.5-flash, ranking định tính)", "100% – hoàn thành"),
         ("Redis cache cho AI Suggestion", "100% – hoàn thành"),
         ("Docker Compose toàn bộ stack (PostgreSQL + Redis + backend + frontend)", "100% – hoàn thành"),
-        ("Kiểm thử tối thiểu 30 test cases", "140% – 42/30 test cases"),
+        ("Kiểm thử tối thiểu 30 test cases", "277% – 42 hộp đen + 83 tự động (56 backend + 11 frontend + 16 mobile)"),
         ("Tài liệu hoàn chỉnh theo mẫu Khoa Công nghệ Thông tin", "100% – hoàn thành"),
     ],
     col_widths=[8.5, 7.0],
@@ -4378,10 +4505,11 @@ for s in [
     "Phân quyền chi tiết chưa được triển khai đầy đủ: hệ thống mới có 3 role cơ bản (ADMIN/MANAGER/EMPLOYEE), chưa có ACL ở mức record (ví dụ: mỗi trưởng phòng chỉ thấy task của phòng mình).",
     "Chưa có thông báo real-time: khi có task mới được giao hoặc deadline sắp đến, nhân viên không nhận được push notification hoặc email tự động.",
     "Chưa có module báo cáo nâng cao: xuất PDF/Excel báo cáo hiệu suất theo tháng/quý chưa được triển khai.",
-    "Ứng dụng mobile chưa hoàn chỉnh: mới có các tính năng cốt lõi (Login, Dashboard, Tasks, Attendance), thiếu các tính năng phụ và chưa được test kỹ trên iOS.",
-    "Unit test backend còn ít: mới có 5 unit test cho AiSuggestionService và AuthController. Tỷ lệ phủ code (test coverage) ước tính ~15%, chưa đạt mức 70% mong muốn.",
-    "Tích hợp LLM còn đơn giản: mới gọi `chat/completions` với prompt tiếng Việt, chưa khai thác function calling, embeddings cho semantic search hay fine-tuning trên dữ liệu nội bộ.",
-    "Chưa có cơ chế revoke token: khi user logout, JWT vẫn còn hợp lệ đến khi hết hạn. Cần triển khai blacklist hoặc dùng refresh token.",
+    "Ứng dụng mobile chưa hoàn chỉnh: mới có các tính năng cốt lõi (Login, Dashboard, Tasks, Attendance) và i18n đầy đủ vi/en; thiếu các tính năng phụ và chưa được test kỹ trên iOS.",
+    "Test coverage backend khoảng 40% (56 test phân bổ trên 10 service + 3 controller). Mục tiêu ban đầu 70% chưa đạt — còn thiếu test cho AttendanceService, AiSuggestionService, OfficeLocationService, SuggestionService và 7 controller chưa có test (cần bổ sung dần ở các phase sau).",
+    "Tích hợp LLM còn đơn giản: mới gọi `generateContent` với prompt tiếng Việt + sanitize input cơ bản chống prompt injection, chưa khai thác function calling, embeddings cho semantic search hay fine-tuning trên dữ liệu nội bộ.",
+    "Cơ chế revoke token chỉ ở mức mềm (qua cache UserDetails TTL 60 s): khi role thay đổi hoặc user bị xoá, token cũ vẫn hợp lệ trong tối đa 60 s. Refresh token + blacklist Redis được defer chính thức (xem `docs/SECURITY_RESIDUAL_RISKS.md`).",
+    "JWT lưu trong `localStorage` của trình duyệt — đã giảm nhẹ rủi ro qua CSP header nhưng chưa chuyển sang HttpOnly cookie hoàn chỉnh; được ghi nhận là \"residual risk\" có lộ trình xử lý.",
     "Giao diện chưa có chế độ tối (dark mode).",
     "Chưa có monitoring và logging tập trung (chưa tích hợp Prometheus, Grafana, ELK stack).",
 ]:
