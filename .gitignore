@@ -1,6 +1,9 @@
 node_modules
 __pycache__
 .env
+.en
+.env.*
+!.env.example
 .DS_Store
 
 # Java / Maven
