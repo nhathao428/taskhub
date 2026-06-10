@@ -45,8 +45,11 @@ Need 'npm'  'npm đi kèm Node.js.'
 if (-not $SkipMobile) { Need 'flutter' 'Cài Flutter SDK và thêm vào PATH (hoặc dùng -SkipMobile).' }
 
 # ---- Env mặc định (dev) ----
-if (-not $env:JWT_SECRET)     { $env:JWT_SECRET = 'dev_secret_change_me_at_least_256_bits_long_xxxxxxxxxxxxxxxx' }
-if (-not $env:ADMIN_PASSWORD) { $env:ADMIN_PASSWORD = 'Admin@12345' }
+# CHỈ dùng cho dev local. KHÔNG dùng các mật khẩu mẫu này trên production.
+if (-not $env:JWT_SECRET)        { $env:JWT_SECRET = 'dev_secret_change_me_at_least_256_bits_long_xxxxxxxxxxxxxxxx' }
+if (-not $env:ADMIN_PASSWORD)    { $env:ADMIN_PASSWORD = 'Admin@12345' }
+if (-not $env:MANAGER_PASSWORD)  { $env:MANAGER_PASSWORD = 'Manager@12345' }
+if (-not $env:EMPLOYEE_PASSWORD) { $env:EMPLOYEE_PASSWORD = 'Employee@12345' }
 
 Write-Host '─────────────────────────────────────────────'
 Write-Host '  TASK MANAGEMENT SYSTEM – khởi động dev mode'
@@ -102,5 +105,10 @@ Write-Host '   Frontend Web  : http://localhost:5173'
 if (-not $SkipMobile) {
 Write-Host '   Mobile (Web)  : http://localhost:5170'
 }
+Write-Host ''
+Write-Host 'Tài khoản mẫu (dev — seed tự động khi khởi động):'
+Write-Host "   Admin    : admin@example.com     /  $env:ADMIN_PASSWORD"
+Write-Host "   Manager  : manager1@example.com  /  $env:MANAGER_PASSWORD"
+Write-Host "   Employee : employee@example.com  /  $env:EMPLOYEE_PASSWORD"
 Write-Host ''
 Write-Host "Để dừng: pwsh -File start.ps1 -Stop"
