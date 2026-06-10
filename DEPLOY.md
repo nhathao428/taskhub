@@ -1,6 +1,6 @@
 # Production Deployment Guide
 
-Triển khai Task Management System lên VPS (Ubuntu/Debian) bằng Docker Compose + Caddy (auto HTTPS).
+Triển khai TaskHub lên VPS (Ubuntu/Debian) bằng Docker Compose + Caddy (auto HTTPS).
 
 ## Yêu cầu
 

@@ -1,6 +1,6 @@
 #requires -Version 5.1
 <#
-Khởi động toàn bộ Task Management System (Windows / PowerShell).
+Khởi động toàn bộ TaskHub (Windows / PowerShell).
 Chạy backend (Spring Boot), frontend (Vite), và mobile-web (Flutter build).
 
 Sử dụng:

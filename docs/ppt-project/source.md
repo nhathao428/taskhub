@@ -1553,7 +1553,7 @@ __*Hình 5\.2: Màn hình Đăng ký tài khoản*__
 
 *Hình 5\.3: Dashboard tổng quan \(Quản lý\)*
 
-Sau khi đăng nhập thành công, người dùng được chuyển đến trang Dashboard\. Bên trái là sidebar tối với logo Task Manager và 6 mục điều hướng chính\. Banner gradient tím–hồng phía trên tóm tắt tổng quan hệ thống\. Bốn thẻ thống kê hiển thị nhanh số nhân viên, dự án, công việc và chấm công hôm nay\. Hai biểu đồ trực quan \(Chart\.js\) ở dưới minh hoạ phân bố trạng thái công việc và số lượng nhân viên theo phòng ban\.
+Sau khi đăng nhập thành công, người dùng được chuyển đến trang Dashboard\. Bên trái là sidebar tối với logo TaskHub và 6 mục điều hướng chính\. Banner gradient tím–hồng phía trên tóm tắt tổng quan hệ thống\. Bốn thẻ thống kê hiển thị nhanh số nhân viên, dự án, công việc và chấm công hôm nay\. Hai biểu đồ trực quan \(Chart\.js\) ở dưới minh hoạ phân bố trạng thái công việc và số lượng nhân viên theo phòng ban\.
 
 ![](source_files/image_009.png)
 

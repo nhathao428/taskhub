@@ -36,7 +36,7 @@ Templates / dependent artifacts reviewed:
 Follow-up TODOs: None.
 -->
 
-# Task Management System Constitution
+# TaskHub Constitution
 
 ## Core Principles
 

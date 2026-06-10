@@ -74,7 +74,7 @@ export default function Sidebar() {
             <MdWorkspaces className="text-white text-xl" />
           </div>
           <div className="leading-tight">
-            <h1 className="text-base font-bold text-white tracking-tight">Task Manager</h1>
+            <h1 className="text-base font-bold text-white tracking-tight">TaskHub</h1>
             <p className="text-[10px] text-slate-400 font-semibold tracking-[0.18em] uppercase mt-0.5">
               Workspace
             </p>

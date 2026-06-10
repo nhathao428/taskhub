@@ -1,6 +1,6 @@
-# 🖥️ Hệ thống Quản lý Công việc — Backend
+# 🖥️ TaskHub — Backend
 
-Phần backend của Hệ thống Quản lý Công việc, xây dựng bằng Spring Boot và cung cấp REST API cho frontend và ứng dụng di động.
+Phần backend của TaskHub (Hệ thống Quản lý Công việc), xây dựng bằng Spring Boot và cung cấp REST API cho frontend và ứng dụng di động.
 
 ---
 

@@ -41,7 +41,7 @@ export default function Layout({ children }) {
   const { t, lang } = useTranslation()
   const { isDemo } = useAuth()
   const titleKey = ROUTE_TITLES[pathname]
-  const title = titleKey ? t(titleKey) : 'Task Manager'
+  const title = titleKey ? t(titleKey) : 'TaskHub'
   const today = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'vi-VN', {
     weekday: 'long',
     year: 'numeric',

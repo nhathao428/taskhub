@@ -21,9 +21,9 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
-                        .title("Task Management System API")
+                        .title("TaskHub API")
                         .version("1.0")
-                        .description("REST API for Task Management System with AI suggestion engine"))
+                        .description("REST API for TaskHub with AI suggestion engine"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()

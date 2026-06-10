@@ -1,6 +1,6 @@
-# 📱 Hệ thống Quản lý Công việc — Ứng dụng Di động
+# 📱 TaskHub — Ứng dụng Di động
 
-Ứng dụng di động cho Hệ thống Quản lý Công việc, xây dựng bằng **Flutter** và kết nối với backend Spring Boot qua REST API.
+Ứng dụng di động cho TaskHub (Hệ thống Quản lý Công việc), xây dựng bằng **Flutter** và kết nối với backend Spring Boot qua REST API.
 
 ---
 

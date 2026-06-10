@@ -31,9 +31,9 @@ const Map<String, String> en = {
   'Có lỗi xảy ra': 'Something went wrong',
 
   // --- Auth ---
-  'Quản lý Công việc': 'Task Manager',
+  'Quản lý Công việc': 'TaskHub',
   'Chào mừng trở lại': 'Welcome back',
-  'Đăng nhập vào Task Manager': 'Log in to Task Manager',
+  'Đăng nhập vào TaskHub': 'Log in to TaskHub',
   'Email': 'Email',
   'Mật khẩu': 'Password',
   'Vui lòng nhập email': 'Please enter your email',

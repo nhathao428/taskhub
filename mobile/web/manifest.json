@@ -1,11 +1,11 @@
 {
-    "name": "task_management_system",
-    "short_name": "task_management_system",
+    "name": "TaskHub",
+    "short_name": "TaskHub",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "TaskHub — Hệ thống Quản lý Công việc tích hợp AI.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

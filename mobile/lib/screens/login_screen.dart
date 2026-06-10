@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      context.tr('Đăng nhập vào Task Manager'),
+                      context.tr('Đăng nhập vào TaskHub'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Color(0xFFCBD5E1),

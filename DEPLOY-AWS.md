@@ -1,6 +1,6 @@
 # Triển khai lên AWS EC2 (all-in-one)
 
-Hướng dẫn chạy Task Management System lâu dài trên **một** máy ảo AWS EC2:
+Hướng dẫn chạy TaskHub lâu dài trên **một** máy ảo AWS EC2:
 một server chạy tất cả qua Docker — PostgreSQL + Redis + Spring Boot + React + Caddy.
 
 | Mục | Giá trị |

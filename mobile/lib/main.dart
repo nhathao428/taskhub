@@ -24,7 +24,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DataProvider()),
       ],
       child: MaterialApp(
-        title: 'Task Manager',
+        title: 'TaskHub',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         initialRoute: '/login',

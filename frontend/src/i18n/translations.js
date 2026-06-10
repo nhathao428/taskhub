@@ -22,7 +22,7 @@ export const en = {
   'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.':
     'Login failed. Please check your email and password.',
   'Chào mừng trở lại': 'Welcome back',
-  'Đăng nhập vào Task Manager': 'Sign in to Task Manager',
+  'Đăng nhập vào TaskHub': 'Sign in to TaskHub',
   'Mật khẩu': 'Password',
   'Đang đăng nhập...': 'Signing in...',
   'Đăng nhập': 'Sign in',
@@ -37,7 +37,7 @@ export const en = {
   'Tên người dùng': 'Username',
   'Xác nhận mật khẩu': 'Confirm password',
   'Tạo tài khoản': 'Create account',
-  'Tham gia Task Manager hôm nay': 'Join Task Manager today',
+  'Tham gia TaskHub hôm nay': 'Join TaskHub today',
   'Đang đăng ký...': 'Signing up...',
   'Đăng ký': 'Sign up',
   'Đã có tài khoản?': 'Already have an account?',

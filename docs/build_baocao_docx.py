@@ -1985,7 +1985,7 @@ add_h2(doc, "3.11. Thiết kế giao diện (Wireframe)")
 add_h3(doc, "3.11.1. Wireframe trang Dashboard")
 add_code(doc, """
 +----------------------------------------------------------------------+
-| Logo  Task Manager                                  [User v]  [Bell] |
+| Logo  TaskHub                                       [User v]  [Bell] |
 +--------+-------------------------------------------------------------+
 | Side   |  Dashboard                                                  |
 | nav    |  +------------+ +------------+ +------------+ +-----------+ |
@@ -3029,7 +3029,7 @@ class TaskManagementApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Task Manager',
+      title: 'TaskHub',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -3778,7 +3778,7 @@ add_caption(doc, "Hình 5.2: Màn hình Đăng ký tài khoản", kind="figure")
 add_h3(doc, "5.4.3. Màn hình Dashboard")
 add_para(doc,
     "Sau khi đăng nhập thành công, người dùng được chuyển đến trang "
-    "Dashboard. Bên trái là sidebar tối với logo Task Manager và 6 mục "
+    "Dashboard. Bên trái là sidebar tối với logo TaskHub và 6 mục "
     "điều hướng chính. Banner gradient tím–hồng phía trên tóm tắt tổng "
     "quan hệ thống. Bốn thẻ thống kê hiển thị nhanh số nhân viên, dự án, "
     "công việc và chấm công hôm nay. Hai biểu đồ trực quan (Chart.js) "

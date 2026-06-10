@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Khởi động toàn bộ Task Management System (Linux / macOS).
+# Khởi động toàn bộ TaskHub (Linux / macOS).
 # Chạy backend (Spring Boot), frontend (Vite) và mobile-web (Flutter build).
 #
 # Sử dụng:
