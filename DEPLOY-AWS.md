@@ -71,8 +71,8 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 ```bash
 cd ~
-git clone https://github.com/nhathao428/task-management-system.git
-cd task-management-system
+git clone https://github.com/nhathao428/taskhub.git
+cd taskhub
 ```
 
 ## Bước 7 — Cấu hình biến môi trường
@@ -128,7 +128,7 @@ Trả về JWT token → thành công.
 ## Cập nhật khi có code mới
 
 ```bash
-cd ~/task-management-system
+cd ~/taskhub
 git pull
 docker compose -f docker-compose.yml -f docker-compose.aws.yml up -d --build
 ```
@@ -144,7 +144,7 @@ docker compose exec postgres pg_dump -U postgres task_management_db > ~/backup_$
 Tự động hằng ngày lúc 2h sáng — `crontab -e`, thêm dòng:
 
 ```
-0 2 * * * cd ~/task-management-system && docker compose exec -T postgres pg_dump -U postgres task_management_db > ~/backup_$(date +\%F).sql
+0 2 * * * cd ~/taskhub && docker compose exec -T postgres pg_dump -U postgres task_management_db > ~/backup_$(date +\%F).sql
 ```
 
 Khôi phục:

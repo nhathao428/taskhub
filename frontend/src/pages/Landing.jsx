@@ -41,8 +41,8 @@ export default function Landing() {
       {/* Hero */}
       <div className="relative overflow-hidden text-white bg-slate-900">
         {/* Aurora mesh */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(99,102,241,0.85),transparent_55%),radial-gradient(ellipse_at_top_right,_rgba(217,70,239,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(56,189,248,0.45),transparent_55%)]" />
-        <div className="absolute -top-32 -right-24 w-[28rem] h-[28rem] bg-fuchsia-500/30 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(31,154,150,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(19,124,121,0.50),transparent_55%)]" />
+        <div className="absolute -top-32 -right-24 w-[28rem] h-[28rem] bg-brand-400/20 rounded-full blur-3xl" />
         <div className="absolute -bottom-32 -left-24 w-[32rem] h-[32rem] bg-brand-500/40 rounded-full blur-3xl" />
         <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
@@ -53,7 +53,7 @@ export default function Landing() {
               <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center shadow-brand-glow ring-1 ring-white/10">
                 <MdWorkspaces className="text-2xl" />
               </div>
-              <span className="text-lg font-bold tracking-tight">Task Manager</span>
+              <span className="text-lg font-bold tracking-tight">TaskHub</span>
             </div>
             <LanguageSwitcher variant="dark" />
           </div>
@@ -64,7 +64,7 @@ export default function Landing() {
               {t('Quản lý công việc thông minh cho doanh nghiệp nhỏ')}
             </h1>
             <p className="mt-5 text-base md:text-lg text-brand-100 leading-relaxed">
-              {t('Giao việc, theo dõi tiến độ, chấm công GPS và để AI gợi ý nhân viên phù hợp — tất cả trong một hệ thống.')}
+              {t('Giao việc, theo dõi tiến độ, chấm công GPS và để AI gợi ý nhân viên phù hợp. Tất cả trong một hệ thống.')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button
@@ -91,7 +91,7 @@ export default function Landing() {
               </Link>
             </div>
             <p className="mt-4 text-sm text-brand-200">
-              {t('Chế độ dùng thử cho xem trước giao diện với dữ liệu mẫu — không cần tài khoản.')}
+              {t('Chế độ dùng thử cho xem trước giao diện với dữ liệu mẫu, không cần tài khoản.')}
             </p>
           </div>
         </div>
@@ -119,8 +119,8 @@ export default function Landing() {
 
         {/* CTA */}
         <div className="mt-14 relative overflow-hidden rounded-2xl p-8 text-center text-white shadow-brand-glow bg-slate-900">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(99,102,241,0.85),transparent_55%),radial-gradient(ellipse_at_top_right,_rgba(217,70,239,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(56,189,248,0.45),transparent_55%)]" />
-          <div className="absolute -top-24 -right-24 w-72 h-72 bg-fuchsia-500/30 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(31,154,150,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,_rgba(19,124,121,0.50),transparent_55%)]" />
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-brand-500/25 rounded-full blur-3xl" />
           <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-brand-500/30 rounded-full blur-3xl" />
           <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] bg-[size:32px_32px]" />
           <div className="relative">

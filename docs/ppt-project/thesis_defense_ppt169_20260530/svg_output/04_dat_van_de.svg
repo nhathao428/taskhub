@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">ĐẶT VẤN ĐỀ &amp; MỤC TIÊU</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 1 · TỔNG QUAN</text>
+
+  <!-- Key message -->
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">Doanh nghiệp nhỏ đa ngành quản lý công việc thủ công — cần giải pháp tích hợp AI</text>
+
+  <!-- 2 column layout -->
+  <!-- Left: Đặt vấn đề -->
+  <rect x="40" y="150" width="600" height="490" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" rx="6"/>
+  <rect x="40" y="150" width="600" height="40" fill="#003366" rx="6"/>
+  <rect x="40" y="180" width="600" height="10" fill="#003366"/>
+  <text x="60" y="178" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="bold">▌ ĐẶT VẤN ĐỀ</text>
+
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#333333">
+    <circle cx="70" cy="225" r="4" fill="#CC0000"/>
+    <text x="90" y="230">Quản lý công việc qua Excel · tin nhắn · giấy tờ</text>
+    <text x="90" y="255" fill="#999999" font-size="13">→ dữ liệu phân tán, khó theo dõi tiến độ</text>
+
+    <circle cx="70" cy="295" r="4" fill="#CC0000"/>
+    <text x="90" y="300">Không có nguồn thông tin thống nhất</text>
+    <text x="90" y="325" fill="#999999" font-size="13">→ thiếu single source of truth</text>
+
+    <circle cx="70" cy="365" r="4" fill="#CC0000"/>
+    <text x="90" y="370">Phân công nhân sự theo cảm tính</text>
+    <text x="90" y="395" fill="#999999" font-size="13">→ chưa dựa trên dữ liệu lịch sử thực tế</text>
+
+    <circle cx="70" cy="435" r="4" fill="#CC0000"/>
+    <text x="90" y="440">Phần mềm thương mại đắt &amp; nặng</text>
+    <text x="90" y="465" fill="#999999" font-size="13">→ nhiều tính năng thừa với DN nhỏ</text>
+
+    <circle cx="70" cy="505" r="4" fill="#CC0000"/>
+    <text x="90" y="510">Chưa khai thác AI hỗ trợ ra quyết định</text>
+    <text x="90" y="535" fill="#999999" font-size="13">→ bỏ lỡ cơ hội tăng hiệu quả phân công</text>
+  </g>
+
+  <!-- Right: Mục tiêu -->
+  <rect x="660" y="150" width="580" height="490" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" rx="6"/>
+  <rect x="660" y="150" width="580" height="40" fill="#147c79" rx="6"/>
+  <rect x="660" y="180" width="580" height="10" fill="#147c79"/>
+  <text x="680" y="178" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="bold">✓ MỤC TIÊU ĐỀ TÀI</text>
+
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#333333">
+    <rect x="680" y="220" width="22" height="22" fill="#147c79" rx="3"/>
+    <text x="694" y="237" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="13">1</text>
+    <text x="712" y="237">Hệ thống quản lý công việc gọn nhẹ</text>
+    <text x="712" y="260" fill="#999999" font-size="13">chi phí thấp, phù hợp doanh nghiệp nhỏ</text>
+
+    <rect x="680" y="290" width="22" height="22" fill="#147c79" rx="3"/>
+    <text x="694" y="307" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="13">2</text>
+    <text x="712" y="307">Kiến trúc đa nền tảng Web · Mobile</text>
+    <text x="712" y="330" fill="#999999" font-size="13">React + Spring Boot + Flutter</text>
+
+    <rect x="680" y="360" width="22" height="22" fill="#147c79" rx="3"/>
+    <text x="694" y="377" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="13">3</text>
+    <text x="712" y="377">Tích hợp AI gợi ý nhân viên</text>
+    <text x="712" y="400" fill="#999999" font-size="13">Google Gemini · TOP 5 phù hợp với task</text>
+
+    <rect x="680" y="430" width="22" height="22" fill="#147c79" rx="3"/>
+    <text x="694" y="447" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="13">4</text>
+    <text x="712" y="447">Bảo mật bằng JWT · phân quyền 3 vai trò</text>
+    <text x="712" y="470" fill="#999999" font-size="13">ADMIN · MANAGER · EMPLOYEE</text>
+
+    <rect x="680" y="500" width="22" height="22" fill="#147c79" rx="3"/>
+    <text x="694" y="517" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="13">5</text>
+    <text x="712" y="517">Đóng gói Docker · triển khai AWS EC2</text>
+    <text x="712" y="540" fill="#999999" font-size="13">chạy thực tế trên Internet</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="665" width="1280" height="55" fill="#F5F7FA"/>
+  <text x="40" y="697" fill="#555555" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="697" text-anchor="end" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">4 / 16</text>
+</svg>

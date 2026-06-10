@@ -2,11 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Audit pass per redesign-skill — bỏ Inter generic, dùng Figtree Variable.
+ * Tabular figures cho data, smooth scroll, text-wrap balance cho heading.
+ */
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  font-family: 'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Off-white tinted instead of #f8fafc cool gray — warmer, less generic. */
+  background-color: #fafaf9;
+  color: #1a1a1c;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* OpenType: contextual alts + tabular figures for clean data alignment. */
+  font-feature-settings: "cv11", "ss01", "ss03";
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+/* Tinted focus ring per audit (accessibility required). */
+*:focus-visible {
+  outline: 2px solid #1f9a96;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Subtle grain overlay (audit: chống flat sterile). */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Skeleton loader (audit: thay generic spinner) */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #f2f2f0;
+  border-radius: 8px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
 }

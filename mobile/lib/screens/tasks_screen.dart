@@ -9,7 +9,11 @@ import '../widgets/loading_widget.dart';
 import '../widgets/status_badge.dart';
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  /// mine=true: nhân viên chỉ xem/cập nhật công việc được giao cho mình
+  /// (gọi /api/tasks/me + PATCH status). mine=false: quản lý xem toàn bộ.
+  final bool mine;
+
+  const TasksScreen({super.key, this.mine = false});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -18,12 +22,16 @@ class TasksScreen extends StatefulWidget {
 class _TasksScreenState extends State<TasksScreen> {
   String _filter = 'all';
 
+  Future<void> _load() => widget.mine
+      ? context.read<DataProvider>().fetchMyTasks()
+      : context.read<DataProvider>().fetchTasks();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.read<DataProvider>().tasks.isEmpty) {
-        context.read<DataProvider>().fetchTasks();
+        _load();
       }
     });
   }
@@ -90,7 +98,8 @@ class _TasksScreenState extends State<TasksScreen> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(result != null
                     ? context.trOnce('Đã tạo công việc "{title}"', {'title': result.title})
-                    : context.trOnce('Tạo công việc thất bại')),
+                    : (context.read<DataProvider>().tasksError ??
+                        context.trOnce('Tạo công việc thất bại'))),
                 backgroundColor:
                     result != null ? AppTheme.emerald500 : AppTheme.rose500,
               ));
@@ -178,13 +187,14 @@ class _TasksScreenState extends State<TasksScreen> {
     );
 
     if (selected == null || selected == task.status) return;
-    final success =
-        await dataProvider.updateTask(task.taskId, {'status': selected});
+    final success = widget.mine
+        ? await dataProvider.updateMyTaskStatus(task.taskId, selected)
+        : await dataProvider.updateTask(task.taskId, {'status': selected});
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(success
           ? context.trOnce('Đã cập nhật trạng thái')
-          : context.trOnce('Cập nhật thất bại')),
+          : (dataProvider.tasksError ?? context.trOnce('Cập nhật thất bại'))),
       backgroundColor:
           success ? AppTheme.emerald500 : AppTheme.rose500,
     ));
@@ -198,11 +208,12 @@ class _TasksScreenState extends State<TasksScreen> {
     return Scaffold(
       backgroundColor: AppTheme.slate50,
       appBar: AppBar(
-        title: Text(context.tr('Công việc')),
+        title: Text(
+            context.tr(widget.mine ? 'Công việc của tôi' : 'Công việc')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => context.read<DataProvider>().fetchTasks(),
+            onPressed: _load,
           ),
           const SizedBox(width: 4),
         ],
@@ -248,24 +259,25 @@ class _TasksScreenState extends State<TasksScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddDialog,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(context.tr('Tạo')),
-      ),
+      floatingActionButton: widget.mine
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _showAddDialog,
+              icon: const Icon(Icons.add_rounded),
+              label: Text(context.tr('Tạo')),
+            ),
       body: data.loadingTasks
           ? LoadingWidget(message: context.tr('Đang tải danh sách công việc...'))
           : data.tasksError != null
               ? _ErrorView(
                   error: data.tasksError!,
-                  onRetry: () => context.read<DataProvider>().fetchTasks(),
+                  onRetry: _load,
                 )
               : tasks.isEmpty
                   ? EmptyView(context.tr('Không có công việc nào'))
                   : RefreshIndicator(
                       color: AppTheme.brand600,
-                      onRefresh: () =>
-                          context.read<DataProvider>().fetchTasks(),
+                      onRefresh: _load,
                       child: ListView.builder(
                         padding: const EdgeInsets.fromLTRB(12, 4, 12, 96),
                         itemCount: tasks.length,

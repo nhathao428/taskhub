@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">USE CASE &amp; CƠ SỞ DỮ LIỆU</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 3 · PHÂN TÍCH THIẾT KẾ</text>
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">14 Use Case · 6 bảng dữ liệu chính · Phân quyền theo vai trò</text>
+
+  <!-- LEFT: Use Case grid -->
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <text x="40" y="150" fill="#003366" font-size="18" font-weight="bold">▸ USE CASE TỔNG THỂ</text>
+    <text x="40" y="172" fill="#999999" font-size="12">3 vai trò: EMPLOYEE → MANAGER → ADMIN (kế thừa)</text>
+
+    <!-- Authentication -->
+    <rect x="40" y="190" width="280" height="65" fill="#FAFAF9" stroke="#003366" rx="4"/>
+    <text x="55" y="213" fill="#003366" font-size="13" font-weight="bold">🔐 Xác thực</text>
+    <text x="55" y="232" fill="#555555" font-size="11">UC-01 Đăng nhập · UC-02 Đăng ký</text>
+    <text x="55" y="247" fill="#555555" font-size="11">UC-03 Đăng xuất</text>
+
+    <!-- Employees + Projects -->
+    <rect x="40" y="270" width="280" height="65" fill="#FAFAF9" stroke="#003366" rx="4"/>
+    <text x="55" y="293" fill="#003366" font-size="13" font-weight="bold">👥 Nhân viên &amp; Dự án</text>
+    <text x="55" y="312" fill="#555555" font-size="11">UC-04 QL nhân viên · UC-05 QL dự án</text>
+
+    <!-- Tasks + Attendance -->
+    <rect x="40" y="350" width="280" height="90" fill="#FAFAF9" stroke="#003366" rx="4"/>
+    <text x="55" y="373" fill="#003366" font-size="13" font-weight="bold">📋 Công việc &amp; Chấm công</text>
+    <text x="55" y="392" fill="#555555" font-size="11">UC-06 Xem CV · UC-07 Cập nhật trạng thái</text>
+    <text x="55" y="407" fill="#555555" font-size="11">UC-08 Tạo &amp; gán CV · UC-09 Chấm GPS</text>
+    <text x="55" y="422" fill="#555555" font-size="11">UC-10 Báo cáo chấm công</text>
+
+    <!-- AI -->
+    <rect x="40" y="455" width="280" height="50" fill="#FAF5FF" stroke="#9333EA" rx="4"/>
+    <text x="55" y="478" fill="#9333EA" font-size="13" font-weight="bold">✨ AI Gợi ý</text>
+    <text x="55" y="497" fill="#555555" font-size="11">UC-11 Gợi ý nhân viên bằng Gemini AI</text>
+
+    <!-- Admin -->
+    <rect x="40" y="520" width="280" height="80" fill="#FAFAF9" stroke="#CC0000" rx="4"/>
+    <text x="55" y="543" fill="#CC0000" font-size="13" font-weight="bold">⚙ Quản trị</text>
+    <text x="55" y="562" fill="#555555" font-size="11">UC-12 Phân quyền · UC-13 Xem logs</text>
+    <text x="55" y="577" fill="#555555" font-size="11">UC-14 Cấu hình hệ thống</text>
+  </g>
+
+  <!-- RIGHT: ERD -->
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <text x="360" y="150" fill="#003366" font-size="18" font-weight="bold">▸ SƠ ĐỒ ERD — 6 BẢNG CHÍNH</text>
+    <text x="360" y="172" fill="#999999" font-size="12">PostgreSQL 16 · Flyway migrations · UNIQUE constraint</text>
+
+    <!-- USERS -->
+    <rect x="360" y="195" width="160" height="120" fill="#FFFFFF" stroke="#0066CC" stroke-width="2" rx="4"/>
+    <rect x="360" y="195" width="160" height="28" fill="#0066CC" rx="4"/>
+    <text x="440" y="215" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">🔑 users</text>
+    <text x="370" y="240" fill="#1A1A1C" font-size="11">▸ user_id (PK)</text>
+    <text x="370" y="258" fill="#1A1A1C" font-size="11">▸ username · email</text>
+    <text x="370" y="276" fill="#1A1A1C" font-size="11">▸ password (bcrypt)</text>
+    <text x="370" y="294" fill="#1A1A1C" font-size="11">▸ role · created_at</text>
+
+    <!-- EMPLOYEES -->
+    <rect x="560" y="195" width="160" height="120" fill="#FFFFFF" stroke="#0066CC" stroke-width="2" rx="4"/>
+    <rect x="560" y="195" width="160" height="28" fill="#0066CC" rx="4"/>
+    <text x="640" y="215" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">👤 employees</text>
+    <text x="570" y="240" fill="#1A1A1C" font-size="11">▸ employee_id (PK)</text>
+    <text x="570" y="258" fill="#1A1A1C" font-size="11">▸ user_id (FK UNIQUE)</text>
+    <text x="570" y="276" fill="#1A1A1C" font-size="11">▸ first_name · last_name</text>
+    <text x="570" y="294" fill="#1A1A1C" font-size="11">▸ skills · group</text>
+
+    <!-- PROJECTS -->
+    <rect x="760" y="195" width="160" height="120" fill="#FFFFFF" stroke="#0066CC" stroke-width="2" rx="4"/>
+    <rect x="760" y="195" width="160" height="28" fill="#0066CC" rx="4"/>
+    <text x="840" y="215" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">📁 projects</text>
+    <text x="770" y="240" fill="#1A1A1C" font-size="11">▸ project_id (PK)</text>
+    <text x="770" y="258" fill="#1A1A1C" font-size="11">▸ name · description</text>
+    <text x="770" y="276" fill="#1A1A1C" font-size="11">▸ start_date · end_date</text>
+    <text x="770" y="294" fill="#1A1A1C" font-size="11">▸ group · status</text>
+
+    <!-- TASKS -->
+    <rect x="360" y="340" width="180" height="135" fill="#FFFFFF" stroke="#003366" stroke-width="2" rx="4"/>
+    <rect x="360" y="340" width="180" height="28" fill="#003366" rx="4"/>
+    <text x="450" y="360" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">📋 tasks</text>
+    <text x="370" y="385" fill="#1A1A1C" font-size="11">▸ task_id (PK)</text>
+    <text x="370" y="403" fill="#1A1A1C" font-size="11">▸ project_id (FK)</text>
+    <text x="370" y="421" fill="#1A1A1C" font-size="11">▸ assigned_to_id (FK)</text>
+    <text x="370" y="439" fill="#1A1A1C" font-size="11">▸ title · description</text>
+    <text x="370" y="457" fill="#1A1A1C" font-size="11">▸ status · due_date</text>
+
+    <!-- ATTENDANCES -->
+    <rect x="580" y="340" width="170" height="135" fill="#FFFFFF" stroke="#147c79" stroke-width="2" rx="4"/>
+    <rect x="580" y="340" width="170" height="28" fill="#147c79" rx="4"/>
+    <text x="665" y="360" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">📍 attendances</text>
+    <text x="590" y="385" fill="#1A1A1C" font-size="11">▸ attendance_id (PK)</text>
+    <text x="590" y="403" fill="#1A1A1C" font-size="11">▸ employee_id (FK)</text>
+    <text x="590" y="421" fill="#1A1A1C" font-size="11">▸ date · check_in · out</text>
+    <text x="590" y="439" fill="#1A1A1C" font-size="11">▸ lat · lng · is_mocked</text>
+    <text x="590" y="457" fill="#1A1A1C" font-size="11">▸ review_status</text>
+
+    <!-- OFFICE_LOCATIONS -->
+    <rect x="790" y="340" width="170" height="135" fill="#FFFFFF" stroke="#147c79" stroke-width="2" rx="4"/>
+    <rect x="790" y="340" width="170" height="28" fill="#147c79" rx="4"/>
+    <text x="875" y="360" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">🏢 office_locations</text>
+    <text x="800" y="385" fill="#1A1A1C" font-size="11">▸ id (PK) · name</text>
+    <text x="800" y="403" fill="#1A1A1C" font-size="11">▸ address</text>
+    <text x="800" y="421" fill="#1A1A1C" font-size="11">▸ latitude · longitude</text>
+    <text x="800" y="439" fill="#1A1A1C" font-size="11">▸ radius_meters</text>
+    <text x="800" y="457" fill="#1A1A1C" font-size="11">▸ active</text>
+
+    <!-- Relationships lines -->
+    <line x1="520" y1="255" x2="560" y2="255" stroke="#003366" stroke-width="2"/>
+    <text x="540" y="248" text-anchor="middle" fill="#003366" font-size="11" font-weight="bold">1:1</text>
+    <line x1="720" y1="280" x2="760" y2="280" stroke="#003366" stroke-width="2"/>
+    <line x1="720" y1="290" x2="760" y2="290" stroke="#003366" stroke-width="2"/>
+    <line x1="840" y1="315" x2="450" y2="340" stroke="#003366" stroke-width="1.5" opacity="0.5"/>
+    <line x1="640" y1="315" x2="450" y2="340" stroke="#003366" stroke-width="1.5" opacity="0.5"/>
+    <line x1="640" y1="315" x2="665" y2="340" stroke="#147c79" stroke-width="1.5" opacity="0.5"/>
+    <line x1="665" y1="475" x2="875" y2="475" stroke="#147c79" stroke-width="1.5" opacity="0.5" stroke-dasharray="3,2"/>
+
+    <!-- Stats -->
+    <rect x="960" y="195" width="280" height="280" fill="#003366" rx="6"/>
+    <text x="1100" y="225" text-anchor="middle" fill="#FFFFFF" font-size="14" letter-spacing="3">SỐ LIỆU</text>
+    <line x1="980" y1="240" x2="1220" y2="240" stroke="#75CEC8" opacity="0.5"/>
+    <text x="980" y="275" fill="#75CEC8" font-size="13">▸ Bảng:</text>
+    <text x="1220" y="275" text-anchor="end" fill="#FFFFFF" font-size="22" font-weight="bold">6</text>
+    <text x="980" y="320" fill="#75CEC8" font-size="13">▸ Use Case:</text>
+    <text x="1220" y="320" text-anchor="end" fill="#FFFFFF" font-size="22" font-weight="bold">14</text>
+    <text x="980" y="365" fill="#75CEC8" font-size="13">▸ REST endpoints:</text>
+    <text x="1220" y="365" text-anchor="end" fill="#FFFFFF" font-size="22" font-weight="bold">~30</text>
+    <text x="980" y="410" fill="#75CEC8" font-size="13">▸ Vai trò:</text>
+    <text x="1220" y="410" text-anchor="end" fill="#FFFFFF" font-size="22" font-weight="bold">3</text>
+    <text x="980" y="455" fill="#75CEC8" font-size="13">▸ Migration:</text>
+    <text x="1220" y="455" text-anchor="end" fill="#FFFFFF" font-size="22" font-weight="bold">V1</text>
+  </g>
+
+  <rect x="0" y="665" width="1280" height="55" fill="#F5F7FA"/>
+  <text x="40" y="697" fill="#555555" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="697" text-anchor="end" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">9 / 16</text>
+</svg>

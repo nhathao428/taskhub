@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">CÔNG NGHỆ SỬ DỤNG</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 2 · CƠ SỞ LÝ THUYẾT</text>
+
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">Open-source stack hiện đại · Mỗi tầng dùng best practice của lĩnh vực</text>
+
+  <!-- 6 tech cards in 3x2 -->
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <!-- Backend -->
+    <rect x="40" y="150" width="395" height="225" fill="#FFFFFF" stroke="#003366" stroke-width="2" rx="8"/>
+    <rect x="40" y="150" width="395" height="48" fill="#003366" rx="8"/>
+    <rect x="40" y="186" width="395" height="12" fill="#003366"/>
+    <text x="60" y="182" fill="#FFFFFF" font-size="20" font-weight="bold">⚙ BACKEND</text>
+    <text x="60" y="232" fill="#003366" font-size="26" font-weight="bold">Spring Boot 3.5</text>
+    <text x="60" y="262" fill="#555555" font-size="14">Java 17 · Maven · REST API</text>
+    <line x1="60" y1="275" x2="415" y2="275" stroke="#E5E7EB"/>
+    <text x="60" y="300" fill="#1A1A1C" font-size="14">▸ Spring Security · jjwt 0.12</text>
+    <text x="60" y="324" fill="#1A1A1C" font-size="14">▸ Spring Data JPA · Hibernate</text>
+    <text x="60" y="348" fill="#1A1A1C" font-size="14">▸ Spring Cache · BCrypt(12)</text>
+
+    <!-- Frontend -->
+    <rect x="450" y="150" width="395" height="225" fill="#FFFFFF" stroke="#147c79" stroke-width="2" rx="8"/>
+    <rect x="450" y="150" width="395" height="48" fill="#147c79" rx="8"/>
+    <rect x="450" y="186" width="395" height="12" fill="#147c79"/>
+    <text x="470" y="182" fill="#FFFFFF" font-size="20" font-weight="bold">⌘ FRONTEND</text>
+    <text x="470" y="232" fill="#147c79" font-size="26" font-weight="bold">React 18 + Vite</text>
+    <text x="470" y="262" fill="#555555" font-size="14">Tailwind CSS · Chart.js</text>
+    <line x1="470" y1="275" x2="825" y2="275" stroke="#E5E7EB"/>
+    <text x="470" y="300" fill="#1A1A1C" font-size="14">▸ React Router v6 · Axios</text>
+    <text x="470" y="324" fill="#1A1A1C" font-size="14">▸ Figtree Variable font</text>
+    <text x="470" y="348" fill="#1A1A1C" font-size="14">▸ Leaflet · OpenStreetMap</text>
+
+    <!-- Mobile -->
+    <rect x="860" y="150" width="380" height="225" fill="#FFFFFF" stroke="#0066CC" stroke-width="2" rx="8"/>
+    <rect x="860" y="150" width="380" height="48" fill="#0066CC" rx="8"/>
+    <rect x="860" y="186" width="380" height="12" fill="#0066CC"/>
+    <text x="880" y="182" fill="#FFFFFF" font-size="20" font-weight="bold">▣ MOBILE</text>
+    <text x="880" y="232" fill="#0066CC" font-size="26" font-weight="bold">Flutter 3.x</text>
+    <text x="880" y="262" fill="#555555" font-size="14">Dart · iOS + Android + Web</text>
+    <line x1="880" y1="275" x2="1220" y2="275" stroke="#E5E7EB"/>
+    <text x="880" y="300" fill="#1A1A1C" font-size="14">▸ Dio HTTP + JWT interceptor</text>
+    <text x="880" y="324" fill="#1A1A1C" font-size="14">▸ Provider state management</text>
+    <text x="880" y="348" fill="#1A1A1C" font-size="14">▸ geolocator (GPS native)</text>
+
+    <!-- Database -->
+    <rect x="40" y="395" width="395" height="225" fill="#FFFFFF" stroke="#E48913" stroke-width="2" rx="8"/>
+    <rect x="40" y="395" width="395" height="48" fill="#E48913" rx="8"/>
+    <rect x="40" y="431" width="395" height="12" fill="#E48913"/>
+    <text x="60" y="427" fill="#FFFFFF" font-size="20" font-weight="bold">▤ DATABASE</text>
+    <text x="60" y="477" fill="#E48913" font-size="26" font-weight="bold">PostgreSQL 16</text>
+    <text x="60" y="507" fill="#555555" font-size="14">RDBMS + ACID + JSONB</text>
+    <line x1="60" y1="520" x2="415" y2="520" stroke="#E5E7EB"/>
+    <text x="60" y="545" fill="#1A1A1C" font-size="14">▸ 6 bảng + Flyway migrations</text>
+    <text x="60" y="569" fill="#1A1A1C" font-size="14">▸ Index + EntityGraph (no N+1)</text>
+    <text x="60" y="593" fill="#1A1A1C" font-size="14">▸ H2 in-memory (test)</text>
+
+    <!-- Cache -->
+    <rect x="450" y="395" width="395" height="225" fill="#FFFFFF" stroke="#CC0000" stroke-width="2" rx="8"/>
+    <rect x="450" y="395" width="395" height="48" fill="#CC0000" rx="8"/>
+    <rect x="450" y="431" width="395" height="12" fill="#CC0000"/>
+    <text x="470" y="427" fill="#FFFFFF" font-size="20" font-weight="bold">⚡ CACHE</text>
+    <text x="470" y="477" fill="#CC0000" font-size="26" font-weight="bold">Redis 7</text>
+    <text x="470" y="507" fill="#555555" font-size="14">In-memory · key-value</text>
+    <line x1="470" y1="520" x2="825" y2="520" stroke="#E5E7EB"/>
+    <text x="470" y="545" fill="#1A1A1C" font-size="14">▸ @Cacheable annotations</text>
+    <text x="470" y="569" fill="#1A1A1C" font-size="14">▸ TTL 5 phút cho AI suggest</text>
+    <text x="470" y="593" fill="#1A1A1C" font-size="14">▸ Giảm latency 1450ms → 10ms</text>
+
+    <!-- AI -->
+    <rect x="860" y="395" width="380" height="225" fill="#FFFFFF" stroke="#9333EA" stroke-width="2" rx="8"/>
+    <rect x="860" y="395" width="380" height="48" fill="#9333EA" rx="8"/>
+    <rect x="860" y="431" width="380" height="12" fill="#9333EA"/>
+    <text x="880" y="427" fill="#FFFFFF" font-size="20" font-weight="bold">✨ AI</text>
+    <text x="880" y="477" fill="#9333EA" font-size="26" font-weight="bold">Google Gemini</text>
+    <text x="880" y="507" fill="#555555" font-size="14">gemini-2.5-flash · LLM</text>
+    <line x1="880" y1="520" x2="1220" y2="520" stroke="#E5E7EB"/>
+    <text x="880" y="545" fill="#1A1A1C" font-size="14">▸ Free tier 1500 req/ngày</text>
+    <text x="880" y="569" fill="#1A1A1C" font-size="14">▸ Response JSON mode</text>
+    <text x="880" y="593" fill="#1A1A1C" font-size="14">▸ Prompt-injection sanitize</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="0" y="665" width="1280" height="55" fill="#F5F7FA"/>
+  <text x="40" y="697" fill="#555555" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="697" text-anchor="end" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">6 / 16</text>
+</svg>

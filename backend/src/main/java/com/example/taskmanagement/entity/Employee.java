@@ -28,8 +28,11 @@ public class Employee implements Serializable {
     @Column(name = "employee_id")
     private Long employeeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    // DB schema có UNIQUE constraint trên user_id (V1__baseline_schema.sql) — model
+    // phải là @OneToOne cho khớp. Trước đây dùng @ManyToOne sai ngữ nghĩa, mặc dù DB
+    // vẫn từ chối bản ghi trùng.
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     @Column(name = "first_name", nullable = false, length = 50)

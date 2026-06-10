@@ -66,6 +66,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return employee;
     } catch (e) {
+      _employeesError = e.toString();
+      notifyListeners();
       return null;
     }
   }
@@ -93,6 +95,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return project;
     } catch (e) {
+      _projectsError = e.toString();
+      notifyListeners();
       return null;
     }
   }
@@ -120,6 +124,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return task;
     } catch (e) {
+      _tasksError = e.toString();
+      notifyListeners();
       return null;
     }
   }
@@ -132,6 +138,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      _tasksError = e.toString();
+      notifyListeners();
       return false;
     }
   }
@@ -144,6 +152,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      _tasksError = e.toString();
+      notifyListeners();
       return false;
     }
   }
@@ -186,6 +196,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return record;
     } catch (e) {
+      _attendanceError = e.toString();
+      notifyListeners();
       return null;
     }
   }
@@ -199,6 +211,8 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
       return updated;
     } catch (e) {
+      _attendanceError = e.toString();
+      notifyListeners();
       return null;
     }
   }

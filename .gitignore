@@ -54,3 +54,15 @@ CLAUDE.md
 # tren GitHub; van build lai duoc tu source khi can.
 docs/*.docx
 !docs/BAO_CAO_DO_AN_CO_SO.docx
+
+# Graphify generated artifacts (rebuild: graphify update .)
+graphify-out/
+
+# Tooling / build artifacts (không commit)
+.codegraph/
+**/.agents/
+mobile/build/
+docs/uml/preview.html
+# File backup/sao lưu dư thừa (git đã lưu lịch sử)
+*.backup*
+*.bak

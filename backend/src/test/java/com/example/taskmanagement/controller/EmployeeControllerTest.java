@@ -59,12 +59,12 @@ class EmployeeControllerTest {
 
     // ----- Authorization gates -----
 
-    // Project security config không có custom AuthenticationEntryPoint, nên Spring trả
-    // 403 (không phải 401) cho request thiếu bearer token. Document hành vi thực tế.
+    // RestAuthenticationEntryPoint trả 401 cho request thiếu/hỏng JWT — semantics
+    // REST đúng chuẩn (401 = "authenticate", 403 = "đã auth nhưng cấm").
     @Test
-    void getAllEmployees_returns403_whenNoAuth() throws Exception {
+    void getAllEmployees_returns401_whenNoAuth() throws Exception {
         mockMvc.perform(get("/api/employees"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

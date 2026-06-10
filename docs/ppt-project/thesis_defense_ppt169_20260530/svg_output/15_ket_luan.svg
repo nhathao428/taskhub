@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">KẾT LUẬN · HẠN CHẾ · HƯỚNG PHÁT TRIỂN</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 4 · KẾT LUẬN</text>
+
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">14/14 yêu cầu chức năng đạt 100% · Sản phẩm chạy thật trên AWS · Vẫn còn 4 hạn chế</text>
+
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <!-- LEFT: Kết quả đạt được -->
+    <rect x="40" y="140" width="395" height="500" fill="#E0F2F1" stroke="#147c79" stroke-width="2" rx="8"/>
+    <rect x="40" y="140" width="395" height="48" fill="#147c79" rx="8"/>
+    <rect x="40" y="176" width="395" height="12" fill="#147c79"/>
+    <text x="60" y="172" fill="#FFFFFF" font-size="20" font-weight="bold">✓ KẾT QUẢ ĐẠT ĐƯỢC</text>
+
+    <g fill="#1A1A1C" font-size="15">
+      <circle cx="68" cy="225" r="4" fill="#147c79"/>
+      <text x="82" y="230">Hoàn thành 14/14 yêu cầu chức năng (100%)</text>
+
+      <circle cx="68" cy="265" r="4" fill="#147c79"/>
+      <text x="82" y="270">Gần 30 REST endpoint · phân quyền 3 vai trò</text>
+
+      <circle cx="68" cy="305" r="4" fill="#147c79"/>
+      <text x="82" y="310">Web + Mobile + AI gợi ý + i18n VI/EN</text>
+
+      <circle cx="68" cy="345" r="4" fill="#147c79"/>
+      <text x="82" y="350">Chấm công GPS · Geofence đa văn phòng</text>
+
+      <circle cx="68" cy="385" r="4" fill="#147c79"/>
+      <text x="82" y="390">Triển khai thật trên AWS EC2 Internet</text>
+
+      <circle cx="68" cy="425" r="4" fill="#147c79"/>
+      <text x="82" y="430">123 test pass · 0 fail · build sạch</text>
+
+      <circle cx="68" cy="465" r="4" fill="#147c79"/>
+      <text x="82" y="470">Tài liệu đầy đủ: báo cáo · UML · setup</text>
+
+      <circle cx="68" cy="505" r="4" fill="#147c79"/>
+      <text x="82" y="510">Security: PromptShield gateway tích hợp</text>
+
+      <circle cx="68" cy="545" r="4" fill="#147c79"/>
+      <text x="82" y="550">Redesign theo taste-skill · UI premium</text>
+    </g>
+
+    <rect x="60" y="580" width="355" height="40" fill="#147c79" rx="4"/>
+    <text x="237" y="606" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">Đáp ứng đầy đủ mục tiêu ban đầu</text>
+
+    <!-- MIDDLE: Hạn chế -->
+    <rect x="450" y="140" width="380" height="500" fill="#FFF4E5" stroke="#E48913" stroke-width="2" rx="8"/>
+    <rect x="450" y="140" width="380" height="48" fill="#E48913" rx="8"/>
+    <rect x="450" y="176" width="380" height="12" fill="#E48913"/>
+    <text x="470" y="172" fill="#FFFFFF" font-size="20" font-weight="bold">⚠ HẠN CHẾ</text>
+
+    <g fill="#1A1A1C" font-size="15">
+      <text x="470" y="230" fill="#E48913" font-weight="bold" font-size="16">▌ Kỹ thuật</text>
+
+      <circle cx="478" cy="263" r="3" fill="#E48913"/>
+      <text x="490" y="268">Phụ thuộc Gemini API (free 1500/ngày)</text>
+
+      <circle cx="478" cy="298" r="3" fill="#E48913"/>
+      <text x="490" y="303">Chưa có refresh token cho JWT</text>
+
+      <circle cx="478" cy="333" r="3" fill="#E48913"/>
+      <text x="490" y="338">Chưa có WebSocket real-time</text>
+
+      <circle cx="478" cy="368" r="3" fill="#E48913"/>
+      <text x="490" y="373">Coverage backend ~30% (thấp)</text>
+
+      <text x="470" y="423" fill="#E48913" font-weight="bold" font-size="16">▌ Nghiệp vụ</text>
+
+      <circle cx="478" cy="456" r="3" fill="#E48913"/>
+      <text x="490" y="461">Chưa có quản lý lương · KPI</text>
+
+      <circle cx="478" cy="491" r="3" fill="#E48913"/>
+      <text x="490" y="496">Chưa có Gantt chart cho dự án</text>
+
+      <circle cx="478" cy="526" r="3" fill="#E48913"/>
+      <text x="490" y="531">AI chưa hỗ trợ training riêng</text>
+
+      <circle cx="478" cy="561" r="3" fill="#E48913"/>
+      <text x="490" y="566">Chưa support đa ngôn ngữ mở rộng</text>
+    </g>
+
+    <!-- RIGHT: Hướng phát triển -->
+    <rect x="845" y="140" width="395" height="500" fill="#FAF5FF" stroke="#9333EA" stroke-width="2" rx="8"/>
+    <rect x="845" y="140" width="395" height="48" fill="#9333EA" rx="8"/>
+    <rect x="845" y="176" width="395" height="12" fill="#9333EA"/>
+    <text x="865" y="172" fill="#FFFFFF" font-size="20" font-weight="bold">→ HƯỚNG PHÁT TRIỂN</text>
+
+    <g fill="#1A1A1C" font-size="14">
+      <text x="865" y="225" fill="#9333EA" font-weight="bold" font-size="15">▌ Kỹ thuật ngắn hạn (3 tháng)</text>
+      <text x="875" y="252">▸ WebSocket cho notification real-time</text>
+      <text x="875" y="275">▸ Refresh token + blacklist Redis</text>
+      <text x="875" y="298">▸ Coverage backend → 80% (TDD)</text>
+      <text x="875" y="321">▸ CI/CD GitHub Actions tự động</text>
+
+      <text x="865" y="365" fill="#9333EA" font-weight="bold" font-size="15">▌ AI nâng cao</text>
+      <text x="875" y="392">▸ RAG + embeddings: tìm nhân viên</text>
+      <text x="875" y="412">  qua mô tả tự nhiên</text>
+      <text x="875" y="435">▸ Fine-tune model trên data nội bộ</text>
+      <text x="875" y="458">▸ Đa LLM: Gemini · GPT · Claude</text>
+
+      <text x="865" y="502" fill="#9333EA" font-weight="bold" font-size="15">▌ Thương mại hoá</text>
+      <text x="875" y="529">▸ SaaS multi-tenant (mỗi DN 1 schema)</text>
+      <text x="875" y="552">▸ Mobile app stores (App Store · Play)</text>
+      <text x="875" y="575">▸ Bóc tách module bán riêng</text>
+      <text x="875" y="598">▸ Mở rộng K8s · auto-scaling</text>
+    </g>
+  </g>
+
+  <rect x="0" y="665" width="1280" height="55" fill="#F5F7FA"/>
+  <text x="40" y="697" fill="#555555" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="697" text-anchor="end" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13">15 / 16</text>
+</svg>

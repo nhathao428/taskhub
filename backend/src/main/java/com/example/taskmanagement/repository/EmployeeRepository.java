@@ -28,4 +28,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     @EntityGraph(attributePaths = {"user"})
     Optional<Employee> findByUser(User user);
+
+    boolean existsByUser(User user);
 }

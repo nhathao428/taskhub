@@ -12,9 +12,9 @@ from docx.oxml import OxmlElement
 from docx.enum.style import WD_STYLE_TYPE
 
 import os as _os
-OUTPUT = r"C:\Users\Admin\task-management-system\docs\BAO_CAO_DO_AN_CO_SO.docx"
-SHOTS_DIR = r"C:\Users\Admin\task-management-system\docs\screenshots"
-UML_DIR = r"C:\Users\Admin\task-management-system\docs\uml\png"
+OUTPUT = r"C:\Users\Admin\taskhub\docs\BAO_CAO_DO_AN_CO_SO.docx"
+SHOTS_DIR = r"C:\Users\Admin\taskhub\docs\screenshots"
+UML_DIR = r"C:\Users\Admin\taskhub\docs\uml\png"
 
 FONT = "Times New Roman"
 SIZE_BODY = 13
@@ -2086,7 +2086,7 @@ add_para(doc,
     "với cấu trúc thư mục như sau, đảm bảo tách biệt rõ ràng giữa "
     "backend, frontend và mobile.")
 add_code(doc, """
-task-management-system/
+taskhub/
 ├── backend/                          # Spring Boot 3.5
 │   ├── src/
 │   │   ├── main/
@@ -2286,7 +2286,7 @@ add_h3(doc, "4.3.2. Cấu hình application.yml")
 add_code(doc, """
 spring:
   application:
-    name: task-management-system
+    name: taskhub
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME:taskmgmt}
     username: ${DB_USER:postgres}
@@ -3276,8 +3276,8 @@ add_h2(doc, "4.8. Triển khai và vận hành")
 add_h3(doc, "4.8.1. Triển khai môi trường phát triển")
 add_code(doc, """
 # Bước 1: Clone repository
-git clone https://github.com/nhathao428/task-management-system.git
-cd task-management-system
+git clone https://github.com/nhathao428/taskhub.git
+cd taskhub
 
 # Bước 2: Tạo file .env từ mẫu
 cp .env.example .env
@@ -4226,13 +4226,13 @@ add_para(doc,
     "Nhờ đó, kịch bản demo trên một máy mới gồm đúng bốn dòng lệnh:")
 add_code(doc, """
 # Windows (PowerShell)
-git clone https://github.com/nhathao428/task-management-system.git
-cd task-management-system
+git clone https://github.com/nhathao428/taskhub.git
+cd taskhub
 pwsh -File start.ps1
 
 # Linux / macOS (Bash)
-git clone https://github.com/nhathao428/task-management-system.git
-cd task-management-system
+git clone https://github.com/nhathao428/taskhub.git
+cd taskhub
 ./start.sh
 """)
 
@@ -4304,7 +4304,7 @@ for i, s in enumerate([
 
 add_para(doc,
     "Cả ba thành phần đều đã được build & chạy thành công tại thời "
-    "điểm nộp đồ án: backend tạo `task-management-system-0.0.1-"
+    "điểm nộp đồ án: backend tạo `taskhub-0.0.1-"
     "SNAPSHOT.jar` ~ 75 MB; frontend `dist/` ~ 680 KB sau gzip; "
     "Flutter web `build/web/` với `main.dart.js` đã tree-shake (giảm "
     "asset MaterialIcons từ 1.6 MB còn 12 KB – tỉ lệ 99.2%). Đây là "
@@ -4758,7 +4758,7 @@ public class ApiResponse<T> {
 add_h2(doc, "Phụ lục II. Cấu trúc thư mục đầy đủ")
 add_para(doc, "Để tham khảo và tái lập, dưới đây là cây thư mục đầy đủ của dự án sau khi build xong:")
 add_code(doc, """
-task-management-system/
+taskhub/
 ├── backend/                 (~ 6500 dòng Java)
 ├── frontend/                (~ 3200 dòng JSX + CSS)
 ├── mobile/                  (~ 2400 dòng Dart)

@@ -11,7 +11,12 @@ import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 
 class AttendanceScreen extends StatefulWidget {
-  const AttendanceScreen({super.key});
+  /// mine=true: nhân viên chỉ xem lịch sử chấm công của chính mình
+  /// (gọi /api/attendance/me). mine=false: quản lý xem toàn bộ.
+  /// Check-in/out luôn là self-service (resolve employee từ JWT).
+  final bool mine;
+
+  const AttendanceScreen({super.key, this.mine = false});
 
   @override
   State<AttendanceScreen> createState() => _AttendanceScreenState();
@@ -19,6 +24,10 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   bool _busy = false;
+
+  Future<void> _loadAttendance() => widget.mine
+      ? context.read<DataProvider>().fetchMyAttendance()
+      : context.read<DataProvider>().fetchAttendance();
   Position? _pos;
   bool _gpsLoading = false;
   String? _gpsError;
@@ -29,7 +38,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DataProvider>().fetchAttendance();
+      _loadAttendance();
       _loadOffices();
       _refreshPosition();
     });
@@ -165,7 +174,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         backgroundColor:
             pending ? AppTheme.amber500 : AppTheme.emerald500,
       ));
-      dataProvider.fetchAttendance();
+      widget.mine ? dataProvider.fetchMyAttendance() : dataProvider.fetchAttendance();
     } catch (e) {
       if (!mounted) return;
       scaffold.showSnackBar(SnackBar(
@@ -196,7 +205,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
-              context.read<DataProvider>().fetchAttendance();
+              _loadAttendance();
               _loadOffices();
               _refreshPosition();
             },

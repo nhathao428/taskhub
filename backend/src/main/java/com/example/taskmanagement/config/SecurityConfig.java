@@ -2,7 +2,9 @@ package com.example.taskmanagement.config;
 
 import com.example.taskmanagement.security.JwtAuthenticationFilter;
 import com.example.taskmanagement.security.JwtTokenProvider;
+import com.example.taskmanagement.security.RestAuthenticationEntryPoint;
 import com.example.taskmanagement.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -27,12 +29,17 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
     private final CorsConfig corsConfig;
+    private final RestAuthenticationEntryPoint authEntryPoint;
+
+    @Value("${springdoc.api-docs.enabled:false}")
+    private boolean swaggerEnabled;
 
     public SecurityConfig(JwtTokenProvider jwtTokenProvider, @Lazy UserService userService,
-                          CorsConfig corsConfig) {
+                          CorsConfig corsConfig, RestAuthenticationEntryPoint authEntryPoint) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
         this.corsConfig = corsConfig;
+        this.authEntryPoint = authEntryPoint;
     }
 
     @Bean
@@ -69,19 +76,19 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/api/auth/**",
-                        // v2 auth (strict password validation) — phải permit riêng vì
-                        // ApiVersionAliasFilter chỉ rewrite v1, không rewrite v2.
-                        "/api/v2/auth/**",
-                        "/api/version",
-                        // Swagger UI / OpenAPI docs — TURN OFF ở prod qua SWAGGER_ENABLED=false.
-                        "/swagger-ui/**", "/swagger-ui.html",
-                        "/api-docs/**", "/v3/api-docs/**"
-                        // H2 console KHÔNG còn ở đây: chỉ enable trong dev qua profile,
-                        // tránh risk khi config drift (xem application-dev.properties nếu cần dev).
-                ).permitAll()
+            // 401 cho request thiếu/hỏng JWT — Spring Security 6 mặc định trả 403,
+            // sai semantics REST (401 = re-auth, 403 = đã auth nhưng cấm).
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/auth/**", "/api/v2/auth/**", "/api/version").permitAll();
+                // Swagger paths chỉ permitAll khi SWAGGER_ENABLED=true. Khi disabled,
+                // rơi vào .anyRequest().authenticated() → 401 thay vì 500 (Springdoc
+                // handler NPE khi bean không tồn tại).
+                if (swaggerEnabled) {
+                    auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html",
+                            "/api-docs/**", "/v3/api-docs/**").permitAll();
+                }
+                auth
 
                 // Employee self-service endpoints — must come BEFORE the broader rules below
                 .requestMatchers(HttpMethod.GET, "/api/employees/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
@@ -124,8 +131,8 @@ public class SecurityConfig {
                 // Quản lý tài khoản & phân quyền: chỉ ADMIN
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
 
-                .anyRequest().authenticated()
-            )
+                .anyRequest().authenticated();
+            })
             .headers(headers -> headers
                 // Defense-in-depth headers (Security L3 + mitigate H2 XSS exfiltration).
                 .frameOptions(frame -> frame.sameOrigin())
@@ -149,6 +156,12 @@ public class SecurityConfig {
                 .referrerPolicy(ref -> ref.policy(
                         ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .contentTypeOptions(opts -> {})  // X-Content-Type-Options: nosniff
+                // Permissions-Policy: tắt mọi API browser nhạy cảm cho origin của backend
+                // (API JSON, không cần camera/mic/geo/USB...). Defense-in-depth khi accident
+                // serve HTML từ backend (vd Swagger UI bật) — browser chặn quyền hardware.
+                .addHeaderWriter((req, resp) -> resp.setHeader("Permissions-Policy",
+                        "accelerometer=(), camera=(), geolocation=(), gyroscope=(), "
+                        + "magnetometer=(), microphone=(), payment=(), usb=()"))
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

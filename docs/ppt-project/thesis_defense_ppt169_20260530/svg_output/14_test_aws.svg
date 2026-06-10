@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">KIỂM THỬ · TRIỂN KHAI AWS · VIDEO DEMO</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 4</text>
+
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">123 test pass · AWS EC2 chạy thật · Video demo 12 màn hình chính phát trực tiếp</text>
+
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <!-- LEFT: Test stats + AWS condensed -->
+    <text x="40" y="155" fill="#003366" font-size="16" font-weight="bold">▸ KẾT QUẢ KIỂM THỬ</text>
+
+    <rect x="40" y="170" width="180" height="80" fill="#FFFFFF" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <rect x="40" y="170" width="4" height="80" fill="#147c79"/>
+    <text x="56" y="190" fill="#999999" font-size="11">BACKEND · JUnit</text>
+    <text x="56" y="218" fill="#147c79" font-size="22" font-weight="bold">58/58</text>
+    <text x="56" y="240" fill="#999999" font-size="10">pass · 2 skip Docker</text>
+
+    <rect x="230" y="170" width="180" height="80" fill="#FFFFFF" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <rect x="230" y="170" width="4" height="80" fill="#147c79"/>
+    <text x="246" y="190" fill="#999999" font-size="11">FRONTEND · Vitest</text>
+    <text x="246" y="218" fill="#147c79" font-size="22" font-weight="bold">11/11</text>
+    <text x="246" y="240" fill="#999999" font-size="10">pass · 0 ESLint warn</text>
+
+    <rect x="40" y="260" width="180" height="80" fill="#FFFFFF" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <rect x="40" y="260" width="4" height="80" fill="#147c79"/>
+    <text x="56" y="280" fill="#999999" font-size="11">MOBILE · flutter</text>
+    <text x="56" y="308" fill="#147c79" font-size="22" font-weight="bold">16/16</text>
+    <text x="56" y="330" fill="#999999" font-size="10">pass · analyze clean</text>
+
+    <rect x="230" y="260" width="180" height="80" fill="#FFFFFF" stroke="#CC0000" stroke-width="1.5" rx="6"/>
+    <rect x="230" y="260" width="4" height="80" fill="#CC0000"/>
+    <text x="246" y="280" fill="#999999" font-size="11">SECURITY · scan</text>
+    <text x="246" y="308" fill="#CC0000" font-size="22" font-weight="bold">38/38</text>
+    <text x="246" y="330" fill="#999999" font-size="10">pass · 6 fix</text>
+
+    <rect x="40" y="355" width="370" height="55" fill="#003366" rx="6"/>
+    <text x="225" y="380" text-anchor="middle" fill="#75CEC8" font-size="11" letter-spacing="3">TỔNG CỘNG</text>
+    <text x="225" y="402" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="bold">123 test pass · 0 fail</text>
+
+    <text x="40" y="445" fill="#003366" font-size="16" font-weight="bold">▸ TRIỂN KHAI AWS EC2</text>
+    <rect x="40" y="455" width="370" height="195" fill="#FFFFFF" stroke="#E48913" stroke-width="2" rx="6"/>
+    <rect x="40" y="455" width="370" height="32" fill="#E48913" rx="6"/>
+    <rect x="40" y="478" width="370" height="9" fill="#E48913"/>
+    <text x="55" y="478" fill="#FFFFFF" font-size="13" font-weight="bold">☁ t3.small · Ubuntu 24.04 LTS</text>
+
+    <rect x="55" y="500" width="160" height="60" fill="#F5F7FA" stroke="#003366" rx="4"/>
+    <text x="135" y="520" text-anchor="middle" fill="#003366" font-size="12" font-weight="bold">Spring Boot</text>
+    <text x="135" y="538" text-anchor="middle" fill="#555555" font-size="10">backend :5000</text>
+    <text x="135" y="552" text-anchor="middle" fill="#999999" font-size="9">multi-stage Docker</text>
+
+    <rect x="230" y="500" width="160" height="60" fill="#F5F7FA" stroke="#147c79" rx="4"/>
+    <text x="310" y="520" text-anchor="middle" fill="#147c79" font-size="12" font-weight="bold">Nginx + Vite</text>
+    <text x="310" y="538" text-anchor="middle" fill="#555555" font-size="10">frontend :80</text>
+    <text x="310" y="552" text-anchor="middle" fill="#999999" font-size="9">React static</text>
+
+    <rect x="55" y="568" width="105" height="60" fill="#F5F7FA" stroke="#E48913" rx="4"/>
+    <text x="107" y="588" text-anchor="middle" fill="#E48913" font-size="12" font-weight="bold">Postgres 16</text>
+    <text x="107" y="606" text-anchor="middle" fill="#555555" font-size="10">:5432</text>
+
+    <rect x="175" y="568" width="105" height="60" fill="#F5F7FA" stroke="#CC0000" rx="4"/>
+    <text x="227" y="588" text-anchor="middle" fill="#CC0000" font-size="12" font-weight="bold">Redis 7</text>
+    <text x="227" y="606" text-anchor="middle" fill="#555555" font-size="10">:6379</text>
+
+    <rect x="295" y="568" width="95" height="60" fill="#F5F7FA" stroke="#003366" rx="4"/>
+    <text x="343" y="588" text-anchor="middle" fill="#003366" font-size="12" font-weight="bold">Caddy</text>
+    <text x="343" y="606" text-anchor="middle" fill="#555555" font-size="10">:80/443</text>
+
+    <!-- RIGHT: VIDEO area (placeholder — video sẽ chèn lên trên qua python-pptx) -->
+    <text x="440" y="155" fill="#003366" font-size="16" font-weight="bold">▸ VIDEO DEMO TRỰC TIẾP</text>
+    <text x="440" y="178" fill="#999999" font-size="12">36 giây · walk-through 12 màn hình chính · click để phát khi thuyết trình</text>
+
+    <!-- Video frame -->
+    <rect x="440" y="195" width="800" height="450" fill="#0d0d0f" stroke="#147c79" stroke-width="3" rx="8"/>
+    <circle cx="840" cy="420" r="55" fill="#FFFFFF" opacity="0.10"/>
+    <polygon points="822,396 822,444 870,420" fill="#FFFFFF" opacity="0.35"/>
+    <text x="840" y="510" text-anchor="middle" fill="#75CEC8" font-size="13" letter-spacing="3">▶ DEMO VIDEO</text>
+    <text x="840" y="540" text-anchor="middle" fill="#75CEC8" opacity="0.6" font-size="11">Login → Dashboard → Tasks → AI Suggest → Geofence → Employee view</text>
+  </g>
+
+  <rect x="0" y="685" width="1280" height="35" fill="#003366"/>
+  <text x="40" y="708" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="12">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="708" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="12">14 / 16</text>
+</svg>

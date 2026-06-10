@@ -15,7 +15,7 @@ class Employee {
     this.hiredAt,
   });
 
-  String get fullName => '$firstName $lastName';
+  String get fullName => '$firstName $lastName'.trim();
 
   factory Employee.fromJson(Map<String, dynamic> json) {
     return Employee(

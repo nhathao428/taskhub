@@ -1,10 +1,10 @@
-# 🗂️ Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành
+# 🗂️ TaskHub — Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành
 
 Hệ thống quản lý toàn diện giúp doanh nghiệp nhỏ quản lý nhân sự, chấm công, dự án, tiến độ công việc và nhận gợi ý phân công nhân viên thông minh từ AI (Google Gemini).
 
 ## 🚀 Deploy demo (free)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nhathao428/task-management-system)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nhathao428/taskhub)
 
 Render Blueprint (`render.yaml`) tự tạo backend (Docker) + frontend (static) + Postgres free. Cold start ~30s sau 15ph idle. Sau khi deploy, set `GEMINI_API_KEY` ở Dashboard nếu muốn bật AI suggestion.
 
@@ -14,7 +14,28 @@ Tự host với domain riêng: xem [`DEPLOY.md`](./DEPLOY.md).
 
 ## 🏗️ Kiến trúc tổng quan
 
-![Sơ đồ kiến trúc tổng thể](docs/uml/png/architecture.png)
+```mermaid
+flowchart LR
+  User["Người dùng"]
+  subgraph CLIENT["TẦNG CLIENT"]
+    Web["Web App<br/>React 18 + Vite<br/>Song ngữ Việt/Anh (i18n)"]
+    Mobile["Mobile App<br/>Flutter 3.x"]
+  end
+  subgraph APP["TẦNG ỨNG DỤNG"]
+    Backend["Spring Boot REST API · cổng 5000<br/>Controller → Service → Repository<br/>Bảo mật JWT · Spring Cache"]
+  end
+  subgraph DATA["TẦNG DỮ LIỆU"]
+    PG[("PostgreSQL 16")]
+    Redis[("Redis 7<br/>bộ nhớ đệm")]
+  end
+  Gemini["Google Gemini API<br/>(gemini-2.5-flash)"]
+  User --> Web & Mobile
+  Web -->|REST / JWT| Backend
+  Mobile -->|REST / JWT| Backend
+  Backend -->|JDBC| PG
+  Backend -->|cache| Redis
+  Backend -->|HTTPS| Gemini
+```
 
 Hệ thống chia 3 tầng: **Client** (Web React + Mobile Flutter) → **Application** (Spring Boot REST API, port 5000, bảo mật JWT) → **Data** (PostgreSQL 16, Redis 7). Module AI gọi Google Gemini để gợi ý nhân viên.
 
@@ -68,8 +89,8 @@ Hệ thống chia 3 tầng: **Client** (Web React + Mobile Flutter) → **Applic
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/nhathao428/task-management-system.git
-cd task-management-system
+git clone https://github.com/nhathao428/taskhub.git
+cd taskhub
 
 # 2. Tạo file biến môi trường (tuỳ chọn)
 cp .env.example .env   # chỉnh JWT_SECRET nếu cần
@@ -197,7 +218,7 @@ flutter build ios     # Build iOS (cần macOS + Xcode)
 ## 📁 Cấu trúc dự án
 
 ```
-task-management-system/
+taskhub/
 ├── backend/                        # Spring Boot REST API
 │   ├── src/main/java/com/example/taskmanagement/
 │   │   ├── config/                 # Security, CORS, Redis, OpenAPI

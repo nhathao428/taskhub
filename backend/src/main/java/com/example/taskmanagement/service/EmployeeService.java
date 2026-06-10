@@ -4,6 +4,7 @@ import com.example.taskmanagement.dto.CreateEmployeeRequest;
 import com.example.taskmanagement.dto.UpdateEmployeeRequest;
 import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.entity.User;
+import com.example.taskmanagement.exception.BusinessException;
 import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.EmployeeRepository;
 import com.example.taskmanagement.repository.UserRepository;
@@ -55,6 +56,11 @@ public class EmployeeService {
         if (request.userEmail() != null && !request.userEmail().isBlank()) {
             User user = userRepository.findByEmail(request.userEmail().trim())
                     .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.userEmail()));
+            // Chặn link 1 user vào nhiều Employee — DB UNIQUE sẽ reject, nhưng check
+            // chủ động ở service để trả 422 message rõ ràng thay vì 409 DataIntegrity.
+            if (employeeRepository.existsByUser(user)) {
+                throw new BusinessException("User này đã được liên kết với một nhân viên khác");
+            }
             employee.setUser(user);
         }
         return employeeRepository.save(employee);

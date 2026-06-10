@@ -46,6 +46,7 @@ public class AiSuggestionService {
     private final AttendanceRepository attendanceRepository;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final String chatCompletionsUrl;
 
     @Value("${gemini.api.key:}")
     private String geminiApiKey;
@@ -57,15 +58,46 @@ public class AiSuggestionService {
                                TaskRepository taskRepository,
                                AttendanceRepository attendanceRepository,
                                RestClient.Builder restClientBuilder,
-                               ObjectMapper objectMapper) {
+                               ObjectMapper objectMapper,
+                               @Value("${gemini.api.base-url:https://generativelanguage.googleapis.com/v1beta/openai/}") String baseUrl) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.attendanceRepository = attendanceRepository;
-        this.restClient = restClientBuilder.baseUrl("https://generativelanguage.googleapis.com").build();
+        // RestClient.create() — fresh client, không phụ thuộc Spring-injected builder
+        // (có thể đã set baseUrl prefix gây xung đột với absolute URI ta truyền vào).
+        this.restClient = RestClient.create();
         this.objectMapper = objectMapper;
+        String normalized = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+        this.chatCompletionsUrl = normalized + "chat/completions";
     }
 
     private static final int MAX_FIELD_LENGTH = 500;
+
+    // PromptShield-style: regex phát hiện các cấu trúc prompt-injection phổ biến.
+    // Match → reject sớm ở 422 thay vì gửi sang Gemini (tốn quota + risk leak).
+    private static final java.util.regex.Pattern INJECTION_PATTERNS = java.util.regex.Pattern.compile(
+            "(?i)("
+            + "ignore\\s+(all\\s+)?previous\\s+instructions"
+            + "|disregard\\s+(all\\s+)?(prior|above|previous)"
+            + "|forget\\s+everything"
+            + "|you\\s+are\\s+now\\s+(in\\s+)?(admin|root|system|dev|developer|jailbreak)"
+            + "|reveal\\s+(your\\s+)?(system\\s+)?prompt"
+            + "|<\\|im_(start|end)\\|>"
+            + "|<\\|endoftext\\|>"
+            + "|\\[\\[\\s*system\\s*\\]\\]"
+            + "|bỏ\\s+qua\\s+(các\\s+)?hướng\\s+dẫn"
+            + "|quên\\s+(tất\\s+cả|mọi\\s+thứ)"
+            + ")");
+
+    // PII redaction trước khi gửi prompt: email, credit card, SSN, VN phone, VN CCCD.
+    private static final java.util.regex.Pattern EMAIL = java.util.regex.Pattern.compile(
+            "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
+    private static final java.util.regex.Pattern CREDIT_CARD = java.util.regex.Pattern.compile(
+            "\\b(?:\\d[ -]?){13,19}\\b");
+    private static final java.util.regex.Pattern VN_PHONE = java.util.regex.Pattern.compile(
+            "(?:\\+84|0)(?:3|5|7|8|9)\\d{8}");
+    private static final java.util.regex.Pattern VN_CCCD = java.util.regex.Pattern.compile(
+            "\\b\\d{12}\\b");
 
     @Cacheable(value = "ai_suggestions", key = "#request.cacheKey")
     public List<EmployeeSuggestionDTO> recommendEmployees(SuggestionRequest request) {
@@ -74,11 +106,15 @@ public class AiSuggestionService {
         }
         requireApiKey();
 
-        // Security H3: Sanitize user-controlled fields trước khi nhồi vào Gemini prompt.
-        // Strip control chars + markdown ngắt section + length cap → giảm prompt injection.
+        // Security H3: Sanitize → reject-if-injection (PromptShield pattern) →
+        // forward. Sanitize trước để injection detect không trigger trên control
+        // char giả; reject trên text đã clean.
         request.setTaskTitle(sanitizePromptInput(request.getTaskTitle()));
         request.setTaskDescription(sanitizePromptInput(request.getTaskDescription()));
         request.setRequiredSkills(sanitizePromptInput(request.getRequiredSkills()));
+        rejectIfInjectionDetected("tiêu đề", request.getTaskTitle());
+        rejectIfInjectionDetected("mô tả", request.getTaskDescription());
+        rejectIfInjectionDetected("kỹ năng yêu cầu", request.getRequiredSkills());
 
         List<Employee> employees = employeeRepository.findAll();
         if (employees.isEmpty()) {
@@ -123,12 +159,30 @@ public class AiSuggestionService {
         // Block các marker dễ bị abuse để giả lập section của prompt
         stripped = stripped.replace("===", "≡≡≡")
                            .replace("```", "ʼʼʼ");
+        // PII redaction (PromptShield-style): mask trước khi nhồi vào prompt — kể cả
+        // không có gateway, app vẫn không tự leak PII của user lên LLM bên thứ ba.
+        stripped = EMAIL.matcher(stripped).replaceAll("[EMAIL]");
+        stripped = CREDIT_CARD.matcher(stripped).replaceAll("[CARD]");
+        stripped = VN_PHONE.matcher(stripped).replaceAll("[PHONE]");
+        stripped = VN_CCCD.matcher(stripped).replaceAll("[ID]");
         // Trim trắng + giới hạn độ dài để cap input
         stripped = stripped.trim();
         if (stripped.length() > MAX_FIELD_LENGTH) {
             stripped = stripped.substring(0, MAX_FIELD_LENGTH) + "…";
         }
         return stripped;
+    }
+
+    /**
+     * Detect prompt injection patterns sau khi sanitize. Trả về BusinessException
+     * (422) thay vì im lặng forward → tiết kiệm quota Gemini + audit logable.
+     */
+    static void rejectIfInjectionDetected(String field, String value) {
+        if (value == null) return;
+        if (INJECTION_PATTERNS.matcher(value).find()) {
+            throw new BusinessException(
+                    "Nội dung " + field + " chứa pattern không cho phép, vui lòng diễn đạt lại.");
+        }
     }
 
     /** Aggregates per-employee historical stats: task progress, completion timing, attendance. */
@@ -211,7 +265,7 @@ public class AiSuggestionService {
         for (Employee emp : employees) {
             EmployeeStats stats = statsByEmployee.getOrDefault(emp.getEmployeeId(), new EmployeeStats());
             sb.append("• ID=").append(emp.getEmployeeId())
-              .append(" | ").append(emp.getFirstName()).append(" ").append(emp.getLastName())
+              .append(" | ").append((emp.getFirstName() + " " + emp.getLastName()).trim())
               .append(" | ").append(emp.getDepartment() != null ? emp.getDepartment() : "—")
               .append(" | ").append(emp.getPosition() != null ? emp.getPosition() : "—").append("\n");
             if (emp.getSkills() != null && !emp.getSkills().isBlank()) {
@@ -261,55 +315,56 @@ public class AiSuggestionService {
     }
 
     private List<EmployeeSuggestionDTO> callGemini(String prompt, List<Employee> employees) {
+        // OpenAI-format request — tương thích cả PromptShield gateway (/v1/chat/completions)
+        // lẫn Gemini OpenAI-compat (/v1beta/openai/chat/completions). Base URL controls
+        // destination; gateway sẽ enforce policy (PII block/mask) trước khi forward.
         Map<String, Object> requestBody = Map.of(
-                "contents", List.of(Map.of(
-                        "parts", List.of(Map.of("text", prompt))
-                )),
-                "generationConfig", Map.of(
-                        "temperature", 0.3,
-                        "responseMimeType", "application/json"
-                )
+                "model", geminiModel,
+                "messages", List.of(Map.of("role", "user", "content", prompt)),
+                "temperature", 0.3,
+                "response_format", Map.of("type", "json_object")
         );
 
         String responseJson;
         try {
+            log.info("Calling AI endpoint: {}", chatCompletionsUrl);
             responseJson = restClient.post()
-                    .uri("/v1beta/models/{model}:generateContent", geminiModel)
-                    .header("x-goog-api-key", geminiApiKey)
+                    .uri(java.net.URI.create(chatCompletionsUrl))
+                    .header("Authorization", "Bearer " + geminiApiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
                     .body(String.class);
         } catch (RestClientResponseException e) {
             int statusCode = e.getStatusCode().value();
-            log.error("Gemini API trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
+            log.error("AI gateway/provider trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
             throw new BusinessException(switch (statusCode) {
+                // 403 từ PromptShield gateway nghĩa là policy block (PII/injection).
+                case 403 -> "Nội dung gửi AI bị chặn bởi policy bảo mật.";
                 case 429 -> "AI tạm thời hết hạn mức gọi (rate limit), vui lòng thử lại sau ít phút.";
                 case 503 -> "Dịch vụ AI đang quá tải, vui lòng thử lại sau ít phút.";
-                case 400, 403 -> "Cấu hình AI không hợp lệ — kiểm tra lại GEMINI_API_KEY và model.";
+                case 400, 401 -> "Cấu hình AI không hợp lệ — kiểm tra lại GEMINI_API_KEY và model.";
                 default -> "Gọi dịch vụ AI thất bại (mã " + statusCode + "), vui lòng thử lại sau.";
             });
         }
 
-        return parseGeminiResponse(responseJson, employees);
+        return parseOpenAiResponse(responseJson, employees);
     }
 
-    private List<EmployeeSuggestionDTO> parseGeminiResponse(String responseJson, List<Employee> employees) {
+    private List<EmployeeSuggestionDTO> parseOpenAiResponse(String responseJson, List<Employee> employees) {
         String content = null;
         try {
             JsonNode root = objectMapper.readTree(responseJson);
 
-            JsonNode candidates = root.path("candidates");
-            if (!candidates.isArray() || candidates.isEmpty()) {
-                String blockReason = root.path("promptFeedback").path("blockReason").asText("");
-                throw new BusinessException("Gemini không trả về kết quả gợi ý"
-                        + (blockReason.isBlank() ? "" : " (prompt bị chặn: " + blockReason + ")"));
+            JsonNode choices = root.path("choices");
+            if (!choices.isArray() || choices.isEmpty()) {
+                throw new BusinessException("AI không trả về kết quả gợi ý");
             }
-            content = candidates.get(0).path("content").path("parts").path(0).path("text").asText("");
+            content = choices.get(0).path("message").path("content").asText("");
             if (content.isBlank()) {
-                String finishReason = candidates.get(0).path("finishReason").asText("");
-                throw new BusinessException("Gemini trả về nội dung rỗng"
-                        + (finishReason.isBlank() ? "" : " (finishReason: " + finishReason + ")"));
+                String finishReason = choices.get(0).path("finish_reason").asText("");
+                throw new BusinessException("AI trả về nội dung rỗng"
+                        + (finishReason.isBlank() ? "" : " (finish_reason: " + finishReason + ")"));
             }
 
             content = content.trim()

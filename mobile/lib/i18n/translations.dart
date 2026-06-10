@@ -62,6 +62,7 @@ const Map<String, String> en = {
   'Tổng quan': 'Overview',
   'Tổng quan hệ thống': 'System overview',
   'Chấm công hôm nay': 'Attendance today',
+  'Chấm công tháng này': 'Attendance this month',
   'Hoàn thành': 'Completed',
   'HOÀN THÀNH': 'COMPLETED',
   'Đang làm': 'In progress',

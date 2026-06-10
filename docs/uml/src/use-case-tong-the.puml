@@ -2,36 +2,33 @@
 !include _style.puml
 title Sơ đồ Use Case tổng thể hệ thống Quản lý Công việc
 
-left to right direction
+top to bottom direction
+skinparam dpi 300
 skinparam packageStyle rectangle
+skinparam nodesep 14
+skinparam ranksep 45
 
-actor "Người dùng\n(EMPLOYEE)" as User
-actor "Quản lý\n(MANAGER)" as Manager
-actor "Quản trị\n(ADMIN)" as Admin
+actor "Người dùng (EMPLOYEE)" as User
+actor "Quản lý (MANAGER)" as Manager
+actor "Quản trị (ADMIN)" as Admin
 
 rectangle "Hệ thống Quản lý Công việc" {
-  package "Xác thực" {
+  package "Nghiệp vụ Nhân viên" as P1 {
     usecase "UC-01\nĐăng nhập" as UC01
     usecase "UC-02\nĐăng ký" as UC02
     usecase "UC-03\nĐăng xuất" as UC03
+    usecase "UC-06\nXem công việc\ncủa tôi" as UC06
+    usecase "UC-07\nCập nhật\ntrạng thái" as UC07
+    usecase "UC-09\nChấm công\nvào/ra" as UC09
   }
-  package "Nhân viên & Dự án" {
+  package "Nghiệp vụ Quản lý & Quản trị" as P2 {
     usecase "UC-04\nQuản lý nhân viên" as UC04
     usecase "UC-05\nQuản lý dự án" as UC05
-  }
-  package "Công việc & Chấm công" {
-    usecase "UC-06\nXem công việc của tôi" as UC06
-    usecase "UC-07\nCập nhật trạng thái" as UC07
-    usecase "UC-08\nTạo & gán công việc" as UC08
-    usecase "UC-09\nChấm công vào/ra" as UC09
-    usecase "UC-10\nXem báo cáo chấm công" as UC10
-  }
-  package "AI Gợi ý" {
+    usecase "UC-08\nTạo & gán\ncông việc" as UC08
+    usecase "UC-10\nXem báo cáo\nchấm công" as UC10
     usecase "UC-11\nGợi ý nhân viên\nbằng AI" as UC11
-  }
-  package "Quản trị" {
     usecase "UC-12\nPhân quyền\ntài khoản" as UC12
-    usecase "UC-13\nXem logs hệ thống" as UC13
+    usecase "UC-13\nXem logs\nhệ thống" as UC13
     usecase "UC-14\nQuản lý cấu hình" as UC14
   }
 }
@@ -43,25 +40,21 @@ User --> UC06
 User --> UC07
 User --> UC09
 
-Manager --> UC01
-Manager --> UC03
 Manager --> UC04
 Manager --> UC05
 Manager --> UC08
 Manager --> UC10
 Manager --> UC11
 
-Admin --> UC01
-Admin --> UC03
 Admin --> UC12
 Admin --> UC13
 Admin --> UC14
 
-Manager -|> User
-Admin -|> Manager
+User <|-- Manager
+Manager <|-- Admin
 
 note bottom of UC11
   Backend gom dữ liệu task + chấm công,
-  gọi Gemini gemini-2.5-flash xếp hạng top 5.
+  gọi Gemini (gemini-2.5-flash) xếp hạng top 5.
 end note
 @enduml

@@ -62,12 +62,12 @@ class TaskControllerTest {
 
     // ----- Authorization gate (URL-pattern rules from SecurityFilterChain) -----
 
-    // JwtAuthenticationFilter trả 403 (không có entry point custom) khi request thiếu
-    // bearer token trên endpoint protected — đây là behavior thực tế của project.
+    // RestAuthenticationEntryPoint trả 401 cho request thiếu/hỏng JWT — semantics
+    // REST đúng chuẩn (401 = "authenticate", 403 = "đã auth nhưng cấm").
     @Test
-    void getAllTasks_returns403_whenNoAuth() throws Exception {
+    void getAllTasks_returns401_whenNoAuth() throws Exception {
         mockMvc.perform(get("/api/tasks"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

@@ -18,7 +18,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-ROOT = Path(r"C:\Users\Admin\task-management-system")
+ROOT = Path(r"C:\Users\Admin\taskhub")
 WEB_DIR = ROOT / "mobile" / "build" / "web"
 OUT = ROOT / "docs" / "screenshots" / "mobile"
 OUT.mkdir(parents=True, exist_ok=True)

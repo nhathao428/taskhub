@@ -9,7 +9,10 @@ import '../widgets/loading_widget.dart';
 import '../widgets/status_badge.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+  /// canManage=false: nhân viên chỉ xem dự án (backend lọc theo nhóm), ẩn nút tạo.
+  final bool canManage;
+
+  const ProjectsScreen({super.key, this.canManage = true});
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -90,7 +93,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(result != null
                     ? context.trOnce('Đã tạo dự án {name}', {'name': result.name})
-                    : context.trOnce('Tạo dự án thất bại')),
+                    : (context.read<DataProvider>().projectsError ??
+                        context.trOnce('Tạo dự án thất bại'))),
                 backgroundColor:
                     result != null ? AppTheme.emerald500 : AppTheme.rose500,
               ));
@@ -117,11 +121,13 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           const SizedBox(width: 4),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddDialog,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(context.tr('Thêm')),
-      ),
+      floatingActionButton: widget.canManage
+          ? FloatingActionButton.extended(
+              onPressed: _showAddDialog,
+              icon: const Icon(Icons.add_rounded),
+              label: Text(context.tr('Thêm')),
+            )
+          : null,
       body: data.loadingProjects
           ? LoadingWidget(message: context.tr('Đang tải danh sách dự án...'))
           : data.projectsError != null

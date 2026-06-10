@@ -22,12 +22,21 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
+  /// Màn hình của quản lý/admin: toàn bộ nhân viên, dự án, công việc, chấm công.
+  static const List<Widget> _managerScreens = [
     _DashboardHome(),
     EmployeesScreen(),
     ProjectsScreen(),
     TasksScreen(),
     AttendanceScreen(),
+  ];
+
+  /// Màn hình của nhân viên: chỉ dữ liệu của chính mình (self-service).
+  static const List<Widget> _employeeScreens = [
+    _DashboardHome(),
+    ProjectsScreen(canManage: false),
+    TasksScreen(mine: true),
+    AttendanceScreen(mine: true),
   ];
 
   @override
@@ -38,16 +47,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _loadAll() {
     final data = context.read<DataProvider>();
-    data.fetchEmployees();
+    final isManager =
+        context.read<AuthProvider>().user?.isManagerOrAdmin ?? false;
     data.fetchProjects();
-    data.fetchTasks();
-    data.fetchAttendance();
+    if (isManager) {
+      // Quản lý: toàn bộ nhân viên + công việc + chấm công.
+      data.fetchEmployees();
+      data.fetchTasks();
+      data.fetchAttendance();
+    } else {
+      // Nhân viên: chỉ công việc được giao + chấm công của mình
+      // (tránh gọi endpoint manager-only -> 403).
+      data.fetchMyTasks();
+      data.fetchMyAttendance();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isManager =
+        context.watch<AuthProvider>().user?.isManagerOrAdmin ?? false;
+    final screens = isManager ? _managerScreens : _employeeScreens;
+    // Đề phòng index lệch khi vai trò đổi (vd hot-reload demo).
+    final index = _currentIndex.clamp(0, screens.length - 1);
+
+    final items = <BottomNavigationBarItem>[
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.dashboard_outlined),
+        activeIcon: const Icon(Icons.dashboard_rounded),
+        label: context.tr('Tổng quan'),
+      ),
+      if (isManager)
+        BottomNavigationBarItem(
+          icon: const Icon(Icons.people_outline),
+          activeIcon: const Icon(Icons.people_rounded),
+          label: context.tr('Nhân viên'),
+        ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.folder_outlined),
+        activeIcon: const Icon(Icons.folder_rounded),
+        label: context.tr('Dự án'),
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.checklist_outlined),
+        activeIcon: const Icon(Icons.checklist_rounded),
+        label: context.tr(isManager ? 'Công việc' : 'Công việc của tôi'),
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.access_time_outlined),
+        activeIcon: const Icon(Icons.access_time_filled_rounded),
+        label: context.tr('Chấm công'),
+      ),
+    ];
+
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(index: index, children: screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -56,40 +110,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         child: BottomNavigationBar(
-          currentIndex: _currentIndex,
+          currentIndex: index,
           onTap: (i) => setState(() => _currentIndex = i),
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
           selectedItemColor: AppTheme.brand600,
           unselectedItemColor: AppTheme.slate400,
           elevation: 0,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard_outlined),
-              activeIcon: const Icon(Icons.dashboard_rounded),
-              label: context.tr('Tổng quan'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.people_outline),
-              activeIcon: const Icon(Icons.people_rounded),
-              label: context.tr('Nhân viên'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.folder_outlined),
-              activeIcon: const Icon(Icons.folder_rounded),
-              label: context.tr('Dự án'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.checklist_outlined),
-              activeIcon: const Icon(Icons.checklist_rounded),
-              label: context.tr('Công việc'),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.access_time_outlined),
-              activeIcon: const Icon(Icons.access_time_filled_rounded),
-              label: context.tr('Chấm công'),
-            ),
-          ],
+          items: items,
         ),
       ),
     );
@@ -103,21 +131,31 @@ class _DashboardHome extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final data = context.watch<DataProvider>();
+    final isManager = auth.user?.isManagerOrAdmin ?? false;
 
-    final isLoading = data.loadingEmployees ||
-        data.loadingProjects ||
-        data.loadingTasks ||
-        data.loadingAttendance;
+    final isLoading = isManager
+        ? (data.loadingEmployees ||
+            data.loadingProjects ||
+            data.loadingTasks ||
+            data.loadingAttendance)
+        : (data.loadingTasks || data.loadingAttendance);
 
     final today = DateTime.now();
     final todayStr =
         '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final monthPrefix = todayStr.substring(0, 7);
     final attendanceToday =
         data.attendance.where((a) => a.date == todayStr).length;
+    final attendanceThisMonth =
+        data.attendance.where((a) => a.date.startsWith(monthPrefix)).length;
 
     final totalTasks = data.tasks.length;
     final doneTasks =
         data.tasks.where((t) => t.status == 'completed').length;
+    final pendingTasks =
+        data.tasks.where((t) => t.status == 'pending').length;
+    final inProgressTasks =
+        data.tasks.where((t) => t.status == 'in_progress').length;
     final pct = totalTasks > 0 ? (doneTasks * 100 ~/ totalTasks) : 0;
 
     return Scaffold(
@@ -141,23 +179,26 @@ class _DashboardHome extends StatelessWidget {
               lp.setLocale(lp.isVietnamese ? 'en' : 'vi');
             },
           ),
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.brand50,
-                borderRadius: BorderRadius.circular(10),
+          // AI gợi ý phân công là chức năng cấp quản lý (gọi /api/suggestions
+          // -> MANAGER/ADMIN). Ẩn với nhân viên để tránh nút lỗi 403.
+          if (isManager)
+            IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.brand50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.auto_awesome_rounded,
+                    color: AppTheme.brand600, size: 18),
               ),
-              child: const Icon(Icons.auto_awesome_rounded,
-                  color: AppTheme.brand600, size: 18),
+              tooltip: context.tr('AI Gợi ý'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AiSuggestionsScreen()),
+              ),
             ),
-            tooltip: context.tr('AI Gợi ý'),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const AiSuggestionsScreen()),
-            ),
-          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert_rounded),
             onSelected: (v) {
@@ -187,23 +228,30 @@ class _DashboardHome extends StatelessWidget {
               onRefresh: () async {
                 final d = context.read<DataProvider>();
                 await Future.wait([
-                  d.fetchEmployees(),
                   d.fetchProjects(),
-                  d.fetchTasks(),
-                  d.fetchAttendance(),
+                  if (isManager) ...[
+                    d.fetchEmployees(),
+                    d.fetchTasks(),
+                    d.fetchAttendance(),
+                  ] else ...[
+                    d.fetchMyTasks(),
+                    d.fetchMyAttendance(),
+                  ],
                 ]);
               },
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
                   _HeroCard(
+                    title: context.tr(
+                        isManager ? 'Tổng quan hệ thống' : 'Công việc của tôi'),
                     username: auth.user?.username ?? '',
                     totalTasks: totalTasks,
                     doneTasks: doneTasks,
                     pct: pct,
                   ),
                   const SizedBox(height: 16),
-                  // Stats grid
+                  // Stats grid — khác nhau giữa quản lý và nhân viên.
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -211,36 +259,67 @@ class _DashboardHome extends StatelessWidget {
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     childAspectRatio: 1.45,
-                    children: [
-                      _StatCard(
-                        icon: Icons.people_rounded,
-                        color: AppTheme.brand600,
-                        bgColor: AppTheme.brand50,
-                        title: context.tr('Nhân viên'),
-                        value: '${data.employees.length}',
-                      ),
-                      _StatCard(
-                        icon: Icons.folder_rounded,
-                        color: AppTheme.sky500,
-                        bgColor: AppTheme.sky100,
-                        title: context.tr('Dự án'),
-                        value: '${data.projects.length}',
-                      ),
-                      _StatCard(
-                        icon: Icons.checklist_rounded,
-                        color: AppTheme.emerald500,
-                        bgColor: AppTheme.emerald100,
-                        title: context.tr('Công việc'),
-                        value: '${data.tasks.length}',
-                      ),
-                      _StatCard(
-                        icon: Icons.access_time_filled_rounded,
-                        color: AppTheme.amber500,
-                        bgColor: AppTheme.amber100,
-                        title: context.tr('Chấm công hôm nay'),
-                        value: '$attendanceToday',
-                      ),
-                    ],
+                    children: isManager
+                        ? [
+                            _StatCard(
+                              icon: Icons.people_rounded,
+                              color: AppTheme.brand600,
+                              bgColor: AppTheme.brand50,
+                              title: context.tr('Nhân viên'),
+                              value: '${data.employees.length}',
+                            ),
+                            _StatCard(
+                              icon: Icons.folder_rounded,
+                              color: AppTheme.sky500,
+                              bgColor: AppTheme.sky100,
+                              title: context.tr('Dự án'),
+                              value: '${data.projects.length}',
+                            ),
+                            _StatCard(
+                              icon: Icons.checklist_rounded,
+                              color: AppTheme.emerald500,
+                              bgColor: AppTheme.emerald100,
+                              title: context.tr('Công việc'),
+                              value: '${data.tasks.length}',
+                            ),
+                            _StatCard(
+                              icon: Icons.access_time_filled_rounded,
+                              color: AppTheme.amber500,
+                              bgColor: AppTheme.amber100,
+                              title: context.tr('Chấm công hôm nay'),
+                              value: '$attendanceToday',
+                            ),
+                          ]
+                        : [
+                            _StatCard(
+                              icon: Icons.hourglass_empty_rounded,
+                              color: AppTheme.amber500,
+                              bgColor: AppTheme.amber100,
+                              title: context.tr('Chờ xử lý'),
+                              value: '$pendingTasks',
+                            ),
+                            _StatCard(
+                              icon: Icons.play_arrow_rounded,
+                              color: AppTheme.brand600,
+                              bgColor: AppTheme.brand50,
+                              title: context.tr('Đang làm'),
+                              value: '$inProgressTasks',
+                            ),
+                            _StatCard(
+                              icon: Icons.task_alt_rounded,
+                              color: AppTheme.emerald500,
+                              bgColor: AppTheme.emerald100,
+                              title: context.tr('Hoàn thành'),
+                              value: '$doneTasks',
+                            ),
+                            _StatCard(
+                              icon: Icons.event_available_rounded,
+                              color: AppTheme.sky500,
+                              bgColor: AppTheme.sky100,
+                              title: context.tr('Chấm công tháng này'),
+                              value: '$attendanceThisMonth',
+                            ),
+                          ],
                   ),
                   const SizedBox(height: 16),
                   _TaskBreakdownCard(tasks: data.tasks),
@@ -253,11 +332,13 @@ class _DashboardHome extends StatelessWidget {
 
 /// Hero gradient mesh dạng "aurora" — giống hero Dashboard.jsx web.
 class _HeroCard extends StatelessWidget {
+  final String title;
   final String username;
   final int totalTasks;
   final int doneTasks;
   final int pct;
   const _HeroCard({
+    required this.title,
     required this.username,
     required this.totalTasks,
     required this.doneTasks,
@@ -293,7 +374,7 @@ class _HeroCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        context.tr('Tổng quan hệ thống'),
+                        title,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,

@@ -42,11 +42,10 @@ public class TaskService {
         if (isManagerOrAdmin(auth)) {
             return taskRepository.findAll();
         }
-        // EMPLOYEE chỉ thấy task được giao cho mình hoặc thuộc project cùng group.
+        // EMPLOYEE: pushdown filter về DB (xem TaskRepository.findOwnedOrSameGroup).
         Employee me = currentUserService.getCurrentEmployee(auth);
-        return taskRepository.findAll().stream()
-                .filter(t -> isOwnedOrSameGroup(t, me))
-                .toList();
+        String group = (me.getGroup() != null && !me.getGroup().isBlank()) ? me.getGroup() : null;
+        return taskRepository.findOwnedOrSameGroup(me.getEmployeeId(), group);
     }
 
     @Transactional(readOnly = true)
@@ -110,7 +109,20 @@ public class TaskService {
         if (request.description() != null) existing.setDescription(request.description());
         if (request.requiredSkills() != null) existing.setRequiredSkills(request.requiredSkills());
         if (request.dueDate() != null) existing.setDueDate(request.dueDate());
-        if (request.status() != null) existing.setStatus(request.status());
+        if (request.status() != null) {
+            String normalized = request.status().toLowerCase();
+            existing.setStatus(normalized);
+            // Đồng bộ completedAt như updateMyTaskStatus để Manager close task qua PUT
+            // cũng tạo dấu thời gian hoàn thành — tránh báo cáo "đã hoàn thành nhưng
+            // không có completedAt".
+            if ("completed".equals(normalized)) {
+                if (existing.getCompletedAt() == null) {
+                    existing.setCompletedAt(LocalDateTime.now());
+                }
+            } else {
+                existing.setCompletedAt(null);
+            }
+        }
         if (request.projectId() != null) {
             Project project = projectRepository.findById(request.projectId())
                     .orElseThrow(() -> new ResourceNotFoundException("Project", "id", request.projectId()));

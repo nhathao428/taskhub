@@ -40,9 +40,9 @@ Tại nhà cung cấp domain (Cloudflare/Namecheap/...), tạo A record:
 
 ```bash
 cd /opt
-sudo git clone https://github.com/nhathao428/task-management-system.git
-sudo chown -R $USER:$USER task-management-system
-cd task-management-system
+sudo git clone https://github.com/nhathao428/taskhub.git
+sudo chown -R $USER:$USER taskhub
+cd taskhub
 ```
 
 ## Bước 5 — Cấu hình env
@@ -99,7 +99,7 @@ Mở browser tại `https://task.example.com` → thấy trang Login.
 ## Cập nhật khi có code mới
 
 ```bash
-cd /opt/task-management-system
+cd /opt/taskhub
 git pull
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```

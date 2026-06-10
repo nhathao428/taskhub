@@ -15,7 +15,7 @@ class EmployeeSuggestion {
     this.reasoning,
   });
 
-  String get fullName => '$firstName $lastName';
+  String get fullName => '$firstName $lastName'.trim();
 
   factory EmployeeSuggestion.fromJson(Map<String, dynamic> json) {
     return EmployeeSuggestion(

@@ -21,7 +21,7 @@ from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from capture_screenshots import install_routes, wait_for_port  # noqa: E402
 
-ROOT = Path(r"C:\Users\Admin\task-management-system")
+ROOT = Path(r"C:\Users\Admin\taskhub")
 FRONTEND = ROOT / "frontend"
 OUT_DIR = ROOT / "docs"
 VIDEO_DIR = OUT_DIR / "_rec"

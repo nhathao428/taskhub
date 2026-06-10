@@ -2,15 +2,17 @@
 !include _style.puml
 title Kiến trúc tổng thể hệ thống
 
+left to right direction
+skinparam dpi 200
 skinparam componentStyle uml2
 skinparam linetype ortho
-skinparam nodesep 35
-skinparam ranksep 50
+skinparam nodesep 28
+skinparam ranksep 110
 
 actor "Người dùng" as User
 
 rectangle "TẦNG CLIENT" as ClientTier {
-  component "Web App\n(React 18 + Vite)\nGiao diện song ngữ Việt / Anh (i18n)" as Web
+  component "Web App\n(React 18 + Vite)\nSong ngữ Việt/Anh (i18n)" as Web
   component "Mobile App\n(Flutter 3.x)" as Mobile
 }
 

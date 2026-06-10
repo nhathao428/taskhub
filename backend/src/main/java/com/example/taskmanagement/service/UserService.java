@@ -3,7 +3,9 @@ package com.example.taskmanagement.service;
 import com.example.taskmanagement.dto.LoginRequest;
 import com.example.taskmanagement.dto.RegisterRequest;
 import com.example.taskmanagement.dto.AuthResponse;
+import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.entity.User;
+import com.example.taskmanagement.repository.EmployeeRepository;
 import com.example.taskmanagement.repository.UserRepository;
 import com.example.taskmanagement.security.JwtTokenProvider;
 import com.example.taskmanagement.security.LoginAttemptService;
@@ -29,17 +31,20 @@ import java.util.List;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
 
     public UserService(UserRepository userRepository,
+                       EmployeeRepository employeeRepository,
                        PasswordEncoder passwordEncoder,
                        JwtTokenProvider jwtTokenProvider,
                        AuthenticationManager authenticationManager,
                        LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
+        this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
@@ -104,6 +109,25 @@ public class UserService implements UserDetailsService {
         // Người tự đăng ký luôn là EMPLOYEE; ADMIN sẽ nâng lên MANAGER khi cần.
         user.setRole("EMPLOYEE");
         userRepository.save(user);
+
+        // Tự tạo hồ sơ Employee liên kết để tài khoản nhân viên dùng được ngay
+        // (các API /me cần Employee). Quản lý có thể bổ sung phòng ban/nhóm/kỹ năng sau.
+        // Cùng @Transactional với việc tạo User -> tạo cả 2 nguyên tử.
+        Employee employee = new Employee();
+        employee.setUser(user);
+        // Tách "họ tên" từ username nếu có khoảng trắng; nếu chỉ 1 từ thì lastName = ""
+        // (cột NOT NULL). Hiển thị tên đã trim nên không dư khoảng trắng. Manager bổ sung sau.
+        String fullName = request.getUsername().trim();
+        int sep = fullName.indexOf(' ');
+        if (sep > 0) {
+            employee.setFirstName(fullName.substring(0, sep).trim());
+            employee.setLastName(fullName.substring(sep + 1).trim());
+        } else {
+            employee.setFirstName(fullName);
+            employee.setLastName("");
+        }
+        employeeRepository.save(employee);
+
         return new AuthResponse(null, user.getUsername(), user.getEmail(), user.getRole());
     }
 

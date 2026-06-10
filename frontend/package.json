@@ -1,5 +1,5 @@
 {
-  "name": "task-management-frontend",
+  "name": "taskhub-frontend",
   "version": "1.0.0",
   "type": "module",
   "private": true,
@@ -12,6 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource-variable/figtree": "^5.2.10",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "axios": "^1.6.0",
     "chart.js": "^4.4.0",
     "leaflet": "^1.9.4",

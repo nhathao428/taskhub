@@ -1,5 +1,6 @@
 package com.example.taskmanagement.dto;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -14,7 +15,8 @@ public record UpdateTaskRequest(
 
         LocalDate dueDate,
 
-        @Size(max = 50, message = "Status must not exceed 50 characters")
+        @Pattern(regexp = "(?i)pending|in_progress|completed",
+                 message = "status must be one of: pending, in_progress, completed")
         String status,
 
         Long projectId,

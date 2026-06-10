@@ -18,43 +18,41 @@ class JwtTokenProviderTest {
         jwtTokenProvider = new JwtTokenProvider();
         ReflectionTestUtils.setField(jwtTokenProvider, "jwtSecret", TEST_SECRET);
         ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationMs", 86400000L);
+        ReflectionTestUtils.setField(jwtTokenProvider, "jwtIssuer", "taskhub");
+        jwtTokenProvider.init();
     }
 
-    /** generateTokenFromUsername + validateToken → token hợp lệ trả true */
+    /** generateTokenFromUsername + parseUsername → token hợp lệ trả username. */
     @Test
     void testGenerateAndValidateToken() {
         String token = jwtTokenProvider.generateTokenFromUsername("testuser");
 
         assertNotNull(token);
-        assertTrue(jwtTokenProvider.validateToken(token));
+        assertEquals("testuser", jwtTokenProvider.parseUsername(token));
     }
 
-    /** generateTokenFromUsername + getUsernameFromToken → trả đúng username */
+    /** parseUsername với chuỗi rác → null. */
     @Test
-    void testGetUsernameFromToken() {
-        String token = jwtTokenProvider.generateTokenFromUsername("testuser");
-
-        String username = jwtTokenProvider.getUsernameFromToken(token);
-
-        assertEquals("testuser", username);
+    void testParseUsername_InvalidToken() {
+        assertNull(jwtTokenProvider.parseUsername("this.is.not.a.valid.token"));
     }
 
-    /** validateToken với chuỗi rác → trả false */
+    /** parseUsername với token đã hết hạn → null. */
     @Test
-    void testValidateToken_InvalidToken() {
-        boolean valid = jwtTokenProvider.validateToken("this.is.not.a.valid.token");
-
-        assertFalse(valid);
-    }
-
-    /** validateToken với token đã hết hạn → trả false */
-    @Test
-    void testValidateToken_ExpiredToken() {
+    void testParseUsername_ExpiredToken() {
         ReflectionTestUtils.setField(jwtTokenProvider, "jwtExpirationMs", -1000L);
         String expiredToken = jwtTokenProvider.generateTokenFromUsername("testuser");
 
-        boolean valid = jwtTokenProvider.validateToken(expiredToken);
+        assertNull(jwtTokenProvider.parseUsername(expiredToken));
+    }
 
-        assertFalse(valid);
+    /** Secret ngắn hơn 32 byte → init() fail-fast (không chờ tới lần parse đầu). */
+    @Test
+    void testInit_RejectsShortSecret() {
+        JwtTokenProvider p = new JwtTokenProvider();
+        ReflectionTestUtils.setField(p, "jwtSecret", "too-short");
+        ReflectionTestUtils.setField(p, "jwtExpirationMs", 86400000L);
+        ReflectionTestUtils.setField(p, "jwtIssuer", "taskhub");
+        assertThrows(IllegalStateException.class, p::init);
     }
 }

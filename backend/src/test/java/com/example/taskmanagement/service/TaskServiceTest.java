@@ -151,28 +151,23 @@ class TaskServiceTest {
         verify(taskRepository).deleteById(1L);
     }
 
-    /** EMPLOYEE: getAllTasks chỉ trả về task assignedTo mình HOẶC cùng project group */
+    /** EMPLOYEE: getAllTasks gọi repository pushdown query với (employeeId, group). */
     @Test
     void testGetAllTasks_EmployeeFiltersOutOtherGroups() {
         Employee me = employee(10L, "alpha");
-
         Task assignedToMe = taskAssignedTo(1L, me);
         Task sameGroup = taskWithProjectGroup(2L, "alpha");
-        Task otherGroup = taskWithProjectGroup(3L, "beta");
-        Task noProjectNoAssignee = new Task();
-        noProjectNoAssignee.setTaskId(4L);
 
         when(currentUserService.getCurrentEmployee(any(Authentication.class))).thenReturn(me);
-        when(taskRepository.findAll())
-                .thenReturn(Arrays.asList(assignedToMe, sameGroup, otherGroup, noProjectNoAssignee));
+        when(taskRepository.findOwnedOrSameGroup(10L, "alpha"))
+                .thenReturn(Arrays.asList(assignedToMe, sameGroup));
 
         List<Task> result = taskService.getAllTasks(employeeAuth());
 
         assertEquals(2, result.size());
         assertTrue(result.contains(assignedToMe));
         assertTrue(result.contains(sameGroup));
-        assertFalse(result.contains(otherGroup));
-        assertFalse(result.contains(noProjectNoAssignee));
+        verify(taskRepository, never()).findAll();
     }
 
     /** EMPLOYEE: getTaskById trên task assignedTo mình → OK */
@@ -228,22 +223,20 @@ class TaskServiceTest {
                 () -> taskService.getTaskById(1L, employeeAuth()));
     }
 
-    /** EMPLOYEE không có group: chỉ thấy task assignedTo mình (group rỗng không match cái gì) */
+    /** EMPLOYEE không có group: gọi pushdown query với group=null (chỉ assignedTo mình). */
     @Test
     void testGetAllTasks_EmployeeWithoutGroup_OnlyAssignedTasks() {
         Employee me = employee(10L, null);
-
         Task assignedToMe = taskAssignedTo(1L, me);
-        Task someProjectWithBlankGroup = taskWithProjectGroup(2L, "");
-        Task someProjectWithGroup = taskWithProjectGroup(3L, "alpha");
 
         when(currentUserService.getCurrentEmployee(any(Authentication.class))).thenReturn(me);
-        when(taskRepository.findAll())
-                .thenReturn(Arrays.asList(assignedToMe, someProjectWithBlankGroup, someProjectWithGroup));
+        when(taskRepository.findOwnedOrSameGroup(10L, null))
+                .thenReturn(List.of(assignedToMe));
 
         List<Task> result = taskService.getAllTasks(employeeAuth());
 
         assertEquals(1, result.size());
         assertTrue(result.contains(assignedToMe));
+        verify(taskRepository, never()).findAll();
     }
 }

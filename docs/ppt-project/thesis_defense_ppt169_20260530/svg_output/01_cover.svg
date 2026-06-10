@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#003366"/>
+      <stop offset="100%" stop-color="#001a33"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+
+  <!-- Top navy band + red accent -->
+  <rect x="0" y="0" width="1280" height="100" fill="url(#navy)"/>
+  <rect x="0" y="0" width="6" height="100" fill="#CC0000"/>
+  <text x="40" y="42" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" letter-spacing="2">BỘ GIÁO DỤC VÀ ĐÀO TẠO</text>
+  <text x="40" y="68" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">TRƯỜNG ĐẠI HỌC CÔNG NGHỆ TP. HỒ CHÍ MINH</text>
+  <text x="40" y="90" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14" letter-spacing="3">KHOA CÔNG NGHỆ THÔNG TIN</text>
+
+  <!-- HUTECH logo top-right -->
+  <image href="../images/hutech_logo.png" x="1170" y="15" width="70" height="80" preserveAspectRatio="xMidYMid meet"/>
+
+  <!-- Project type label -->
+  <text x="640" y="180" text-anchor="middle" fill="#CC0000" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" letter-spacing="6" font-weight="600">ĐỒ ÁN CƠ SỞ</text>
+
+  <!-- Main title -->
+  <text x="640" y="260" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">HỆ THỐNG QUẢN LÝ CÔNG VIỆC</text>
+  <text x="640" y="310" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">CHO DOANH NGHIỆP NHỎ ĐA NGÀNH</text>
+  <text x="640" y="360" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">TÍCH HỢP AI</text>
+
+  <!-- Decorative divider -->
+  <line x1="440" y1="395" x2="840" y2="395" stroke="#0066CC" stroke-width="2"/>
+  <circle cx="640" cy="395" r="5" fill="#CC0000"/>
+
+  <!-- Subtitle -->
+  <text x="640" y="430" text-anchor="middle" fill="#555555" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="20" font-style="italic">Web · Mobile · Tích hợp Google Gemini AI</text>
+
+  <!-- Info block -->
+  <rect x="320" y="490" width="640" height="150" fill="#F5F7FA" stroke="#003366" stroke-width="1" rx="4"/>
+  <text x="360" y="525" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13" letter-spacing="2">GIẢNG VIÊN HƯỚNG DẪN</text>
+  <text x="360" y="552" fill="#1A1A1C" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="600">ThS. Dương Thành Phết</text>
+  <text x="360" y="590" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13" letter-spacing="2">SINH VIÊN THỰC HIỆN</text>
+  <text x="360" y="617" fill="#1A1A1C" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="600">Nguyễn Nhật Hảo</text>
+  <text x="720" y="525" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13" letter-spacing="2">MSSV</text>
+  <text x="720" y="552" fill="#1A1A1C" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="600">2380612688</text>
+  <text x="720" y="590" fill="#999999" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13" letter-spacing="2">LỚP</text>
+  <text x="720" y="617" fill="#1A1A1C" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="600">23DTHC1</text>
+
+  <!-- Footer -->
+  <rect x="0" y="685" width="1280" height="35" fill="#003366"/>
+  <text x="640" y="708" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="13" letter-spacing="2">TP. HỒ CHÍ MINH · THÁNG 5 NĂM 2026</text>
+</svg>

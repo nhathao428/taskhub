@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#FFFFFF"/>
+  <rect x="0" y="0" width="1280" height="70" fill="#003366"/>
+  <rect x="0" y="0" width="6" height="70" fill="#CC0000"/>
+  <text x="40" y="44" fill="#FFFFFF" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="bold">DEMO · GÓC NHÌN MANAGER vs EMPLOYEE</text>
+  <text x="1240" y="44" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="14">PHẦN 3 · DEMO</text>
+
+  <rect x="0" y="70" width="1280" height="50" fill="#F5F7FA"/>
+  <text x="640" y="100" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="16" font-style="italic">Cùng một hệ thống · giao diện và quyền hạn khác nhau theo vai trò</text>
+
+  <line x1="640" y1="135" x2="640" y2="655" stroke="#E5E7EB" stroke-width="2" stroke-dasharray="6,4"/>
+
+  <g font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif">
+    <!-- LEFT: MANAGER POV -->
+    <rect x="40" y="138" width="560" height="44" fill="#003366" rx="22"/>
+    <circle cx="68" cy="160" r="14" fill="#CC0000"/>
+    <text x="68" y="166" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="bold">M</text>
+    <text x="92" y="167" fill="#FFFFFF" font-size="18" font-weight="bold">MANAGER · Toàn quyền quản lý</text>
+    <text x="580" y="167" text-anchor="end" fill="#75CEC8" font-size="12">5 màn hình</text>
+
+    <text x="40" y="207" fill="#003366" font-size="13" font-weight="bold">▸ QUYỀN HẠN</text>
+    <text x="40" y="227" fill="#555555" font-size="12">▸ CRUD nhân viên · dự án · công việc · văn phòng</text>
+    <text x="40" y="245" fill="#555555" font-size="12">▸ Gán công việc cho nhân viên · cấu hình geofence</text>
+    <text x="40" y="263" fill="#555555" font-size="12">▸ Gọi AI gợi ý nhân viên · duyệt PENDING_REVIEW</text>
+
+    <rect x="40" y="280" width="275" height="170" fill="#FAFAF9" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <image href="../images/screenshots/03_dashboard.png" x="46" y="286" width="263" height="158" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="40" y="280" width="80" height="20" fill="#003366" rx="3"/>
+    <text x="80" y="294" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Dashboard</text>
+
+    <rect x="325" y="280" width="275" height="170" fill="#FAFAF9" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <image href="../images/screenshots/06_tasks.png" x="331" y="286" width="263" height="158" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="325" y="280" width="100" height="20" fill="#003366" rx="3"/>
+    <text x="375" y="294" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">QL Công việc</text>
+
+    <rect x="40" y="460" width="180" height="125" fill="#FAFAF9" stroke="#003366" stroke-width="1.5" rx="6"/>
+    <image href="../images/screenshots/04_employees.png" x="46" y="466" width="168" height="113" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="40" y="460" width="92" height="20" fill="#003366" rx="3"/>
+    <text x="86" y="474" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Nhân viên</text>
+
+    <rect x="225" y="460" width="180" height="125" fill="#FAF5FF" stroke="#9333EA" stroke-width="2" rx="6"/>
+    <image href="../images/screenshots/08_ai_suggestions.png" x="231" y="466" width="168" height="113" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="225" y="460" width="92" height="20" fill="#9333EA" rx="3"/>
+    <text x="271" y="474" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">AI Suggest</text>
+
+    <rect x="410" y="460" width="190" height="125" fill="#E0F2F1" stroke="#147c79" stroke-width="2" rx="6"/>
+    <image href="../images/screenshots/14_office_locations.png" x="416" y="466" width="178" height="113" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="410" y="460" width="86" height="20" fill="#147c79" rx="3"/>
+    <text x="453" y="474" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Geofence</text>
+
+    <rect x="40" y="600" width="560" height="50" fill="#003366" rx="6"/>
+    <text x="55" y="624" fill="#75CEC8" font-size="11" letter-spacing="2">PHÂN QUYỀN</text>
+    <text x="55" y="644" fill="#FFFFFF" font-size="13">CRUD all · approve attendance · AI · config geofence</text>
+
+    <!-- RIGHT: EMPLOYEE POV -->
+    <rect x="680" y="138" width="560" height="44" fill="#147c79" rx="22"/>
+    <circle cx="708" cy="160" r="14" fill="#FFFFFF"/>
+    <text x="708" y="166" text-anchor="middle" fill="#147c79" font-size="14" font-weight="bold">E</text>
+    <text x="732" y="167" fill="#FFFFFF" font-size="18" font-weight="bold">EMPLOYEE · Self-service</text>
+    <text x="1220" y="167" text-anchor="end" fill="#E0F2F1" font-size="12">3 màn hình</text>
+
+    <text x="680" y="207" fill="#147c79" font-size="13" font-weight="bold">▸ QUYỀN HẠN</text>
+    <text x="680" y="227" fill="#555555" font-size="12">▸ Xem dashboard cá nhân · tỷ lệ hoàn thành riêng</text>
+    <text x="680" y="245" fill="#555555" font-size="12">▸ Tự cập nhật trạng thái công việc được giao</text>
+    <text x="680" y="263" fill="#555555" font-size="12">▸ Tự chấm công GPS · xem lịch sử của mình</text>
+
+    <rect x="680" y="280" width="275" height="170" fill="#E0F2F1" stroke="#147c79" stroke-width="1.5" rx="6"/>
+    <image href="../images/screenshots/10_emp_dashboard.png" x="686" y="286" width="263" height="158" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="680" y="280" width="135" height="20" fill="#147c79" rx="3"/>
+    <text x="747" y="294" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Dashboard cá nhân</text>
+
+    <rect x="965" y="280" width="275" height="170" fill="#E0F2F1" stroke="#147c79" stroke-width="1.5" rx="6"/>
+    <image href="../images/screenshots/11_emp_my_tasks.png" x="971" y="286" width="263" height="158" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="965" y="280" width="125" height="20" fill="#147c79" rx="3"/>
+    <text x="1027" y="294" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Công việc của tôi</text>
+
+    <rect x="680" y="460" width="560" height="125" fill="#E0F2F1" stroke="#147c79" stroke-width="2" rx="6"/>
+    <image href="../images/screenshots/15_my_attendance_map.png" x="686" y="466" width="548" height="113" preserveAspectRatio="xMidYMid slice"/>
+    <rect x="680" y="460" width="195" height="20" fill="#147c79" rx="3"/>
+    <text x="777" y="474" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold">Chấm công GPS (Leaflet map)</text>
+
+    <rect x="680" y="600" width="560" height="50" fill="#147c79" rx="6"/>
+    <text x="695" y="624" fill="#E0F2F1" font-size="11" letter-spacing="2">PHÂN QUYỀN</text>
+    <text x="695" y="644" fill="#FFFFFF" font-size="13">read own data · update own task status · GPS check-in</text>
+  </g>
+
+  <rect x="0" y="685" width="1280" height="35" fill="#003366"/>
+  <text x="40" y="708" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="12">Nguyễn Nhật Hảo · 23DTHC1 · 2380612688</text>
+  <text x="1240" y="708" text-anchor="end" fill="#75CEC8" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="12">12 / 16</text>
+</svg>

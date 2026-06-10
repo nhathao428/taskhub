@@ -4,6 +4,7 @@ import com.example.taskmanagement.dto.AuthResponse;
 import com.example.taskmanagement.dto.RegisterRequest;
 import com.example.taskmanagement.entity.User;
 import com.example.taskmanagement.exception.DuplicateResourceException;
+import com.example.taskmanagement.repository.EmployeeRepository;
 import com.example.taskmanagement.repository.UserRepository;
 import com.example.taskmanagement.security.JwtTokenProvider;
 import com.example.taskmanagement.security.LoginAttemptService;
@@ -29,6 +30,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EmployeeRepository employeeRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;

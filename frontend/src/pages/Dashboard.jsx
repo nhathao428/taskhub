@@ -111,8 +111,8 @@ function ManagerDashboard() {
         })
         setTasks(taskRes.data?.data ?? taskRes.data ?? [])
         setEmployees(empRes.data?.data ?? empRes.data ?? [])
-      } catch (err) {
-        console.error('Lỗi khi tải dữ liệu dashboard:', err)
+      } catch {
+        // Dashboard degrade về 0 nếu tải lỗi — không log ra console ở production.
       } finally {
         setLoading(false)
       }
