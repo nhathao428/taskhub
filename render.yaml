@@ -48,6 +48,19 @@ services:
         value: admin@example.com
       - key: ADMIN_PASSWORD
         generateValue: true
+      # Tài khoản nhân viên mẫu (đăng nhập được) — credential demo công khai, vai trò EMPLOYEE
+      # (quyền thấp). Admin vẫn dùng mật khẩu ngẫu nhiên ở trên nên không bị lộ.
+      - key: EMPLOYEE_USERNAME
+        value: employee1
+      - key: EMPLOYEE_EMAIL
+        value: employee@example.com
+      - key: EMPLOYEE_PASSWORD
+        value: Employee@123                       # đổi/để sync:false nếu không muốn public
+      # Pool ~30 nhân viên (hồ sơ, không kèm login) để demo gợi ý phân công AI.
+      - key: SEED_SAMPLE_EMPLOYEES
+        value: "true"
+      - key: SEED_SAMPLE_EMPLOYEES_COUNT
+        value: "30"
       - key: GEMINI_API_KEY
         sync: false                              # set manually in dashboard
       - key: GEMINI_MODEL
