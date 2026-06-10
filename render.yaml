@@ -47,7 +47,14 @@ services:
       - key: ADMIN_EMAIL
         value: admin@example.com
       - key: ADMIN_PASSWORD
-        generateValue: true
+        generateValue: true                       # ngẫu nhiên — xem ở Render dashboard
+      # Tài khoản manager mẫu (đăng nhập được) — credential demo công khai, vai trò MANAGER.
+      - key: MANAGER_USERNAME
+        value: manager1
+      - key: MANAGER_EMAIL
+        value: manager@example.com
+      - key: MANAGER_PASSWORD
+        value: Manager@123                         # đổi/để sync:false nếu không muốn public
       # Tài khoản nhân viên mẫu (đăng nhập được) — credential demo công khai, vai trò EMPLOYEE
       # (quyền thấp). Admin vẫn dùng mật khẩu ngẫu nhiên ở trên nên không bị lộ.
       - key: EMPLOYEE_USERNAME
