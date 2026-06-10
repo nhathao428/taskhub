@@ -1,37 +1,65 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { MdEmail, MdLock, MdWorkspaces, MdLogin } from 'react-icons/md'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { MdLock, MdWorkspaces, MdLockReset, MdArrowBack } from 'react-icons/md'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from '../context/LanguageContext'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import { WorkspaceIllustration } from '../components/Illustrations'
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+// Quy tắc mật khẩu trùng với @Pattern trong ResetPasswordRequest.java — đổi 1 chỗ phải đổi cả 2.
+const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]).{8,100}$/
+
+export default function ResetPassword() {
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token') || ''
+
+  const [form, setForm] = useState({ password: '', confirm: '' })
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { resetPassword } = useAuth()
   const { t } = useTranslation()
   const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!token) {
+      setError(t('Liên kết đặt lại không hợp lệ hoặc thiếu mã. Vui lòng yêu cầu lại.'))
+      return
+    }
+    if (form.password !== form.confirm) {
+      setError(t('Mật khẩu xác nhận không khớp.'))
+      return
+    }
+    if (!PASSWORD_RULE.test(form.password)) {
+      setError(t('Mật khẩu phải 8–100 ký tự, có chữ, số và ký tự đặc biệt.'))
+      return
+    }
     setLoading(true)
     try {
-      await login(email, password)
-      navigate('/dashboard')
+      await resetPassword(token, form.password)
+      setSuccess(t('Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...'))
+      setTimeout(() => navigate('/login'), 1800)
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          t('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
+          t('Đặt lại mật khẩu thất bại. Vui lòng thử lại.')
       )
     } finally {
       setLoading(false)
     }
   }
+
+  const fields = [
+    { name: 'password', label: 'Mật khẩu mới', type: 'password' },
+    { name: 'confirm', label: 'Xác nhận mật khẩu', type: 'password' },
+  ]
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden py-8 bg-slate-950">
@@ -63,8 +91,8 @@ export default function Login() {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 shadow-brand-glow mb-4">
               <MdWorkspaces className="text-white text-2xl" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Chào mừng trở lại')}</h1>
-            <p className="text-slate-500 text-sm mt-1.5">{t('Đăng nhập vào TaskHub')}</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Đặt lại mật khẩu')}</h1>
+            <p className="text-slate-500 text-sm mt-1.5">{t('Chọn mật khẩu mới cho tài khoản của bạn.')}</p>
           </div>
 
           {error && (
@@ -72,43 +100,40 @@ export default function Login() {
               {error}
             </div>
           )}
+          {success && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm">
+              {success}
+            </div>
+          )}
+
+          {!token && !success && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm">
+              {t('Thiếu mã đặt lại. Vui lòng mở liên kết từ bước "Quên mật khẩu" hoặc yêu cầu lại.')}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
-                <MdEmail className="text-brand-600" />
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
-                <MdLock className="text-brand-600" />
-                {t('Mật khẩu')}
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
-              />
-              <div className="mt-1.5 text-right">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs text-brand-600 hover:text-brand-700 hover:underline font-medium transition-colors"
-                >
-                  {t('Quên mật khẩu?')}
-                </Link>
+            {fields.map(({ name, label, type }) => (
+              <div key={name}>
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
+                  <MdLock className="text-brand-600" />
+                  {t(label)}
+                </label>
+                <input
+                  type={type}
+                  name={name}
+                  value={form[name]}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
+                />
+                {name === 'password' && (
+                  <p className="mt-1.5 text-[11px] text-slate-500">
+                    {t('Tối thiểu 8 ký tự, bao gồm chữ, số và ký tự đặc biệt (vd: !@#$).')}
+                  </p>
+                )}
               </div>
-            </div>
+            ))}
 
             <button
               type="submit"
@@ -118,21 +143,20 @@ export default function Login() {
               {loading ? (
                 <>
                   <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
-                  {t('Đang đăng nhập...')}
+                  {t('Đang đặt lại...')}
                 </>
               ) : (
                 <>
-                  <MdLogin className="text-lg" />
-                  {t('Đăng nhập')}
+                  <MdLockReset className="text-lg" />
+                  {t('Đặt lại mật khẩu')}
                 </>
               )}
             </button>
           </form>
 
           <p className="text-center text-sm text-slate-500 mt-6">
-            {t('Chưa có tài khoản?')}{' '}
-            <Link to="/register" className="text-brand-600 hover:text-brand-700 hover:underline font-semibold transition-colors">
-              {t('Đăng ký ngay')}
+            <Link to="/login" className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-700 hover:underline font-semibold transition-colors">
+              <MdArrowBack /> {t('Quay lại đăng nhập')}
             </Link>
           </p>
         </div>

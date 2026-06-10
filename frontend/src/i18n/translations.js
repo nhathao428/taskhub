@@ -42,6 +42,34 @@ export const en = {
   'Đăng ký': 'Sign up',
   'Đã có tài khoản?': 'Already have an account?',
 
+  // --- Quên / Đặt lại mật khẩu ---
+  'Quên mật khẩu?': 'Forgot password?',
+  'Nhập email của bạn để nhận liên kết đặt lại mật khẩu.':
+    'Enter your email to receive a password reset link.',
+  'Nếu email tồn tại, chúng tôi đã tạo liên kết đặt lại mật khẩu.':
+    'If the email exists, we have created a password reset link.',
+  'Không gửi được yêu cầu. Vui lòng thử lại.': 'Could not send the request. Please try again.',
+  'Chế độ thử nghiệm: dùng liên kết bên dưới để đặt lại mật khẩu.':
+    'Test mode: use the link below to reset your password.',
+  'Sao chép': 'Copy',
+  'Đã sao chép': 'Copied',
+  'Đang gửi...': 'Sending...',
+  'Gửi liên kết đặt lại': 'Send reset link',
+  'Quay lại đăng nhập': 'Back to sign in',
+  'Đặt lại mật khẩu': 'Reset password',
+  'Chọn mật khẩu mới cho tài khoản của bạn.': 'Choose a new password for your account.',
+  'Mật khẩu mới': 'New password',
+  'Liên kết đặt lại không hợp lệ hoặc thiếu mã. Vui lòng yêu cầu lại.':
+    'The reset link is invalid or missing a code. Please request a new one.',
+  'Thiếu mã đặt lại. Vui lòng mở liên kết từ bước "Quên mật khẩu" hoặc yêu cầu lại.':
+    'Missing reset code. Please open the link from the "Forgot password" step or request a new one.',
+  'Mật khẩu phải 8–100 ký tự, có chữ, số và ký tự đặc biệt.':
+    'Password must be 8–100 characters with letters, numbers and a special character.',
+  'Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...':
+    'Password reset successful! Redirecting to the login page...',
+  'Đặt lại mật khẩu thất bại. Vui lòng thử lại.': 'Password reset failed. Please try again.',
+  'Đang đặt lại...': 'Resetting...',
+
   // --- Dashboard ---
   'Tổng quan hệ thống': 'System overview',
   '{tasks} công việc đã được tạo, {done} đã hoàn thành':

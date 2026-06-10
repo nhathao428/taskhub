@@ -1,35 +1,53 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { MdEmail, MdLock, MdWorkspaces, MdLogin } from 'react-icons/md'
+import { Link } from 'react-router-dom'
+import { MdEmail, MdWorkspaces, MdSend, MdArrowBack, MdContentCopy } from 'react-icons/md'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from '../context/LanguageContext'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import { WorkspaceIllustration } from '../components/Illustrations'
 
-export default function Login() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const [resetLink, setResetLink] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const [copied, setCopied] = useState(false)
+  const { forgotPassword } = useAuth()
   const { t } = useTranslation()
-  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setMessage('')
+    setResetLink('')
     setLoading(true)
     try {
-      await login(email, password)
-      navigate('/dashboard')
+      const data = await forgotPassword(email)
+      setMessage(
+        data?.message ||
+          t('Nếu email tồn tại, chúng tôi đã tạo liên kết đặt lại mật khẩu.')
+      )
+      // Dev-only: backend trả link đặt lại trong response vì chưa gửi email.
+      if (data?.resetLink) setResetLink(data.resetLink)
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          t('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
+          t('Không gửi được yêu cầu. Vui lòng thử lại.')
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resetLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      /* ignore */
     }
   }
 
@@ -63,13 +81,44 @@ export default function Login() {
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-600 shadow-brand-glow mb-4">
               <MdWorkspaces className="text-white text-2xl" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Chào mừng trở lại')}</h1>
-            <p className="text-slate-500 text-sm mt-1.5">{t('Đăng nhập vào TaskHub')}</p>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{t('Quên mật khẩu?')}</h1>
+            <p className="text-slate-500 text-sm mt-1.5">
+              {t('Nhập email của bạn để nhận liên kết đặt lại mật khẩu.')}
+            </p>
           </div>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
               {error}
+            </div>
+          )}
+          {message && (
+            <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm">
+              {message}
+            </div>
+          )}
+
+          {/* Dev-only: hiển thị link đặt lại vì hệ thống chưa gửi email thật. */}
+          {resetLink && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
+              <p className="text-amber-800 font-medium mb-1.5">
+                {t('Chế độ thử nghiệm: dùng liên kết bên dưới để đặt lại mật khẩu.')}
+              </p>
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/reset-password${new URL(resetLink).search}`}
+                  className="flex-1 truncate text-brand-700 hover:underline font-mono text-xs"
+                >
+                  {resetLink}
+                </Link>
+                <button
+                  type="button"
+                  onClick={copyLink}
+                  className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-semibold transition-colors"
+                >
+                  <MdContentCopy /> {copied ? t('Đã sao chép') : t('Sao chép')}
+                </button>
+              </div>
             </div>
           )}
 
@@ -88,28 +137,6 @@ export default function Login() {
               />
             </div>
 
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-1.5">
-                <MdLock className="text-brand-600" />
-                {t('Mật khẩu')}
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm transition-all"
-              />
-              <div className="mt-1.5 text-right">
-                <Link
-                  to="/forgot-password"
-                  className="text-xs text-brand-600 hover:text-brand-700 hover:underline font-medium transition-colors"
-                >
-                  {t('Quên mật khẩu?')}
-                </Link>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
@@ -118,21 +145,20 @@ export default function Login() {
               {loading ? (
                 <>
                   <div className="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full" />
-                  {t('Đang đăng nhập...')}
+                  {t('Đang gửi...')}
                 </>
               ) : (
                 <>
-                  <MdLogin className="text-lg" />
-                  {t('Đăng nhập')}
+                  <MdSend className="text-lg" />
+                  {t('Gửi liên kết đặt lại')}
                 </>
               )}
             </button>
           </form>
 
           <p className="text-center text-sm text-slate-500 mt-6">
-            {t('Chưa có tài khoản?')}{' '}
-            <Link to="/register" className="text-brand-600 hover:text-brand-700 hover:underline font-semibold transition-colors">
-              {t('Đăng ký ngay')}
+            <Link to="/login" className="inline-flex items-center gap-1 text-brand-600 hover:text-brand-700 hover:underline font-semibold transition-colors">
+              <MdArrowBack /> {t('Quay lại đăng nhập')}
             </Link>
           </p>
         </div>

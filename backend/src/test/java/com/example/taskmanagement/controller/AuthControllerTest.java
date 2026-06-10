@@ -1,8 +1,10 @@
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.AuthResponse;
+import com.example.taskmanagement.dto.ForgotPasswordResponse;
 import com.example.taskmanagement.dto.LoginRequest;
 import com.example.taskmanagement.dto.RegisterRequest;
+import com.example.taskmanagement.service.PasswordResetService;
 import com.example.taskmanagement.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,6 +34,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private PasswordResetService passwordResetService;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
@@ -101,6 +106,63 @@ class AuthControllerTest {
                 """;
 
         mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    // ----- Quên mật khẩu -----
+
+    @Test
+    void forgotPassword_returns200_withGenericMessage() throws Exception {
+        when(passwordResetService.requestReset(any()))
+                .thenReturn(new ForgotPasswordResponse("Nếu email tồn tại...", null, null));
+
+        String body = """
+                {"email": "hao@example.com"}
+                """;
+
+        mockMvc.perform(post("/api/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.message").exists());
+    }
+
+    @Test
+    void forgotPassword_returns400_whenEmailInvalid() throws Exception {
+        String body = """
+                {"email": "not-an-email"}
+                """;
+
+        mockMvc.perform(post("/api/auth/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void resetPassword_returns200_whenValidPayload() throws Exception {
+        String body = """
+                {"token": "some-token", "newPassword": "Password1!"}
+                """;
+
+        mockMvc.perform(post("/api/auth/reset-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+    }
+
+    @Test
+    void resetPassword_returns400_whenPasswordWeak() throws Exception {
+        // Thiếu số + ký tự đặc biệt → vi phạm @Pattern.
+        String body = """
+                {"token": "some-token", "newPassword": "onlyletters"}
+                """;
+
+        mockMvc.perform(post("/api/auth/reset-password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isBadRequest());

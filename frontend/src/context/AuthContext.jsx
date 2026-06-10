@@ -52,6 +52,19 @@ export function AuthProvider({ children }) {
     return response.data
   }
 
+  // Bước 1 quên mật khẩu: gửi email để backend phát token đặt lại.
+  // Response luôn generic (anti-enumeration); ở dev kèm resetToken/resetLink vì chưa có email.
+  const forgotPassword = async (email) => {
+    const response = await api.post('/api/auth/forgot-password', { email })
+    return response.data.data
+  }
+
+  // Bước 2: đặt mật khẩu mới bằng token nhận ở bước 1.
+  const resetPassword = async (token, newPassword) => {
+    const response = await api.post('/api/auth/reset-password', { token, newPassword })
+    return response.data
+  }
+
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -75,6 +88,8 @@ export function AuthProvider({ children }) {
         exitDemo,
         login,
         register,
+        forgotPassword,
+        resetPassword,
         logout,
       }}
     >
