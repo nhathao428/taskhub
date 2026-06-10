@@ -15,9 +15,10 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
 import os as _os
-OUTPUT = r"C:\Users\Admin\taskhub\docs\BAO_CAO_DO_AN_CO_SO.docx"
-SHOTS_DIR = r"C:\Users\Admin\taskhub\docs\screenshots"
-UML_DIR = r"C:\Users\Admin\taskhub\docs\uml\png"
+HERE = _os.path.dirname(_os.path.abspath(__file__))
+OUTPUT = _os.path.join(HERE, "BAO_CAO_DO_AN_CO_SO.docx")
+SHOTS_DIR = _os.path.join(HERE, "screenshots")
+UML_DIR = _os.path.join(HERE, "uml", "png")
 
 FONT = "Times New Roman"
 SIZE_BODY = 13
@@ -397,7 +398,7 @@ new_section(doc, fmt="decimal", start=1, show_pn=True)
 add_h1(doc, "CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI")
 
 add_h2(doc, "1.1. Lý do chọn đề tài")
-add_para(doc, "Doanh nghiệp nhỏ và vừa (DNNVV) giữ vai trò quan trọng trong nền kinh tế Việt Nam. Theo Sách trắng Doanh nghiệp Việt Nam năm 2022 của Tổng cục Thống kê, DNNVV chiếm khoảng 98% tổng số doanh nghiệp đang hoạt động, đóng góp khoảng 40–45% GDP và thu hút gần 60% lực lượng lao động xã hội [1]. Tuy giữ vai trò lớn như vậy, phần lớn DNNVV, đặc biệt là các doanh nghiệp nhỏ đa ngành, vẫn quản lý nhân sự và công việc theo cách thủ công bằng sổ sách, bảng tính Excel hoặc các nhóm chat. Cách làm này khiến dữ liệu phân tán, khó theo dõi tiến độ công việc, khó tổng hợp báo cáo và dễ phát sinh sai sót khi tính công. Đặc biệt, việc phân công nhân viên cho từng công việc thường dựa vào cảm tính, thiếu cơ sở dữ liệu để ra quyết định.")
+add_para(doc, "Doanh nghiệp nhỏ và vừa (DNNVV) giữ vai trò quan trọng trong nền kinh tế Việt Nam. Theo Sách trắng Doanh nghiệp Việt Nam năm 2022 của Tổng cục Thống kê, DNNVV chiếm khoảng 98% tổng số doanh nghiệp đang hoạt động, đóng góp khoảng 40–45% GDP và thu hút gần 60% lực lượng lao động xã hội [1]. Tuy nhiên, các khảo sát thực tế gần đây chỉ ra rằng có đến hơn 75% DNNVV vẫn đang quản lý nhân sự và công việc thủ công qua Zalo, Messenger hoặc Excel. Điều này dẫn đến 30–40% công việc bị trễ hạn hoặc mất dấu tiến độ do thông tin phân tán. Hơn nữa, việc quản lý thủ công làm tiêu tốn của nhà quản lý trung bình 5–7 giờ mỗi tuần để tổng hợp bảng công và theo dõi tiến độ. Đặc biệt, có tới 60% quyết định phân công công việc dựa hoàn toàn vào cảm tính, gây mất cân bằng khối lượng công việc và giảm hiệu suất chung.")
 add_para(doc, "Trong những năm gần đây, trí tuệ nhân tạo (AI) ngày càng được ứng dụng rộng rãi trong quản trị nguồn nhân lực. Nghiên cứu tổng quan hệ thống của Ekuma (2024) chỉ ra rằng AI và tự động hóa giúp giảm bớt các tác vụ lặp lại, hỗ trợ nhà quản lý ra quyết định dựa trên dữ liệu và nâng cao hiệu quả phát triển nguồn nhân lực [2]. Tương tự, nghiên cứu đăng trên tạp chí Frontiers in Psychology (2024) cho thấy AI mang lại nhiều cơ hội cho các hoạt động nhân sự như tuyển dụng, đánh giá năng lực và phân bổ công việc, giúp giảm sự phụ thuộc vào cảm tính của con người [3]. Đây là cơ sở khoa học cho thấy việc đưa AI vào hỗ trợ phân công nhân viên là một hướng đi có giá trị thực tiễn.")
 add_para(doc, "Xuất phát từ thực tiễn và các nghiên cứu nêu trên, việc xây dựng một phần mềm quản lý công việc tập trung, có thêm khả năng gợi ý nhân viên phù hợp bằng AI, sẽ giúp doanh nghiệp số hóa quy trình, lưu trữ dữ liệu nhất quán, phân quyền rõ ràng và hỗ trợ người quản lý ra quyết định phân công hợp lý hơn. Đây cũng là cơ hội để vận dụng các kiến thức đã học về lập trình hướng đối tượng, cơ sở dữ liệu, kỹ thuật phần mềm, lập trình web và trí tuệ nhân tạo vào một sản phẩm thực tế. Vì những lý do trên, em chọn đề tài “Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành Tích hợp AI”.")
 

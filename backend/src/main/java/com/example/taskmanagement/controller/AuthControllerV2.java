@@ -2,6 +2,7 @@ package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.dto.ApiResponse;
 import com.example.taskmanagement.dto.AuthResponse;
+import com.example.taskmanagement.dto.ForgotPasswordRequest;
 import com.example.taskmanagement.dto.LoginRequest;
 import com.example.taskmanagement.dto.RegisterRequestV2;
 import com.example.taskmanagement.service.UserService;
@@ -36,5 +37,11 @@ public class AuthControllerV2 {
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequestV2 request) {
         AuthResponse response = userService.register(request.toV1());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        userService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(ApiResponse.ok("Mật khẩu của bạn đã được đặt lại thành Reset@123"));
     }
 }

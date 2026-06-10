@@ -12,9 +12,10 @@ from docx.oxml import OxmlElement
 from docx.enum.style import WD_STYLE_TYPE
 
 import os as _os
-OUTPUT = r"C:\Users\Admin\taskhub\docs\BAO_CAO_DO_AN_CO_SO.docx"
-SHOTS_DIR = r"C:\Users\Admin\taskhub\docs\screenshots"
-UML_DIR = r"C:\Users\Admin\taskhub\docs\uml\png"
+HERE = _os.path.dirname(_os.path.abspath(__file__))
+OUTPUT = _os.path.join(HERE, "BAO_CAO_DO_AN_CO_SO.docx")
+SHOTS_DIR = _os.path.join(HERE, "screenshots")
+UML_DIR = _os.path.join(HERE, "uml", "png")
 
 FONT = "Times New Roman"
 SIZE_BODY = 13

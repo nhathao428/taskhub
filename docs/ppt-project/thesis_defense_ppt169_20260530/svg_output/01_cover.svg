@@ -22,9 +22,9 @@
   <text x="640" y="180" text-anchor="middle" fill="#CC0000" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="18" letter-spacing="6" font-weight="600">ĐỒ ÁN CƠ SỞ</text>
 
   <!-- Main title -->
-  <text x="640" y="260" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">HỆ THỐNG QUẢN LÝ CÔNG VIỆC</text>
-  <text x="640" y="310" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">CHO DOANH NGHIỆP NHỎ ĐA NGÀNH</text>
-  <text x="640" y="360" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold" letter-spacing="-1">TÍCH HỢP AI</text>
+  <text x="640" y="260" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold">HỆ THỐNG QUẢN LÝ CÔNG VIỆC</text>
+  <text x="640" y="310" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold">CHO DOANH NGHIỆP NHỎ ĐA NGÀNH</text>
+  <text x="640" y="360" text-anchor="middle" fill="#003366" font-family="Segoe UI, Microsoft YaHei, Arial, sans-serif" font-size="42" font-weight="bold">TÍCH HỢP AI</text>
 
   <!-- Decorative divider -->
   <line x1="440" y1="395" x2="840" y2="395" stroke="#0066CC" stroke-width="2"/>

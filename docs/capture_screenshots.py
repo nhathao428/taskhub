@@ -17,7 +17,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-ROOT = Path(r"C:\Users\Admin\taskhub")
+ROOT = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FRONTEND = ROOT / "frontend"
 OUT = ROOT / "docs" / "screenshots"
 OUT.mkdir(parents=True, exist_ok=True)

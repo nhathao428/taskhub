@@ -151,4 +151,13 @@ public class UserService implements UserDetailsService {
         user.setRole(role);
         return userRepository.save(user);
     }
+
+    @Transactional
+    @CacheEvict(value = "user_details", allEntries = true)
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        user.setPassword(passwordEncoder.encode("Reset@123"));
+        userRepository.save(user);
+    }
 }

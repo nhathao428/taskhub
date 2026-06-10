@@ -163,8 +163,8 @@ pageno(s, 4)
 # ===================================================================== S5 PHÂN TÍCH & THIẾT KẾ
 s = slide()
 header(s, "4 · Phân tích – Thiết kế", "Use Case & Cơ sở dữ liệu", INDIGO)
-img(s, os.path.join(UML, "use-case-tong-the.png"), Inches(0.7), Inches(2.2), w=Inches(8.4))
-card(s, Inches(9.3), Inches(2.0), Inches(3.3), Inches(4.3), CYAN, "Thiết kế",
+img(s, os.path.join(UML, "use-case-tong-the.png"), Inches(0.7), Inches(2.0), h=Inches(4.5))
+card(s, Inches(6.2), Inches(2.0), Inches(6.4), Inches(4.5), CYAN, "Thiết kế",
      ["3 tác nhân: Admin · Manager · Employee",
       "14 use case chính",
       "CSDL 7 bảng (ERD)",

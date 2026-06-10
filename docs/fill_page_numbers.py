@@ -7,7 +7,8 @@ cột "Trang" của Danh mục bảng và Danh mục hình. Chạy SAU build_bao
 import os, re, sys
 import win32com.client as win32
 
-DOCX = r"C:\Users\Admin\taskhub\docs\BAO_CAO_DO_AN_CO_SO.docx"
+HERE = os.path.dirname(os.path.abspath(__file__))
+DOCX = os.path.join(HERE, "BAO_CAO_DO_AN_CO_SO.docx")
 
 WD_ADJUSTED_PAGE = 1  # wdActiveEndAdjustedPageNumber (số trang hiển thị, theo định dạng section)
 

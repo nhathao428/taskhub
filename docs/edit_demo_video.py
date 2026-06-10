@@ -15,9 +15,10 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import imageio
 
-SCREENSHOTS = r'C:\Users\Admin\taskhub\docs\screenshots'
-LOGO = r'C:\Users\Admin\taskhub\docs\hutech_logo.png'
-OUT = r'C:\Users\Admin\taskhub\docs\demo_video.mp4'
+HERE = os.path.dirname(os.path.abspath(__file__))
+SCREENSHOTS = os.path.join(HERE, 'screenshots')
+LOGO = os.path.join(HERE, 'hutech_logo.png')
+OUT = os.path.join(HERE, 'demo_video.mp4')
 
 W, H = 1920, 1080
 FPS = 30
@@ -255,7 +256,7 @@ prev_last = None
 for item in TIMELINE:
     if item[0] == 'section':
         _, title, sub, accent = item
-        print(f'  Section: {title}')
+        print(f'  Section: {title.encode("ascii", "ignore").decode("ascii")}')
         n = int(SECTION_DUR * FPS); n_fade = int(CROSSFADE * FPS) if prev_last is not None else 0
         for i in range(n):
             frame = make_section_frame(title, sub, accent, i / FPS, SECTION_DUR)
