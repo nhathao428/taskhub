@@ -195,17 +195,13 @@ bullet(tf, "Đầu ra: TOP 5 nhân viên phù hợp + lý do bằng tiếng Vi�
 img(s, os.path.join(SHOTS, "09_ai_result.png"), Inches(8.4), Inches(2.15), w=Inches(4.2))
 pageno(s, 7)
 
-# ===================================================================== S8 DEMO (VIDEO)
+# ===================================================================== S8 DEMO (LIVE)
 s = slide(DEEPER)
-header(s, "7 · Sản phẩm", "Demo hệ thống (Web · Quản lý + Nhân viên)", GREEN)
-poster = os.path.join(HERE, "demo_poster.png")
-mv = s.shapes.add_movie(os.path.join(HERE, "demo_video.mp4"),
-                        Inches(2.2), Inches(2.0), Inches(8.9), Inches(4.55),
-                        poster_frame_image=poster if os.path.exists(poster) else None,
-                        mime_type="video/mp4")
-tf = box(s, Inches(0.7), Inches(6.7), Inches(12), Inches(0.6))
-txt(tf, "▶ Bấm để phát — quay trực tiếp ứng dụng đang chạy (đăng nhập, quản lý, AI gợi ý, nhân viên)",
-    13, MUTED, italic=True, align=PP_ALIGN.CENTER, space_after=0)
+header(s, "7 · Sản phẩm", "Trình diễn trực tiếp hệ thống (Demo)", GREEN)
+tf = box(s, Inches(0.7), Inches(2.8), Inches(12), Inches(3.0))
+txt(tf, "DEMO HỆ THỐNG TRỰC TIẾP", 36, CYAN, bold=True, align=PP_ALIGN.CENTER, space_after=16)
+txt(tf, "Trình diễn trực tiếp thao tác trên Web (Quản lý) và giao diện Mobile (Nhân viên)", 18, WHITE, align=PP_ALIGN.CENTER, space_after=10)
+txt(tf, "· Quy trình Đăng nhập, Thêm nhân viên, Dự án, Công việc và Chấm công\n· Quy trình chạy AI gợi ý nhân sự tối ưu hiệu suất công việc", 16, MUTED, align=PP_ALIGN.CENTER, space_after=0)
 pageno(s, 8)
 
 # ===================================================================== S9 KIỂM THỬ
