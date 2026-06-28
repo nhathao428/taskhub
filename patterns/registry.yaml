@@ -1,0 +1,42 @@
+# Machine-readable index of the maintenance loops active on TaskHub.
+# Consumed by loop-audit / tooling. See LOOP.md for the human-readable config.
+
+patterns:
+  - id: daily-triage
+    name: Daily Triage
+    goal: Prioritized daily scan of CI, issues, commits, and dependency drift
+    cadence: 1d
+    risk: low
+    tools: [claude-code, github-actions]
+    skills: [loop-triage]
+    state: STATE.md
+    phases: [report, act-small-wins, escalate]
+    human_gates: [auth, secrets, db-migrations, deploy-config, multi-file-refactors]
+    week_one_mode: L1
+    token_cost: low
+
+  - id: ci-sweeper
+    name: CI Sweeper
+    goal: Summarize red CI runs from .github/workflows/ci.yml into STATE
+    cadence: on-red-ci
+    risk: medium
+    tools: [claude-code, github-actions]
+    skills: [loop-triage, loop-verifier]
+    state: STATE.md
+    phases: [discover, triage, report]
+    human_gates: [auth, secrets, db-migrations, max-fix-attempts]
+    week_one_mode: L1
+    token_cost: high
+
+  - id: dependency-sweeper
+    name: Dependency Sweeper
+    goal: Scan frontend/package.json (npm) + backend/pom.xml (Maven); propose patch bumps only
+    cadence: weekly
+    risk: medium
+    tools: [claude-code, github-actions]
+    skills: [loop-triage, minimal-fix, loop-verifier]
+    state: STATE.md
+    phases: [scan, propose-patch, verify]
+    human_gates: [major-version-bumps, lockfile-changes]
+    week_one_mode: L1
+    token_cost: medium
