@@ -12,7 +12,7 @@ Spring Boot backend (Java 17, Maven) · React + Vite frontend · Flutter mobile 
 
 | Pattern | Cadence | Status | Trigger |
 |---------|---------|--------|---------|
-| Daily Triage | 1d | **L1 report-only** | `/loop 1d Run $loop-triage` → update `STATE.md` |
+| Daily Triage | 1d | **L2 auto-fix** (enabled 2026-06-30) | `/loop 1d Run $loop-triage` → update `STATE.md`; auto-fix only within `docs/safety.md` Allowed column |
 | CI Sweeper | on red CI | L1 report-only | Summarize `.github/workflows/ci.yml` failures into STATE |
 | Dependency Sweeper | weekly | L1 report-only | Scan `frontend/package.json` (npm) + `backend/pom.xml` (Maven); patch bumps only |
 
