@@ -121,15 +121,19 @@ Nên set (không bắt buộc nhưng cần cho production thật):
 
 | Biến | Mặc định nếu bỏ trống | Ghi chú |
 |---|---|---|
+| `ADMIN_EMAIL` | `admin@example.com` | Email tài khoản admin được seed lúc khởi động lần đầu. Nên đổi sang email thật, khác với `MANAGER_EMAIL` |
+| `MANAGER_EMAIL` | `manager1@example.com` (chỉ seed khi có `MANAGER_PASSWORD`) | Email tài khoản manager được seed — nên dùng email thật, tách biệt khỏi `ADMIN_EMAIL` |
 | `GEMINI_API_KEY` | trống — endpoint AI trả 422 | Lấy free tại aistudio.google.com/apikey |
 | `GROQ_API_KEY` | trống — không fallback | Free tại console.groq.com/keys. Backend tự động fallback sang Groq khi Gemini trả 429 (hết hạn mức free ~1.500 req/ngày) — Groq free cao hơn nhiều (~14.400 req/ngày). Nên set nếu quy mô user lớn (nhiều manager dùng tính năng gợi ý AI cùng lúc) |
 | `SPRING_PROFILES_ACTIVE` | — | Set `postgres` để dùng `application-postgres.properties` (Flyway bật, Hibernate chỉ validate schema thay vì tự sửa) |
 | `CORS_ORIGINS` | `http://localhost:3000,http://localhost:5173` | Đổi thành domain frontend thật, không đổi sẽ bị CORS chặn |
 | `SWAGGER_ENABLED` | `false` | Để `false` ở production — bật lên là lộ toàn bộ API schema |
-| `PWD_RESET_EXPOSE_TOKEN` | `false` (đã đúng ở profile postgres) | **Không bật `true` ở production** — bật là link reset password bị trả thẳng trong response, ai cũng chiếm được tài khoản người khác |
+| `PWD_RESET_EXPOSE_TOKEN` | `false` (đã đúng ở profile postgres) | **Không bật `true` ở production** — bật là link reset password bị trả thẳng trong response, ai cũng chiếm được tài khoản người khác. Độc lập với việc gửi email thật (`RESEND_API_KEY`) |
 | `CACHE_TYPE` | `none` | Set `redis` nếu có Redis server (free tier hiếm platform nào có Redis free lâu dài, để `none` cũng chạy được) |
 | `MANAGER_PASSWORD`, `EMPLOYEE_PASSWORD` | trống — không seed | Chỉ set nếu muốn có sẵn tài khoản demo; đổi khỏi giá trị mẫu trong `render.yaml` nếu deploy thật |
 | `SEED_SAMPLE_EMPLOYEES` | `false` | `true` để tạo ~30 nhân viên mẫu test tính năng gợi ý AI — chỉ nên bật ở bản demo |
+| `RESEND_API_KEY` | trống — không gửi email, chỉ log | Free tại resend.com/api-keys (3.000 email/tháng). Bật gửi email thật cho luồng quên mật khẩu, độc lập với `PWD_RESET_EXPOSE_TOKEN` bên dưới |
+| `RESEND_FROM` | `TaskHub <onboarding@resend.dev>` | Free tier chưa verify domain: bắt buộc dùng `onboarding@resend.dev`, và Resend chỉ gửi được tới đúng email đăng ký tài khoản Resend. Verify domain riêng tại resend.com/domains để gửi tới bất kỳ ai |
 
 > Xem đầy đủ toàn bộ biến (kèm giải thích chi tiết bằng tiếng Việt) tại [`.env.example`](./.env.example).
 
@@ -154,3 +158,4 @@ Trả về JWT token → backend chạy đúng. Sau đó mở URL frontend, ki�
 | AI suggestion trả 422 | `GEMINI_API_KEY` chưa set |
 | Request đầu tiên chậm 30-60s | Bình thường với free tier có cold start (Render) — nâng cấp gói trả phí mới hết |
 | Mất toàn bộ dữ liệu sau ~1 tháng | Dùng Postgres free của Render (tự xoá sau 30 ngày) — chuyển sang Neon/Supabase |
+| Quên mật khẩu không nhận được email | `RESEND_API_KEY` chưa set (chỉ log, xem log server), hoặc email nhận không trùng email đăng ký tài khoản Resend (giới hạn free tier chưa verify domain — xem bảng biến môi trường ở trên) |

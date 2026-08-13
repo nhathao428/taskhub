@@ -31,8 +31,10 @@ import java.util.Optional;
  *  - Token dùng một lần (used=true sau khi đổi) và hết hạn sau {@code token-ttl-minutes}.
  *  - Mỗi yêu cầu mới vô hiệu hoá các token cũ chưa dùng của cùng user.
  *
- * Hệ thống CHƯA gửi email: ở dev ({@code app.password-reset.expose-token=true}) token/link
- * được trả thẳng trong response để thao tác end-to-end. Production phải tắt cờ này.
+ * Gửi email qua Resend ({@link EmailService}) khi có cấu hình {@code RESEND_API_KEY} — độc
+ * lập với cờ {@code app.password-reset.expose-token} (dev vẫn có thể vừa nhận email thật vừa
+ * thấy token/link trong response để tiện thao tác end-to-end mà không cần mở hộp thư). Khi
+ * CHƯA cấu hình RESEND_API_KEY, hệ thống quay lại hành vi cũ (chỉ log, không gửi gì).
  */
 @Service
 public class PasswordResetService {
@@ -43,6 +45,7 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Value("${app.password-reset.token-ttl-minutes:15}")
     private long ttlMinutes;
@@ -55,10 +58,12 @@ public class PasswordResetService {
 
     public PasswordResetService(UserRepository userRepository,
                                 PasswordResetTokenRepository tokenRepository,
-                                PasswordEncoder passwordEncoder) {
+                                PasswordEncoder passwordEncoder,
+                                EmailService emailService) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     /**
@@ -88,12 +93,31 @@ public class PasswordResetService {
 
         log.info("Đã phát token đặt lại mật khẩu (userId={}, ttl={}min)", user.getUserId(), ttlMinutes);
 
+        String link = resetUrlBase + "?token=" + rawToken;
+        sendResetEmail(user.getEmail(), link);
+
         if (exposeToken) {
-            // DEV ONLY: chưa có email nên trả token + link thẳng cho client.
-            String link = resetUrlBase + "?token=" + rawToken;
+            // DEV: vẫn trả token + link thẳng cho client để tiện thao tác end-to-end mà
+            // không cần mở hộp thư (dùng song song với gửi email thật ở trên nếu đã cấu hình).
             return new ForgotPasswordResponse(generic, rawToken, link);
         }
         return new ForgotPasswordResponse(generic, null, null);
+    }
+
+    /**
+     * Gửi email chứa liên kết đặt lại mật khẩu. Không throw — lỗi gửi email chỉ được log,
+     * không được làm hỏng response generic anti-enumeration của /forgot-password.
+     */
+    private void sendResetEmail(String toEmail, String resetLink) {
+        String subject = "TaskHub — Yêu cầu đặt lại mật khẩu";
+        String html = """
+                <p>Chào bạn,</p>
+                <p>Hệ thống TaskHub nhận được yêu cầu đặt lại mật khẩu cho tài khoản này.</p>
+                <p><a href="%s">Bấm vào đây để đặt lại mật khẩu</a> (liên kết hết hạn sau %d phút).</p>
+                <p>Nếu bạn không yêu cầu việc này, có thể bỏ qua email — mật khẩu hiện tại vẫn giữ nguyên.</p>
+                <p>— TaskHub</p>
+                """.formatted(resetLink, ttlMinutes);
+        emailService.sendEmail(toEmail, subject, html);
     }
 
     /**
