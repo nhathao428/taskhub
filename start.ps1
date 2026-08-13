@@ -30,7 +30,26 @@ function Stop-Started {
     Remove-Item $PidFile -Force
 }
 
-if ($Stop) { Stop-Started; return }
+$AppPorts = @(5000, 5173, 5170, 35729)
+
+function Free-Ports {
+    foreach ($port in $AppPorts) {
+        $conns = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+        foreach ($procId in ($conns.OwningProcess | Select-Object -Unique)) {
+            try {
+                $p = Get-Process -Id $procId -ErrorAction Stop
+                Stop-Process -Id $procId -Force
+                Write-Host "✓ Giải phóng port $port (đã dừng PID $procId / $($p.ProcessName))"
+            } catch { }
+        }
+    }
+}
+
+if ($Stop) { Stop-Started; Free-Ports; return }
+
+# ---- Dọn lần chạy trước để tránh lỗi 'port already in use' ----
+Stop-Started
+Free-Ports
 
 # ---- Kiểm tra tooling ----
 function Need($cmd, $hint) {
@@ -59,7 +78,7 @@ $pids = @()
 
 # 1) Backend
 Write-Host '[1/3] Backend Spring Boot (port 5000)...'
-$be = Start-Process -FilePath 'mvn' -ArgumentList @('-q', 'spring-boot:run') `
+$be = Start-Process -FilePath 'mvn.cmd' -ArgumentList @('-q', 'spring-boot:run') `
     -WorkingDirectory (Join-Path $Root 'backend') -PassThru -WindowStyle Minimized
 $pids += $be.Id
 
@@ -69,10 +88,10 @@ $frontDir = Join-Path $Root 'frontend'
 if (-not (Test-Path (Join-Path $frontDir 'node_modules'))) {
     Write-Host '    npm install (lần đầu)...'
     Push-Location $frontDir
-    npm install --no-audit --no-fund
+    & npm.cmd install --no-audit --no-fund
     Pop-Location
 }
-$fe = Start-Process -FilePath 'npm' -ArgumentList @('run','dev') `
+$fe = Start-Process -FilePath 'npm.cmd' -ArgumentList @('run','dev') `
     -WorkingDirectory $frontDir -PassThru -WindowStyle Minimized
 $pids += $fe.Id
 
@@ -87,7 +106,7 @@ if (-not $SkipMobile) {
     $serverCmd = if (Get-Command python -ErrorAction SilentlyContinue) {
         @('python', '-m', 'http.server', '5170')
     } else {
-        @('npx', '--yes', 'http-server', '-p', '5170', '-s')
+        @('npx.cmd', '--yes', 'http-server', '-p', '5170', '-s')
     }
     $mw = Start-Process -FilePath $serverCmd[0] -ArgumentList $serverCmd[1..($serverCmd.Length-1)] `
         -WorkingDirectory (Join-Path $mobileDir 'build/web') -PassThru -WindowStyle Minimized

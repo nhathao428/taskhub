@@ -1,0 +1,26 @@
+# Loop Readiness Audit — scores this repo's loop-readiness on every push/PR.
+name: Loop Readiness Audit
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 9 * * *'   # daily 09:17 UTC
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Run loop-audit
+        run: npx @cobusgreyling/loop-audit . --md | tee /tmp/audit.md
+      - name: Gate (fail under 40)
+        run: npx @cobusgreyling/loop-audit . --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);console.log('Score',j.score,j.level);if(j.score<40)process.exit(1)})"

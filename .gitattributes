@@ -1,0 +1,44 @@
+# Normalize line endings to LF in the repo, check out native on each OS.
+# Ends the recurring ~25k-line CRLF<->LF churn noted in STATE.md.
+* text=auto eol=lf
+
+# Scripts: keep POSIX scripts LF, PowerShell CRLF.
+*.sh    text eol=lf
+*.bash  text eol=lf
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Explicit text types (helps cross-platform tooling)
+*.java  text eol=lf
+*.dart  text eol=lf
+*.js    text eol=lf
+*.jsx   text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.xml   text eol=lf
+*.properties text eol=lf
+
+# Binary assets — never normalize.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.svg   text eol=lf
+*.pdf   binary
+*.docx  binary
+*.pptx  binary
+*.xlsx  binary
+*.jar   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
