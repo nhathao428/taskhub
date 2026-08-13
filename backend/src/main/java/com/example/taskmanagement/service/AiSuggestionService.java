@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDate;
@@ -332,13 +333,19 @@ public class AiSuggestionService {
         try {
             String responseJson = doChatCompletion(chatCompletionsUrl, geminiApiKey, geminiModel, prompt);
             return parseOpenAiResponse(responseJson, employees);
-        } catch (RestClientResponseException e) {
-            int statusCode = e.getStatusCode().value();
+        } catch (RestClientException e) {
+            // Bắt RestClientException (lớp cha) chứ không chỉ RestClientResponseException:
+            // lỗi mạng/kết nối (DNS, timeout, connection refused...) ném ra
+            // ResourceAccessException — KHÔNG phải RestClientResponseException — nên trước
+            // đây lọt qua catch cũ, gây 500 "Unexpected error" thay vì lỗi rõ ràng. Phát
+            // hiện lúc test thật (Gemini không gọi được từ môi trường test).
+            Integer statusCode = (e instanceof RestClientResponseException responseEx)
+                    ? responseEx.getStatusCode().value() : null;
 
             // Fallback sang Groq khi Gemini bị rate-limit (429) và có cấu hình GROQ_API_KEY.
             // Groq free tier (~14.400 req/ngày) cao hơn nhiều Gemini Flash free (~1.500/ngày),
             // đủ chịu tải khi số manager dùng tính năng gợi ý AI tăng lên mà không tốn tiền.
-            if (statusCode == 429 && groqApiKey != null && !groqApiKey.isBlank()) {
+            if (statusCode != null && statusCode == 429 && groqApiKey != null && !groqApiKey.isBlank()) {
                 log.warn("Gemini bị rate-limit (429) — fallback sang Groq (model={})", groqModel);
                 try {
                     String responseJson = doChatCompletion(groqChatCompletionsUrl, groqApiKey, groqModel, prompt);
@@ -347,11 +354,21 @@ public class AiSuggestionService {
                     int groqStatus = groqEx.getStatusCode().value();
                     log.error("Groq fallback cũng lỗi {}: {}", groqStatus, groqEx.getResponseBodyAsString());
                     throw translateProviderError(groqStatus);
+                } catch (RestClientException groqEx) {
+                    log.error("Groq fallback không gọi được (lỗi kết nối): {}", groqEx.getMessage());
+                    throw new BusinessException(
+                            "Không kết nối được tới dịch vụ AI (cả Gemini lẫn Groq), vui lòng thử lại sau.");
                 }
             }
 
-            log.error("AI gateway/provider trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
-            throw translateProviderError(statusCode);
+            if (statusCode != null) {
+                String body = ((RestClientResponseException) e).getResponseBodyAsString();
+                log.error("AI gateway/provider trả lỗi {}: {}", statusCode, body);
+                throw translateProviderError(statusCode);
+            }
+            // Lỗi kết nối (không có HTTP status) — vd không gọi được generativelanguage.googleapis.com.
+            log.error("Không gọi được AI provider (lỗi kết nối/mạng): {}", e.getMessage());
+            throw new BusinessException("Không kết nối được tới dịch vụ AI, vui lòng thử lại sau.");
         }
     }
 
