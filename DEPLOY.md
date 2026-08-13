@@ -128,7 +128,8 @@ Nên set (không bắt buộc nhưng cần cho production thật):
 | `SPRING_PROFILES_ACTIVE` | — | Set `postgres` để dùng `application-postgres.properties` (Flyway bật, Hibernate chỉ validate schema thay vì tự sửa) |
 | `CORS_ORIGINS` | `http://localhost:3000,http://localhost:5173` | Đổi thành domain frontend thật, không đổi sẽ bị CORS chặn |
 | `SWAGGER_ENABLED` | `false` | Để `false` ở production — bật lên là lộ toàn bộ API schema |
-| `PWD_RESET_EXPOSE_TOKEN` | `false` (đã đúng ở profile postgres) | **Không bật `true` ở production** — bật là link reset password bị trả thẳng trong response, ai cũng chiếm được tài khoản người khác. Độc lập với việc gửi email thật (`RESEND_API_KEY`) |
+| `PWD_RESET_EXPOSE_TOKEN` | `false` (đã đúng ở profile postgres) | **Không bật `true` ở production** — bật là mã OTP đặt lại mật khẩu bị trả thẳng trong response, ai cũng chiếm được tài khoản người khác. Độc lập với việc gửi email thật (`RESEND_API_KEY`) |
+| `PWD_RESET_MAX_ATTEMPTS` | `5` | Số lần nhập sai OTP tối đa trước khi khoá mã, bắt yêu cầu mã mới (chống brute-force 6 số) |
 | `CACHE_TYPE` | `none` | Set `redis` nếu có Redis server (free tier hiếm platform nào có Redis free lâu dài, để `none` cũng chạy được) |
 | `MANAGER_PASSWORD`, `EMPLOYEE_PASSWORD` | trống — không seed | Chỉ set nếu muốn có sẵn tài khoản demo; đổi khỏi giá trị mẫu trong `render.yaml` nếu deploy thật |
 | `SEED_SAMPLE_EMPLOYEES` | `false` | `true` để tạo ~30 nhân viên mẫu test tính năng gợi ý AI — chỉ nên bật ở bản demo |

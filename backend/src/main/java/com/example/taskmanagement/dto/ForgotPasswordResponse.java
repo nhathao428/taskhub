@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
  * Phản hồi cho /forgot-password.
  *
  * {@code message} luôn generic (anti-enumeration): không tiết lộ email có tồn tại hay không.
- * {@code resetToken}/{@code resetLink} CHỈ có giá trị ở môi trường dev (khi
- * {@code app.password-reset.expose-token=true}) vì hệ thống chưa gửi email thật.
- * Ở production phải tắt cờ này — token đi qua email, không bao giờ lọt vào response.
+ * {@code otp} CHỈ có giá trị ở môi trường dev (khi {@code app.password-reset.expose-token=true})
+ * để test end-to-end không cần mở hộp thư — dùng song song với gửi email thật qua Resend nếu
+ * đã cấu hình. Ở production PHẢI tắt cờ này — OTP chỉ đi qua email, không bao giờ lọt vào response.
  */
 @Data
 @NoArgsConstructor
@@ -19,6 +19,5 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ForgotPasswordResponse {
     private String message;
-    private String resetToken;
-    private String resetLink;
+    private String otp;
 }

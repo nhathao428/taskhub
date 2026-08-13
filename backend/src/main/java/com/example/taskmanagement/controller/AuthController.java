@@ -49,11 +49,11 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
-    /** Bước 2: đặt mật khẩu mới bằng token nhận được ở bước 1. */
+    /** Bước 2: đặt mật khẩu mới bằng mã OTP 6 số nhận được ở bước 1 (qua email). */
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<String>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
-        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+        passwordResetService.resetPassword(request.getEmail(), request.getOtp(), request.getNewPassword());
         return ResponseEntity.ok(ApiResponse.ok("Đặt lại mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới."));
     }
 }

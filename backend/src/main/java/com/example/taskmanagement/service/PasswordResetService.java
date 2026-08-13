@@ -18,43 +18,49 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Optional;
 
 /**
- * Luồng "quên mật khẩu" (token-based).
+ * Luồng "quên mật khẩu" bằng mã OTP 6 chữ số gửi qua email (thay cho link đặt lại trước đây).
  *
  * Nguyên tắc bảo mật:
  *  - Anti-enumeration: /forgot-password luôn trả message generic dù email có tồn tại hay không.
- *  - Token thật (random 256-bit) chỉ gửi cho người dùng; DB chỉ lưu SHA-256 hash.
- *  - Token dùng một lần (used=true sau khi đổi) và hết hạn sau {@code token-ttl-minutes}.
- *  - Mỗi yêu cầu mới vô hiệu hoá các token cũ chưa dùng của cùng user.
+ *  - OTP sinh bằng {@link SecureRandom} (không dùng {@code java.util.Random} — không đủ ngẫu
+ *    nhiên cho mục đích bảo mật); DB chỉ lưu SHA-256 hash, không lưu OTP thật.
+ *  - OTP dùng một lần (used=true sau khi đổi mật khẩu thành công) và hết hạn sau
+ *    {@code token-ttl-minutes} — mặc định 10 phút, ngắn hơn link cũ (15 phút) vì không gian chỉ
+ *    10^6 khả năng nên dễ bị đoán/brute-force hơn nhiều so với token dài 256-bit.
+ *  - Chống brute-force: mỗi lần nhập sai OTP tăng {@code attempts}; vượt quá
+ *    {@link #MAX_ATTEMPTS} thì khoá luôn OTP đó (used=true), bắt buộc người dùng yêu cầu mã mới
+ *    — 5 lần thử cho 10^6 khả năng là an toàn (không đủ để dò được trong thời hạn 10 phút).
+ *  - Mỗi yêu cầu mới vô hiệu hoá các OTP cũ chưa dùng của cùng user (chỉ 1 OTP hiệu lực).
  *
  * Gửi email qua Resend ({@link EmailService}) khi có cấu hình {@code RESEND_API_KEY} — độc
  * lập với cờ {@code app.password-reset.expose-token} (dev vẫn có thể vừa nhận email thật vừa
- * thấy token/link trong response để tiện thao tác end-to-end mà không cần mở hộp thư). Khi
- * CHƯA cấu hình RESEND_API_KEY, hệ thống quay lại hành vi cũ (chỉ log, không gửi gì).
+ * thấy OTP trong response để tiện thao tác end-to-end mà không cần mở hộp thư). Khi CHƯA cấu
+ * hình RESEND_API_KEY, hệ thống quay lại hành vi cũ (chỉ log, không gửi gì).
  */
 @Service
 public class PasswordResetService {
 
     private static final Logger log = LoggerFactory.getLogger(PasswordResetService.class);
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final int OTP_BOUND = 1_000_000; // 6 chữ số: 000000..999999
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
-    @Value("${app.password-reset.token-ttl-minutes:15}")
+    @Value("${app.password-reset.token-ttl-minutes:10}")
     private long ttlMinutes;
 
     @Value("${app.password-reset.expose-token:false}")
     private boolean exposeToken;
 
-    @Value("${app.password-reset.reset-url-base:http://localhost:5173/reset-password}")
-    private String resetUrlBase;
+    @Value("${app.password-reset.max-attempts:5}")
+    private int maxAttempts;
 
     public PasswordResetService(UserRepository userRepository,
                                 PasswordResetTokenRepository tokenRepository,
@@ -67,74 +73,105 @@ public class PasswordResetService {
     }
 
     /**
-     * Phát token đặt lại cho email (nếu tồn tại user). Luôn trả response generic.
+     * Phát mã OTP đặt lại cho email (nếu tồn tại user). Luôn trả response generic.
      */
     @Transactional
     public ForgotPasswordResponse requestReset(String email) {
-        String generic = "Nếu email tồn tại trong hệ thống, chúng tôi đã tạo liên kết đặt lại mật khẩu.";
+        String generic = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi mã đặt lại mật khẩu.";
         Optional<User> userOpt = userRepository.findByEmail(email == null ? "" : email.trim());
         if (userOpt.isEmpty()) {
             // Vẫn trả về như khi thành công — không tiết lộ email có tồn tại hay không.
             log.info("Forgot-password cho email không tồn tại (anti-enumeration generic 200)");
-            return new ForgotPasswordResponse(generic, null, null);
+            return new ForgotPasswordResponse(generic, null);
         }
 
         User user = userOpt.get();
-        // Mỗi lần yêu cầu → chỉ giữ đúng 1 token còn hiệu lực.
+        // Mỗi lần yêu cầu → chỉ giữ đúng 1 OTP còn hiệu lực.
         tokenRepository.invalidateAllForUser(user);
 
-        String rawToken = generateToken();
+        String otp = generateOtp();
         PasswordResetToken token = new PasswordResetToken();
         token.setUser(user);
-        token.setTokenHash(sha256(rawToken));
+        token.setTokenHash(sha256(otp));
         token.setExpiresAt(LocalDateTime.now().plusMinutes(ttlMinutes));
         token.setUsed(false);
+        token.setAttempts(0);
         tokenRepository.save(token);
 
-        log.info("Đã phát token đặt lại mật khẩu (userId={}, ttl={}min)", user.getUserId(), ttlMinutes);
+        log.info("Đã phát OTP đặt lại mật khẩu (userId={}, ttl={}min)", user.getUserId(), ttlMinutes);
 
-        String link = resetUrlBase + "?token=" + rawToken;
-        sendResetEmail(user.getEmail(), link);
+        sendResetEmail(user.getEmail(), otp);
 
         if (exposeToken) {
-            // DEV: vẫn trả token + link thẳng cho client để tiện thao tác end-to-end mà
-            // không cần mở hộp thư (dùng song song với gửi email thật ở trên nếu đã cấu hình).
-            return new ForgotPasswordResponse(generic, rawToken, link);
+            // DEV: vẫn trả OTP thẳng cho client để tiện thao tác end-to-end mà không cần mở
+            // hộp thư (dùng song song với gửi email thật ở trên nếu đã cấu hình).
+            return new ForgotPasswordResponse(generic, otp);
         }
-        return new ForgotPasswordResponse(generic, null, null);
+        return new ForgotPasswordResponse(generic, null);
     }
 
     /**
-     * Gửi email chứa liên kết đặt lại mật khẩu. Không throw — lỗi gửi email chỉ được log,
+     * Gửi email chứa mã OTP đặt lại mật khẩu. Không throw — lỗi gửi email chỉ được log,
      * không được làm hỏng response generic anti-enumeration của /forgot-password.
      */
-    private void sendResetEmail(String toEmail, String resetLink) {
-        String subject = "TaskHub — Yêu cầu đặt lại mật khẩu";
+    private void sendResetEmail(String toEmail, String otp) {
+        String subject = "TaskHub — Mã đặt lại mật khẩu của bạn";
         String html = """
                 <p>Chào bạn,</p>
                 <p>Hệ thống TaskHub nhận được yêu cầu đặt lại mật khẩu cho tài khoản này.</p>
-                <p><a href="%s">Bấm vào đây để đặt lại mật khẩu</a> (liên kết hết hạn sau %d phút).</p>
+                <p>Mã xác nhận của bạn là:</p>
+                <p style="font-size:28px;font-weight:bold;letter-spacing:4px;">%s</p>
+                <p>Mã có hiệu lực trong %d phút và chỉ dùng được 1 lần.</p>
                 <p>Nếu bạn không yêu cầu việc này, có thể bỏ qua email — mật khẩu hiện tại vẫn giữ nguyên.</p>
                 <p>— TaskHub</p>
-                """.formatted(resetLink, ttlMinutes);
+                """.formatted(otp, ttlMinutes);
         emailService.sendEmail(toEmail, subject, html);
     }
 
     /**
-     * Đổi mật khẩu bằng token. Ném {@link BusinessException} (message generic) nếu
-     * token không hợp lệ / đã dùng / hết hạn.
+     * Đổi mật khẩu bằng email + OTP. Ném {@link BusinessException} (message generic) nếu
+     * không có OTP đang hiệu lực cho email này, đã dùng, hết hạn, hoặc sai (có đếm số lần sai).
+     *
+     * QUAN TRỌNG — {@code noRollbackFor}: @Transactional mặc định rollback toàn bộ khi có
+     * RuntimeException (BusinessException là RuntimeException), nên nếu không khai báo
+     * noRollbackFor thì việc tăng {@code attempts} rồi throw lỗi OTP sai sẽ bị rollback theo —
+     * counter không bao giờ tăng thật trong DB, khoá sau N lần sai sẽ KHÔNG BAO GIỜ kích hoạt
+     * (đã tự phát hiện bug này lúc test: 6 lần nhập sai liên tiếp vẫn không bị khoá).
      */
-    @Transactional
+    @Transactional(noRollbackFor = BusinessException.class)
     @CacheEvict(value = "user_details", allEntries = true)
-    public void resetPassword(String rawToken, String newPassword) {
-        PasswordResetToken token = tokenRepository.findByTokenHash(sha256(rawToken))
-                .orElseThrow(PasswordResetService::invalidTokenException);
+    public void resetPassword(String email, String otp, String newPassword) {
+        Optional<User> userOpt = userRepository.findByEmail(email == null ? "" : email.trim());
+        if (userOpt.isEmpty()) {
+            // Không tiết lộ email có tồn tại hay không — cùng message với các nhánh lỗi khác.
+            throw invalidOtpException();
+        }
+        User user = userOpt.get();
 
-        if (token.isUsed() || token.isExpired()) {
-            throw invalidTokenException();
+        PasswordResetToken token = tokenRepository.findFirstByUserAndUsedFalseOrderByCreatedAtDesc(user)
+                .orElseThrow(PasswordResetService::invalidOtpException);
+
+        if (token.isExpired()) {
+            throw invalidOtpException();
+        }
+        if (token.getAttempts() >= maxAttempts) {
+            // Đã vượt số lần thử cho phép — khoá luôn, không cho thử tiếp dù OTP đúng hay sai.
+            token.setUsed(true);
+            tokenRepository.save(token);
+            throw tooManyAttemptsException();
         }
 
-        User user = token.getUser();
+        if (!sha256(otp == null ? "" : otp.trim()).equals(token.getTokenHash())) {
+            token.setAttempts(token.getAttempts() + 1);
+            tokenRepository.save(token);
+            if (token.getAttempts() >= maxAttempts) {
+                token.setUsed(true);
+                tokenRepository.save(token);
+                throw tooManyAttemptsException();
+            }
+            throw invalidOtpException();
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
@@ -144,15 +181,18 @@ public class PasswordResetService {
         log.info("Đặt lại mật khẩu thành công (userId={})", user.getUserId());
     }
 
-    private static BusinessException invalidTokenException() {
-        return new BusinessException("Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu lại.");
+    private static BusinessException invalidOtpException() {
+        return new BusinessException("Mã OTP không đúng hoặc đã hết hạn. Vui lòng yêu cầu mã mới.");
     }
 
-    /** Token ngẫu nhiên 256-bit, mã hoá Base64 URL-safe (không padding) → an toàn đặt trên URL. */
-    private static String generateToken() {
-        byte[] bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    private static BusinessException tooManyAttemptsException() {
+        return new BusinessException("Bạn đã nhập sai mã quá nhiều lần. Vui lòng yêu cầu mã đặt lại mật khẩu mới.");
+    }
+
+    /** OTP 6 chữ số, sinh bằng SecureRandom (không dùng Random thường) — giữ số 0 ở đầu nếu có. */
+    private static String generateOtp() {
+        int n = SECURE_RANDOM.nextInt(OTP_BOUND);
+        return String.format("%06d", n);
     }
 
     private static String sha256(String value) {

@@ -6,11 +6,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Token đặt lại mật khẩu (luồng "quên mật khẩu").
+ * Mã OTP đặt lại mật khẩu (luồng "quên mật khẩu").
  *
- * Bảo mật: cột {@code token_hash} CHỈ lưu SHA-256 của token thật — giống nguyên tắc
- * không lưu mật khẩu plaintext. Token thật chỉ tồn tại phía client (qua link đặt lại).
- * DB rò rỉ cũng không dùng được vì attacker không đảo ngược được hash về token gốc.
+ * Bảo mật: cột {@code token_hash} CHỈ lưu SHA-256 của mã OTP 6 chữ số thật — giống nguyên
+ * tắc không lưu mật khẩu plaintext. KHÔNG unique giữa các user: OTP chỉ có 10^6 khả năng nên
+ * hai user khác nhau hoàn toàn có thể ngẫu nhiên trùng mã cùng lúc — tra cứu lúc verify luôn
+ * đi theo (user, used=false), không tra trực tiếp theo token_hash.
+ *
+ * Chống brute-force 6 số: {@code attempts} đếm số lần nhập sai; verify tăng dần và khoá
+ * (used=true) khi vượt ngưỡng cho phép — xem {@code PasswordResetService.MAX_ATTEMPTS}.
  */
 @Entity
 @Table(name = "password_reset_tokens")
@@ -30,7 +34,7 @@ public class PasswordResetToken {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "token_hash", nullable = false, unique = true, length = 64)
+    @Column(name = "token_hash", nullable = false, length = 64)
     private String tokenHash;
 
     @Column(name = "expires_at", nullable = false)
@@ -38,6 +42,9 @@ public class PasswordResetToken {
 
     @Column(name = "used", nullable = false)
     private boolean used = false;
+
+    @Column(name = "attempts", nullable = false)
+    private int attempts = 0;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
