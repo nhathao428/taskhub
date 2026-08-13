@@ -13,3 +13,8 @@ __pycache__/
 # Virtualenv tao khi cai dat local - khong commit (nang, khac nhau tung may)
 venv/
 .venv/
+
+# train.py (classifier SVM/kNN cu) da duoc thay bang enroll.py (embedding-based
+# verification) - file vat ly co the con sot lai o mot so may do gioi han xoa file
+# cua moi trung, KHONG con duoc git theo doi nua, bo qua neu con thay.
+train.py

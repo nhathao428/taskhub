@@ -13,7 +13,9 @@ facenet-pytorch==2.6.0
 # ca 2 cung ghi vao chung module "cv2" -> xung dot/loi import kho hieu tren Windows.
 # opencv-contrib-python la superset cua opencv-python (co du moi ham dang dung trong code).
 opencv-contrib-python==4.10.0.84
-scikit-learn==1.5.2
+# scikit-learn KHONG con can nua: thiet ke moi la embedding-based verification
+# (so cosine similarity, xem enroll.py/verify.py) thay vi train classifier SVM/kNN,
+# nen bo luon dependency nay cho gon (giam rui ro xung dot version).
 mediapipe==0.10.14
 numpy==1.26.4
 joblib==1.4.2

@@ -1,16 +1,18 @@
 """
 capture_faces.py
-Chup anh khuon mat tu webcam, luu vao dataset/<ten_nguoi>/*.jpg de train.py dung.
+Chup anh khuon mat tu webcam, luu vao dataset/<ten_nguoi>/*.jpg de enroll.py dung.
 
 Cach chay:
-    python capture_faces.py --name hao --num-images 30
+    python capture_faces.py --name hao --num-images 5
 
-Huong dan chup (quan trong, anh huong truc tiep den accuracy sau nay):
-    - Chup it nhat 20-30 anh moi nguoi.
-    - Doi goc mat giua cac lan chup: chinh dien, nghieng trai/phai nhe, ngua/cui nhe.
-    - Doi bieu cam: binh thuong, cuoi, nghiem tuc.
-    - Doi anh sang neu duoc: chup ca cho sang va cho hoi toi hon (nhung van thay ro
-      mat) - de model chiu duoc dieu kien check-in thuc te (sang som, den, den flash).
+Huong dan chup (quan trong, anh huong truc tiep den do chinh xac sau nay):
+    - Chup 3-5 anh moi nguoi la du (thiet ke embedding-based verification khong can
+      nhieu anh nhu cach train classifier truoc day - xem README.md muc "Vi sao doi
+      thiet ke" de biet ly do).
+    - Doi goc mat giua cac lan chup: chinh dien, nghieng trai/phai nhe.
+    - Doi bieu cam / anh sang neu duoc, trong pham vi vai anh: 1-2 anh binh thuong,
+      1-2 anh o dieu kien anh sang khac (de model chiu duoc dieu kien check-in thuc
+      te - sang som, den, den flash).
     - Nhan SPACE de chup 1 anh, nhan 'q' de thoat som.
 """
 from __future__ import annotations
@@ -28,7 +30,7 @@ def main() -> None:
         help="Ten nguoi (dung lam ten thu muc - nen viet khong dau, khong dau cach, vd 'hao')",
     )
     parser.add_argument("--dataset-dir", default="dataset")
-    parser.add_argument("--num-images", type=int, default=30, help="So anh muon chup them")
+    parser.add_argument("--num-images", type=int, default=5, help="So anh muon chup them")
     parser.add_argument("--camera-index", type=int, default=0)
     args = parser.parse_args()
 
@@ -47,8 +49,8 @@ def main() -> None:
             "Kiem tra webcam co dang bi ung dung khac dung khong, hoac thu --camera-index 1."
         )
 
-    # Haar cascade co san trong goi opencv-python, chi dung de VE KHUNG XEM TRUOC cho de
-    # canh mat khi chup - KHONG dung cho train (train.py dung MTCNN chinh xac hon nhieu).
+    # Haar cascade co san trong goi opencv-contrib-python, chi dung de VE KHUNG XEM TRUOC
+    # cho de canh mat khi chup - KHONG dung de enroll (enroll.py dung MTCNN chinh xac hon).
     cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
     face_cascade = cv2.CascadeClassifier(cascade_path)
 

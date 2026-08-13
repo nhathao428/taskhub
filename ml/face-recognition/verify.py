@@ -1,48 +1,64 @@
 """
 verify.py
-Mo webcam, detect + trich xuat embedding khuon mat hien tai, so voi classifier da
-train (models/classifier.pkl), in ten nguoi nhan dien duoc + do tin cay len man hinh.
-Nhan 'q' de thoat.
+Mo webcam, detect + trich embedding khuon mat hien tai, so cosine similarity voi
+TUNG embedding da enroll (models/enrolled_embeddings.pkl - xem enroll.py), chon
+nguoi co similarity CAO NHAT. Neu similarity >= threshold: nhan dien la nguoi do.
+Neu duoi threshold: "Unknown" (khong khop ai du tin cay).
+
+Day la kieu 1:N VERIFICATION - KHAC voi cach classifier truoc day: khong can co
+buoc "train", them nguoi moi chi can enroll them (xem enroll.py), khong anh huong
+gi nguoi da co san. Nhan 'q' de thoat.
 
 Cach chay:
-    python verify.py --model models/classifier.pkl --threshold 0.6
+    python verify.py --enrolled models/enrolled_embeddings.pkl --threshold 0.65
 """
 from __future__ import annotations
 
 import argparse
+from typing import Dict, Optional, Tuple
 
 import cv2
 import joblib
 import numpy as np
 
-from face_pipeline import FaceEmbedder, get_device
+from face_pipeline import FaceEmbedder, cosine_similarity, get_device
+
+
+def best_match(embedding: np.ndarray, enrolled: Dict[str, np.ndarray]) -> Tuple[Optional[str], float]:
+    """So embedding voi tung nguoi da enroll, tra ve (ten_giong_nhat, similarity_cao_nhat)."""
+    if not enrolled:
+        return None, -1.0
+    best_name: Optional[str] = None
+    best_sim = -1.0
+    for name, ref_emb in enrolled.items():
+        sim = cosine_similarity(embedding, ref_emb)
+        if sim > best_sim:
+            best_name, best_sim = name, sim
+    return best_name, best_sim
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Xac thuc khuon mat qua webcam bang classifier da train")
-    parser.add_argument("--model", default="models/classifier.pkl")
+    parser = argparse.ArgumentParser(description="Xac thuc khuon mat qua webcam bang embedding da enroll (1:N)")
+    parser.add_argument("--enrolled", default="models/enrolled_embeddings.pkl")
     parser.add_argument(
-        "--threshold", type=float, default=0.6,
-        help="Nguong do tin cay (0-1) - duoi nguong nay bao 'Unknown' thay vi nhan dien nham",
+        "--threshold", type=float, default=0.65,
+        help="Nguong cosine similarity (~0.6-0.7 voi InceptionResnetV1/VGGFace2) - "
+             "duoi nguong bao 'Unknown' thay vi nhan dien nham. Xem README.md de biet cach chinh.",
     )
     parser.add_argument("--camera-index", type=int, default=0)
     parser.add_argument("--cpu", action="store_true")
     args = parser.parse_args()
 
-    bundle = joblib.load(args.model)
-    clf = bundle["classifier"]
-    encoder = bundle["label_encoder"]
-    classifier_type = bundle.get("classifier_type", "svm")
-
-    if not hasattr(clf, "predict_proba"):
+    bundle = joblib.load(args.enrolled)
+    enrolled: Dict[str, np.ndarray] = bundle["enrolled"]
+    if not enrolled:
         raise RuntimeError(
-            "Classifier khong ho tro predict_proba. Dung train.py voi --classifier svm "
-            "(kNN mac dinh trong train.py cung ho tro predict_proba qua sklearn, "
-            "nhung neu doi sang loai khac can tu kiem tra lai)."
+            f"File '{args.enrolled}' khong co nguoi nao da enroll. Chay enroll.py truoc."
         )
+    print(f"[info] Da nap {len(enrolled)} nguoi da enroll: {', '.join(enrolled.keys())}")
 
     device = get_device(force_cpu=args.cpu)
-    print(f"[info] Dung device: {device} | classifier: {classifier_type}")
+    print(f"[info] Dung device: {device}")
     embedder = FaceEmbedder(device=device)
 
     cap = cv2.VideoCapture(args.camera_index)
@@ -63,15 +79,12 @@ def main() -> None:
         if box is not None:
             emb = embedder.embed_from_bgr_frame(frame)
             if emb is not None:
-                proba = clf.predict_proba(emb.reshape(1, -1))[0]
-                best_idx = int(np.argmax(proba))
-                confidence = float(proba[best_idx])
-                if confidence >= args.threshold:
-                    name = encoder.inverse_transform([best_idx])[0]
-                    label_text = f"{name} ({confidence:.2f})"
+                name, sim = best_match(emb, enrolled)
+                if name is not None and sim >= args.threshold:
+                    label_text = f"{name} ({sim:.2f})"
                     color = (0, 200, 0)
                 else:
-                    label_text = f"Unknown ({confidence:.2f})"
+                    label_text = f"Unknown ({sim:.2f})"
                     color = (0, 165, 255)
 
             x1, y1, x2, y2 = [int(v) for v in box]
