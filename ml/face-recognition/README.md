@@ -62,6 +62,14 @@ nhất với 2 bản này (Python 3.12+ có thể thiếu wheel sẵn cho vài t
 TRƯỚC, rồi mới cài `requirements.txt` ở Bước 3 (facenet-pytorch phụ thuộc torch có
 sẵn).**
 
+**QUAN TRỌNG — phải ghim đúng version:** `facenet-pytorch==2.6.0` yêu cầu chặt
+`torch>=2.2.0,<2.3.0` và `torchvision>=0.17.0,<0.18.0`. Nếu cài torch **không ghim
+version** (chỉ gõ `pip install torch torchvision`), pip sẽ tự lấy bản mới nhất
+(vd 2.13.x) — báo lỗi xung đột dependency ngay khi cài `facenet-pytorch` ở Bước 3,
+giống lỗi Pillow đã gặp. Các lệnh dưới đây đã ghim đúng `torch==2.2.2` +
+`torchvision==0.17.2` (cặp version tương thích nhau, nằm trong khoảng
+facenet-pytorch cho phép) — copy nguyên văn, không tự ý bỏ phần `==...`.
+
 Laptop của Hào có **GTX 1650** (hỗ trợ CUDA) — nên cài bản CUDA để train/verify
 nhanh hơn CPU nhiều lần (đặc biệt lúc train và test webcam realtime).
 
@@ -77,12 +85,12 @@ nhanh hơn CPU nhiều lần (đặc biệt lúc train và test webcam realtime)
 2. Cài torch bản CUDA 12.1 (tương thích tốt với hầu hết driver hiện tại, GTX 1650
    dùng kiến trúc Turing — chạy tốt với CUDA 12.x):
    ```bash
-   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+   pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
    ```
    Nếu lệnh trên báo lỗi không tìm thấy bản phù hợp, thử bản CUDA 11.8 (cũ hơn,
    tương thích rộng hơn):
    ```bash
-   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+   pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu118
    ```
 
 3. Kiểm tra torch nhận đúng GPU:
@@ -97,7 +105,7 @@ nhanh hơn CPU nhiều lần (đặc biệt lúc train và test webcam realtime)
 Nếu Cách A lỗi (driver cũ, không có GPU lúc test, hoặc chỉ muốn chạy nhanh không
 cần cài driver CUDA):
 ```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cpu
 ```
 Toàn bộ script (`train.py`, `verify.py`, `evaluate.py`) đều có cờ `--cpu` để ép
 chạy CPU dù máy có GPU — dùng khi cần so sánh tốc độ hoặc debug.
@@ -230,7 +238,7 @@ cd ml/face-recognition
 python -m venv venv
 # Windows: venv\Scripts\activate | macOS/Linux: source venv/bin/activate
 
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 
 python capture_faces.py --name hao --num-images 30

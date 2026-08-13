@@ -8,9 +8,15 @@
 #   pip install -r requirements.txt
 
 facenet-pytorch==2.6.0
-opencv-python==4.10.0.84
+# opencv-contrib-python (KHONG dung opencv-python): mediapipe tu keo opencv-contrib-python
+# lam dependency - neu ghim rieng opencv-python o day, pip se cai CA HAI goi cung luc, va
+# ca 2 cung ghi vao chung module "cv2" -> xung dot/loi import kho hieu tren Windows.
+# opencv-contrib-python la superset cua opencv-python (co du moi ham dang dung trong code).
+opencv-contrib-python==4.10.0.84
 scikit-learn==1.5.2
 mediapipe==0.10.14
 numpy==1.26.4
 joblib==1.4.2
-Pillow==10.4.0
+# Pillow PHAI trong khoang [10.2.0, 10.3.0) - facenet-pytorch==2.6.0 ghim cung: "Pillow<10.3.0,>=10.2.0".
+# Ban 10.3.0+ (vd 10.4.0) se bao loi xung dot dependency luc pip install.
+Pillow==10.2.0

@@ -9,3 +9,7 @@ models/*
 *.npz
 __pycache__/
 *.pyc
+
+# Virtualenv tao khi cai dat local - khong commit (nang, khac nhau tung may)
+venv/
+.venv/
