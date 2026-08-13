@@ -1,0 +1,11 @@
+# Anh khuon mat that va model da train la du lieu sinh trac hoc/ca nhan - KHONG commit len git.
+dataset/*/
+!dataset/.gitkeep
+
+models/*
+!models/.gitkeep
+
+*.pkl
+*.npz
+__pycache__/
+*.pyc

@@ -1,0 +1,16 @@
+# ===================================================================
+# Face recognition prototype - TaskHub (do an chuyen nganh)
+# ===================================================================
+# QUAN TRONG: torch / torchvision KHONG ghi phien ban cu the o day.
+# Phai cai torch RIENG truoc (lenh khac nhau tuy may co GPU CUDA hay khong)
+# - xem huong dan chi tiet trong README.md, muc "Buoc 2: Cai torch".
+# Sau khi cai torch xong moi chay:
+#   pip install -r requirements.txt
+
+facenet-pytorch==2.6.0
+opencv-python==4.10.0.84
+scikit-learn==1.5.2
+mediapipe==0.10.14
+numpy==1.26.4
+joblib==1.4.2
+Pillow==10.4.0
