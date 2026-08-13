@@ -135,10 +135,11 @@ public class AttendanceService {
                 .orElseThrow(() -> new BusinessException("No open check-in for today"));
         open.setCheckOut(java.time.LocalTime.now());
 
-        // Lưu vị trí check-out (không thay đổi reviewStatus đã có lúc check-in).
+        // Xử lý vị trí check-out (không thay đổi reviewStatus đã có lúc check-in).
+        // KHÔNG lưu toạ độ GPS thô vào DB nữa (audit bảo mật 8/2026) — chỉ dùng lat/lng
+        // trong bộ nhớ lúc xử lý request này, không set lên entity. Xem applyLocation()
+        // để biết lý do đầy đủ.
         if (loc != null) {
-            open.setCheckOutLat(loc.latitude());
-            open.setCheckOutLng(loc.longitude());
             if (Boolean.TRUE.equals(loc.isMocked())) {
                 open.setIsMocked(true);
                 open.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
@@ -147,15 +148,25 @@ public class AttendanceService {
         return attendanceRepository.save(open);
     }
 
-    /** Gán thông tin vị trí + reviewStatus cho bản ghi check-in mới. */
+    /**
+     * Gán thông tin vị trí + reviewStatus cho bản ghi check-in mới.
+     *
+     * QUAN TRỌNG (audit bảo mật 8/2026): KHÔNG còn lưu toạ độ GPS thô (lat/lng) vào DB.
+     * Vẫn nhận GPS từ client và vẫn dùng để so khớp bán kính văn phòng như trước (không đổi
+     * logic chống gian lận) — chỉ khác là sau khi tính ra kết quả (APPROVED/PENDING_REVIEW +
+     * khoảng cách mét), toạ độ chính xác KHÔNG được ghi lên entity nữa, chỉ tồn tại tạm trong
+     * bộ nhớ lúc xử lý request này. Lý do: lịch sử vị trí chi tiết, giữ vĩnh viễn, Manager nào
+     * cũng xem được toàn bộ — là dữ liệu nhạy cảm nhất trong hệ thống nếu DB bị rò rỉ, trong
+     * khi nghiệp vụ chỉ thực sự cần biết "trong hay ngoài bán kính", không cần toạ độ chính xác.
+     * Cột check_in_lat/check_in_lng/check_out_lat/check_out_lng vẫn giữ trong schema (không
+     * migration xoá cột — tránh rủi ro không cần thiết) nhưng từ nay luôn là null.
+     */
     private void applyLocation(Attendance a, CheckInLocationRequest loc) {
         if (loc == null || loc.latitude() == null || loc.longitude() == null) {
             // Không có GPS -> đẩy lên review.
             a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
             return;
         }
-        a.setCheckInLat(loc.latitude());
-        a.setCheckInLng(loc.longitude());
         a.setIsMocked(Boolean.TRUE.equals(loc.isMocked()));
 
         // Mock location => bắt buộc review.

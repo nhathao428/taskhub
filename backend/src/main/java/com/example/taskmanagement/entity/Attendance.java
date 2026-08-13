@@ -45,7 +45,15 @@ public class Attendance implements Serializable {
     @Column(name = "check_out")
     private LocalTime checkOut;
 
-    /* ----------- Geofence fields (chấm công xác thực qua GPS) ----------- */
+    /*
+     * ----------- Geofence fields (chấm công xác thực qua GPS) -----------
+     * QUAN TRỌNG (audit bảo mật 8/2026): 4 cột toạ độ dưới đây KHÔNG còn được service ghi
+     * giá trị nữa — luôn null từ nay. Lý do: lịch sử vị trí GPS chi tiết, giữ vĩnh viễn,
+     * mọi Manager đều xem được toàn bộ, là dữ liệu nhạy cảm nhất hệ thống nếu DB rò rỉ,
+     * trong khi nghiệp vụ chỉ cần biết trong/ngoài bán kính (xem checkInDistanceMeters +
+     * reviewStatus), không cần toạ độ chính xác. Giữ cột lại trong schema (không migration
+     * xoá) để tránh rủi ro không cần thiết — xem AttendanceService.applyLocation().
+     */
 
     @Column(name = "check_in_lat")
     private Double checkInLat;

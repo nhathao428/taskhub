@@ -135,6 +135,7 @@ Nên set (không bắt buộc nhưng cần cho production thật):
 | `SEED_SAMPLE_EMPLOYEES` | `false` | `true` để tạo ~30 nhân viên mẫu test tính năng gợi ý AI — chỉ nên bật ở bản demo |
 | `RESEND_API_KEY` | trống — không gửi email, chỉ log | Free tại resend.com/api-keys (3.000 email/tháng). Bật gửi email thật cho luồng quên mật khẩu, độc lập với `PWD_RESET_EXPOSE_TOKEN` bên dưới |
 | `RESEND_FROM` | `TaskHub <onboarding@resend.dev>` | Free tier chưa verify domain: bắt buộc dùng `onboarding@resend.dev`, và Resend chỉ gửi được tới đúng email đăng ký tài khoản Resend. Verify domain riêng tại resend.com/domains để gửi tới bất kỳ ai |
+| `RATELIMIT_EMPLOYEES` | `40` | Giới hạn request/phút/IP cho `/api/employees/**` và `/api/attendance/**` — chặn kéo dữ liệu hàng loạt nếu tài khoản manager bị lộ. Audit bảo mật 8/2026 phát hiện 2 nhóm endpoint này trước đó không có rate limit |
 
 > Xem đầy đủ toàn bộ biến (kèm giải thích chi tiết bằng tiếng Việt) tại [`.env.example`](./.env.example).
 
