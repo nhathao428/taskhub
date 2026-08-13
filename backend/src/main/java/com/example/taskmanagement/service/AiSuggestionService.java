@@ -47,6 +47,7 @@ public class AiSuggestionService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final String chatCompletionsUrl;
+    private final String groqChatCompletionsUrl;
 
     @Value("${gemini.api.key:}")
     private String geminiApiKey;
@@ -54,12 +55,23 @@ public class AiSuggestionService {
     @Value("${gemini.api.model:gemini-2.5-flash}")
     private String geminiModel;
 
+    // Groq — fallback khi Gemini bị rate-limit (429). Free tier Groq (14.400 req/ngày)
+    // cao hơn nhiều so với Gemini Flash (~1.500 req/ngày), dùng để chịu tải khi số lượng
+    // manager gọi tính năng gợi ý AI tăng lên. Để trống GROQ_API_KEY = không fallback,
+    // Gemini 429 vẫn trả lỗi cho người dùng như trước.
+    @Value("${groq.api.key:}")
+    private String groqApiKey;
+
+    @Value("${groq.api.model:llama-3.3-70b-versatile}")
+    private String groqModel;
+
     public AiSuggestionService(EmployeeRepository employeeRepository,
                                TaskRepository taskRepository,
                                AttendanceRepository attendanceRepository,
                                RestClient.Builder restClientBuilder,
                                ObjectMapper objectMapper,
-                               @Value("${gemini.api.base-url:https://generativelanguage.googleapis.com/v1beta/openai/}") String baseUrl) {
+                               @Value("${gemini.api.base-url:https://generativelanguage.googleapis.com/v1beta/openai/}") String baseUrl,
+                               @Value("${groq.api.base-url:https://api.groq.com/openai/v1}") String groqBaseUrl) {
         this.employeeRepository = employeeRepository;
         this.taskRepository = taskRepository;
         this.attendanceRepository = attendanceRepository;
@@ -69,6 +81,8 @@ public class AiSuggestionService {
         this.objectMapper = objectMapper;
         String normalized = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
         this.chatCompletionsUrl = normalized + "chat/completions";
+        String groqNormalized = groqBaseUrl.endsWith("/") ? groqBaseUrl : groqBaseUrl + "/";
+        this.groqChatCompletionsUrl = groqNormalized + "chat/completions";
     }
 
     private static final int MAX_FIELD_LENGTH = 500;
@@ -315,40 +329,65 @@ public class AiSuggestionService {
     }
 
     private List<EmployeeSuggestionDTO> callGemini(String prompt, List<Employee> employees) {
-        // OpenAI-format request — tương thích cả PromptShield gateway (/v1/chat/completions)
-        // lẫn Gemini OpenAI-compat (/v1beta/openai/chat/completions). Base URL controls
-        // destination; gateway sẽ enforce policy (PII block/mask) trước khi forward.
+        try {
+            String responseJson = doChatCompletion(chatCompletionsUrl, geminiApiKey, geminiModel, prompt);
+            return parseOpenAiResponse(responseJson, employees);
+        } catch (RestClientResponseException e) {
+            int statusCode = e.getStatusCode().value();
+
+            // Fallback sang Groq khi Gemini bị rate-limit (429) và có cấu hình GROQ_API_KEY.
+            // Groq free tier (~14.400 req/ngày) cao hơn nhiều Gemini Flash free (~1.500/ngày),
+            // đủ chịu tải khi số manager dùng tính năng gợi ý AI tăng lên mà không tốn tiền.
+            if (statusCode == 429 && groqApiKey != null && !groqApiKey.isBlank()) {
+                log.warn("Gemini bị rate-limit (429) — fallback sang Groq (model={})", groqModel);
+                try {
+                    String responseJson = doChatCompletion(groqChatCompletionsUrl, groqApiKey, groqModel, prompt);
+                    return parseOpenAiResponse(responseJson, employees);
+                } catch (RestClientResponseException groqEx) {
+                    int groqStatus = groqEx.getStatusCode().value();
+                    log.error("Groq fallback cũng lỗi {}: {}", groqStatus, groqEx.getResponseBodyAsString());
+                    throw translateProviderError(groqStatus);
+                }
+            }
+
+            log.error("AI gateway/provider trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
+            throw translateProviderError(statusCode);
+        }
+    }
+
+    /**
+     * Gọi 1 endpoint OpenAI-compatible chat/completions (Gemini, Groq, hay PromptShield
+     * gateway đều cùng format request/response) và trả về raw JSON response.
+     */
+    private String doChatCompletion(String url, String apiKey, String model, String prompt) {
+        // OpenAI-format request — tương thích cả PromptShield gateway (/v1/chat/completions),
+        // Gemini OpenAI-compat (/v1beta/openai/chat/completions) lẫn Groq (/openai/v1/chat/completions).
         Map<String, Object> requestBody = Map.of(
-                "model", geminiModel,
+                "model", model,
                 "messages", List.of(Map.of("role", "user", "content", prompt)),
                 "temperature", 0.3,
                 "response_format", Map.of("type", "json_object")
         );
 
-        String responseJson;
-        try {
-            log.info("Calling AI endpoint: {}", chatCompletionsUrl);
-            responseJson = restClient.post()
-                    .uri(java.net.URI.create(chatCompletionsUrl))
-                    .header("Authorization", "Bearer " + geminiApiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(requestBody)
-                    .retrieve()
-                    .body(String.class);
-        } catch (RestClientResponseException e) {
-            int statusCode = e.getStatusCode().value();
-            log.error("AI gateway/provider trả lỗi {}: {}", statusCode, e.getResponseBodyAsString());
-            throw new BusinessException(switch (statusCode) {
-                // 403 từ PromptShield gateway nghĩa là policy block (PII/injection).
-                case 403 -> "Nội dung gửi AI bị chặn bởi policy bảo mật.";
-                case 429 -> "AI tạm thời hết hạn mức gọi (rate limit), vui lòng thử lại sau ít phút.";
-                case 503 -> "Dịch vụ AI đang quá tải, vui lòng thử lại sau ít phút.";
-                case 400, 401 -> "Cấu hình AI không hợp lệ — kiểm tra lại GEMINI_API_KEY và model.";
-                default -> "Gọi dịch vụ AI thất bại (mã " + statusCode + "), vui lòng thử lại sau.";
-            });
-        }
+        log.info("Calling AI endpoint: {}", url);
+        return restClient.post()
+                .uri(java.net.URI.create(url))
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(requestBody)
+                .retrieve()
+                .body(String.class);
+    }
 
-        return parseOpenAiResponse(responseJson, employees);
+    private BusinessException translateProviderError(int statusCode) {
+        return new BusinessException(switch (statusCode) {
+            // 403 từ PromptShield gateway nghĩa là policy block (PII/injection).
+            case 403 -> "Nội dung gửi AI bị chặn bởi policy bảo mật.";
+            case 429 -> "AI tạm thời hết hạn mức gọi (rate limit), vui lòng thử lại sau ít phút.";
+            case 503 -> "Dịch vụ AI đang quá tải, vui lòng thử lại sau ít phút.";
+            case 400, 401 -> "Cấu hình AI không hợp lệ — kiểm tra lại GEMINI_API_KEY/GROQ_API_KEY và model.";
+            default -> "Gọi dịch vụ AI thất bại (mã " + statusCode + "), vui lòng thử lại sau.";
+        });
     }
 
     private List<EmployeeSuggestionDTO> parseOpenAiResponse(String responseJson, List<Employee> employees) {

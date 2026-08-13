@@ -1,134 +1,156 @@
-# Production Deployment Guide
+# Hướng dẫn Deploy TaskHub (miễn phí)
 
-Triển khai TaskHub lên VPS (Ubuntu/Debian) bằng Docker Compose + Caddy (auto HTTPS).
+Tài liệu này hướng dẫn đưa TaskHub lên internet với domain/URL thật, **chỉ dùng các gói free** — phù hợp cho demo, đồ án, hoặc dự án cá nhân lưu lượng thấp.
 
-## Yêu cầu
+> Repo hiện **không có** `docker-compose.yml`, `docker-compose.prod.yml` hay `Caddyfile` (đã bị xoá ở một commit trước). Nếu muốn tự host VPS bằng Docker + HTTPS tự động, cần tự viết lại các file này hoặc khôi phục từ lịch sử git (`git log --all --full-history -- Caddyfile`). Muốn deploy lên AWS EC2 xem thêm [`DEPLOY-AWS.md`](./DEPLOY-AWS.md).
 
-- VPS Linux có ít nhất **2 GB RAM**, 20 GB ổ cứng (DigitalOcean / Vultr / Hetzner ~$5-10/tháng)
-- Domain trỏ DNS A record về IP của VPS
-- SSH access vào VPS
+## Tổng quan 2 cách
 
-## Bước 1 — Cài Docker trên VPS
+| Cách | Phù hợp khi | Độ khó |
+|---|---|---|
+| **1. Render Blueprint** (`render.yaml` có sẵn) | Muốn deploy nhanh nhất, backend + frontend + DB trong 1 lần bấm | Dễ nhất |
+| **2. Tự deploy từng phần** | Muốn tách backend/frontend ra platform khác nhau, hoặc Render không phù hợp | Trung bình |
+
+Cả 2 cách đều **không tốn tiền** nếu ở đúng free tier, nhưng đọc kỹ phần **giới hạn** bên dưới — free tier luôn có đánh đổi (cold start, DB hết hạn...), không phải "free mãi mãi không giới hạn".
+
+---
+
+## Cách 1 — Render Blueprint (nhanh nhất)
+
+Repo đã có sẵn `render.yaml` mô tả đủ 3 service: backend (Docker), frontend (static), Postgres.
+
+1. Push code lên GitHub (repo đã có sẵn).
+2. Vào [render.com](https://render.com) → **New** → **Blueprint** → chọn repo `taskhub`.
+3. Render tự đọc `render.yaml` và tạo:
+   - `tms-backend` — Spring Boot chạy qua Docker, free tier
+   - `tms-frontend` — static site (build từ `frontend/`, free tier)
+   - `tms-db` — Postgres free
+4. Sau khi tạo xong, vào **tms-backend → Environment**, set thủ công:
+   - `GEMINI_API_KEY` — lấy free tại [aistudio.google.com/apikey](https://aistudio.google.com/apikey) (không set thì tính năng gợi ý AI trả lỗi 422, phần còn lại vẫn chạy bình thường)
+5. **Đổi mật khẩu demo trước khi public thật**: `render.yaml` đang set sẵn `MANAGER_PASSWORD=Manager@123` và `EMPLOYEE_PASSWORD=Employee@123` ở dạng public (ai đọc code cũng thấy). Nếu không muốn ai cũng đăng nhập được 2 tài khoản này, vào Render dashboard đổi giá trị khác, hoặc sửa `render.yaml` thêm `sync: false` cho 2 key đó rồi set thủ công trên dashboard.
+6. Đợi build xong (~5-10 phút lần đầu) → mở URL `tms-frontend` Render cấp (dạng `https://tms-frontend-xxxx.onrender.com`).
+
+### Giới hạn cần biết (free tier Render)
+
+| Giới hạn | Chi tiết |
+|---|---|
+| Backend cold start | Sleep sau 15 phút không có traffic, request đầu tiên sau đó chờ ~30-60s |
+| **Postgres free hết hạn sau 30 ngày** | Render sẽ **xoá luôn database** sau 30 ngày + 14 ngày gia hạn nếu không nâng cấp lên gói trả phí. Đây là giới hạn quan trọng nhất — không phù hợp lưu dữ liệu thật lâu dài nếu không nâng cấp |
+| Free Postgres không có backup | Nếu bị xoá là mất hết, không khôi phục được |
+
+**Nếu muốn dữ liệu tồn tại lâu dài mà vẫn free**: đừng dùng Postgres free của Render — dùng **[Neon](https://neon.tech)** (Postgres free, không giới hạn thời gian, không cần thẻ) làm database, rồi trỏ `DB_URL` của backend Render sang Neon thay vì Postgres của Render. Cách làm: xoá phần `databases:` trong `render.yaml` (hoặc bỏ set `fromDatabase`), thay bằng `DB_URL` trỏ tới connection string Neon cấp.
+
+---
+
+## Cách 2 — Tự deploy từng phần
+
+### Bước 1: Build backend thành jar
 
 ```bash
-# SSH vào VPS, chạy:
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-newgrp docker  # hoặc logout & login lại
+cd backend
+mvn clean package -DskipTests
+# Kết quả: target/taskhub-0.0.1-SNAPSHOT.jar
 ```
 
-## Bước 2 — Mở firewall
+Chạy thử local để kiểm tra jar chạy được (cần set các biến môi trường bắt buộc — xem bảng bên dưới):
 
 ```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp
-sudo ufw enable
+JWT_SECRET=$(openssl rand -base64 48) \
+ADMIN_PASSWORD=Admin@12345 \
+java -jar target/taskhub-0.0.1-SNAPSHOT.jar
 ```
 
-## Bước 3 — Trỏ DNS
+Backend cũng có sẵn `backend/Dockerfile` (multi-stage, JDK17 Alpine) nếu platform bạn chọn deploy bằng Docker image thay vì jar trực tiếp.
 
-Tại nhà cung cấp domain (Cloudflare/Namecheap/...), tạo A record:
+### Bước 2: Deploy backend (chọn 1)
 
-| Type | Name              | Value           |
-|------|-------------------|-----------------|
-| A    | task (hoặc @)     | <IP của VPS>    |
+| Platform | Free tier thật? | Ghi chú |
+|---|---|---|
+| **Render** (Web Service thủ công, không qua Blueprint) | Có, free vĩnh viễn | Giống Cách 1 nhưng tự cấu hình từng biến thay vì để `render.yaml` làm hết. Cold start sau 15 phút idle |
+| **Railway** | Không còn free thật | Chỉ còn $5 credit dùng thử 1 lần, sau đó tính phí theo usage (tối thiểu ~$5/tháng) — **không phù hợp nếu Hào muốn free vĩnh viễn**, chỉ nêu để biết |
 
-Đợi 1-5 phút cho DNS propagate. Verify: `dig +short task.example.com` phải trả về đúng IP.
+→ Với ràng buộc không tốn tiền, **Render Web Service** vẫn là lựa chọn hợp lý nhất cho backend.
 
-## Bước 4 — Clone code lên VPS
+Cách deploy trên Render (không dùng Blueprint):
+1. New → Web Service → connect repo → Root Directory: `backend`
+2. Runtime: Docker (dùng sẵn `backend/Dockerfile`)
+3. Set đầy đủ biến môi trường ở bảng dưới
+4. Deploy
+
+### Bước 3: Build frontend thành static file
 
 ```bash
-cd /opt
-sudo git clone https://github.com/nhathao428/taskhub.git
-sudo chown -R $USER:$USER taskhub
-cd taskhub
+cd frontend
+npm install
+npm run build
+# Kết quả: dist/ — toàn bộ file HTML/CSS/JS tĩnh
 ```
 
-## Bước 5 — Cấu hình env
+### Bước 4: Deploy frontend (chọn 1 — đều free, không cần thẻ)
+
+| Platform | Băng thông free | Ghi chú |
+|---|---|---|
+| **Cloudflare Pages** | Không giới hạn | Free tier rộng nhất, cho phép dùng thương mại, khuyến nghị nếu không chắc traffic sau này |
+| **Netlify** | 100 GB/tháng | Free, cho phép dùng thương mại, tích hợp form/function tiện |
+| **Vercel** | 100 GB/tháng | Free (Hobby) — chỉ dành cho dự án cá nhân/phi thương mại, không có build minutes miễn phí cho một số tác vụ |
+
+Cả 3 đều theo flow giống nhau: kết nối repo GitHub → chọn `frontend` làm root directory → build command `npm run build` → output directory `dist` → set biến môi trường `VITE_API_BASE_URL` = URL backend đã deploy ở Bước 2.
+
+### Bước 5: Database — dùng Neon hoặc Supabase (free, không hết hạn)
+
+Vì Postgres free của Render tự xoá sau 30 ngày, nếu deploy thủ công nên dùng luôn:
+
+- **[Neon](https://neon.tech)** — Postgres free, không giới hạn thời gian, không cần thẻ, scale-to-zero khi idle. Khuyến nghị.
+- **[Supabase](https://supabase.com)** — Postgres free, không hết hạn nhưng project tự pause sau 7 ngày không hoạt động (tự resume khi có request lại).
+
+Lấy connection string từ 1 trong 2 nơi trên, set vào `DB_URL` của backend.
+
+---
+
+## Biến môi trường cần thiết
+
+Bắt buộc (backend sẽ lỗi/không chạy nếu thiếu):
+
+| Biến | Ý nghĩa |
+|---|---|
+| `JWT_SECRET` | Khoá ký JWT, ≥32 ký tự ngẫu nhiên. Tạo bằng `openssl rand -base64 48` |
+| `ADMIN_PASSWORD` | Mật khẩu tài khoản admin được seed lúc khởi động — thiếu là app throw exception khi start |
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Kết nối Postgres (hoặc dùng `DB_HOST`/`DB_PORT`/`DB_NAME` nếu platform cấp riêng từng phần, ví dụ Render) |
+
+Nên set (không bắt buộc nhưng cần cho production thật):
+
+| Biến | Mặc định nếu bỏ trống | Ghi chú |
+|---|---|---|
+| `GEMINI_API_KEY` | trống — endpoint AI trả 422 | Lấy free tại aistudio.google.com/apikey |
+| `GROQ_API_KEY` | trống — không fallback | Free tại console.groq.com/keys. Backend tự động fallback sang Groq khi Gemini trả 429 (hết hạn mức free ~1.500 req/ngày) — Groq free cao hơn nhiều (~14.400 req/ngày). Nên set nếu quy mô user lớn (nhiều manager dùng tính năng gợi ý AI cùng lúc) |
+| `SPRING_PROFILES_ACTIVE` | — | Set `postgres` để dùng `application-postgres.properties` (Flyway bật, Hibernate chỉ validate schema thay vì tự sửa) |
+| `CORS_ORIGINS` | `http://localhost:3000,http://localhost:5173` | Đổi thành domain frontend thật, không đổi sẽ bị CORS chặn |
+| `SWAGGER_ENABLED` | `false` | Để `false` ở production — bật lên là lộ toàn bộ API schema |
+| `PWD_RESET_EXPOSE_TOKEN` | `false` (đã đúng ở profile postgres) | **Không bật `true` ở production** — bật là link reset password bị trả thẳng trong response, ai cũng chiếm được tài khoản người khác |
+| `CACHE_TYPE` | `none` | Set `redis` nếu có Redis server (free tier hiếm platform nào có Redis free lâu dài, để `none` cũng chạy được) |
+| `MANAGER_PASSWORD`, `EMPLOYEE_PASSWORD` | trống — không seed | Chỉ set nếu muốn có sẵn tài khoản demo; đổi khỏi giá trị mẫu trong `render.yaml` nếu deploy thật |
+| `SEED_SAMPLE_EMPLOYEES` | `false` | `true` để tạo ~30 nhân viên mẫu test tính năng gợi ý AI — chỉ nên bật ở bản demo |
+
+> Xem đầy đủ toàn bộ biến (kèm giải thích chi tiết bằng tiếng Việt) tại [`.env.example`](./.env.example).
+
+---
+
+## Kiểm tra sau khi deploy
 
 ```bash
-cp .env.production.example .env
-nano .env
-```
-
-Điền các giá trị bắt buộc:
-
-```bash
-DOMAIN=task.example.com         # đúng domain bạn đã trỏ DNS
-DB_PASSWORD=$(openssl rand -base64 24)
-JWT_SECRET=$(openssl rand -base64 48)
-ADMIN_PASSWORD=<mật khẩu mạnh>
-GEMINI_API_KEY=AIza...          # tùy chọn, lấy free tại aistudio.google.com/apikey
-```
-
-Tip — tự gen secrets nhanh:
-```bash
-echo "DB_PASSWORD=$(openssl rand -base64 24)" >> .env
-echo "JWT_SECRET=$(openssl rand -base64 48)" >> .env
-```
-
-## Bước 6 — Khởi động stack
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
-
-Lần đầu sẽ build image (~5-10 phút). Sau đó:
-- Caddy tự xin Let's Encrypt cert qua HTTP-01 challenge (cần port 80 mở)
-- Backend boot ~30s rồi seed admin account
-
-## Bước 7 — Verify
-
-```bash
-# Xem log từng service
-docker compose logs -f caddy
-docker compose logs -f backend
-docker compose logs -f postgres
-
-# Health check
-curl https://task.example.com/api/auth/login -X POST \
+curl https://<backend-url>/api/auth/login -X POST \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@example.com","password":"<ADMIN_PASSWORD>"}'
+  -d '{"email":"admin@example.com","password":"<ADMIN_PASSWORD của bạn>"}'
 ```
 
-Nếu trả về JWT token → deploy thành công.
-
-Mở browser tại `https://task.example.com` → thấy trang Login.
-
-## Cập nhật khi có code mới
-
-```bash
-cd /opt/taskhub
-git pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
-
-## Backup database
-
-```bash
-# Dump
-docker compose exec postgres pg_dump -U postgres task_management_db > backup_$(date +%F).sql
-
-# Restore
-cat backup.sql | docker compose exec -T postgres psql -U postgres task_management_db
-```
+Trả về JWT token → backend chạy đúng. Sau đó mở URL frontend, kiểm tra đăng nhập được và gọi API không bị lỗi CORS.
 
 ## Troubleshoot
 
 | Triệu chứng | Nguyên nhân thường gặp |
 |---|---|
-| Caddy không có cert | DNS chưa trỏ đúng / port 80 bị chặn |
-| Backend crash on boot | Thiếu env var `JWT_SECRET` hoặc `ADMIN_PASSWORD` |
-| 502 Bad Gateway | Backend chưa boot xong (chờ ~30s) hoặc crash — `docker compose logs backend` |
-| CORS error trong browser | `DOMAIN` trong `.env` không khớp với URL truy cập |
-| AI suggestion 422 | `GEMINI_API_KEY` chưa set |
-
-## Tắt stack
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml down
-
-# Xóa luôn volume (cẩn thận — mất data!)
-docker compose -f docker-compose.yml -f docker-compose.prod.yml down -v
-```
+| Backend crash lúc start | Thiếu `JWT_SECRET` hoặc `ADMIN_PASSWORD` |
+| Frontend gọi API bị lỗi CORS | `CORS_ORIGINS` chưa khớp domain frontend thật |
+| AI suggestion trả 422 | `GEMINI_API_KEY` chưa set |
+| Request đầu tiên chậm 30-60s | Bình thường với free tier có cold start (Render) — nâng cấp gói trả phí mới hết |
+| Mất toàn bộ dữ liệu sau ~1 tháng | Dùng Postgres free của Render (tự xoá sau 30 ngày) — chuyển sang Neon/Supabase |
