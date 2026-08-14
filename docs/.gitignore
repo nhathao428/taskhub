@@ -1,0 +1,22 @@
+# Script dung-mot-lan de dung file bao cao/slide cua do an co so (thang 6/2026).
+# Da bo khoi git (8/2026) vi khong con dung nua va lam ron repo — ban goc van con
+# trong lich su git (`git log --all --full-history -- docs/<ten_file>`) va van con
+# tren may local, chi la khong day len GitHub nua.
+add_screenshots.py
+animate_pptx_10.ps1
+build_*.py
+capture_*.py
+convert_svg_to_pptx.py
+cover/make_*.py
+edit_demo_video.py
+fill_page_numbers.py
+fix_*.py
+insert_auto_toc.py
+record_*.py
+replace_*.py
+resize_logos.py
+restructure_*.py
+sort_refs.py
+trim_*.py
+uml/build_mdj.py
+update_*.py
