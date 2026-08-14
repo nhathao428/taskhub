@@ -1,3 +1,23 @@
+# ===================================================================
+# San pham DO AN CO SO (da nop xong 6/2026) - da bo khoi git 8/2026 vi chuyen
+# sang lam do an chuyen nganh. File goc VAN CON tren may local va trong lich su
+# git (`git log --all --full-history -- docs/<ten_file>`), chi la khong day len
+# GitHub nua (docs/ truoc do nang ~82MB, gio con ~1.8MB).
+# ===================================================================
+BAO_CAO_DO_AN_CO_SO.*
+THUYET_TRINH_DO_AN*.pptx
+demo_poster.png
+test_cover.png
+preview_*.png
+brochure/
+cover/
+ppt-project/
+recording/
+screenshots/
+uml/_crop*.png
+uml/_shot.png
+
+# -------------------------------------------------------------------
 # Script dung-mot-lan de dung file bao cao/slide cua do an co so (thang 6/2026).
 # Da bo khoi git (8/2026) vi khong con dung nua va lam ron repo — ban goc van con
 # trong lich su git (`git log --all --full-history -- docs/<ten_file>`) va van con
