@@ -10,7 +10,9 @@ Tài liệu này chứa các sơ đồ Use Case, Class Diagram, Sequence và Act
 
 ### 1.1. Use Case tổng thể
 
-Sơ đồ tổng thể gồm 14 use case chia thành 5 nhóm chức năng (Xác thực, Nhân viên & Dự án, Công việc & Chấm công, AI Gợi ý, Quản trị). Ba actor là EMPLOYEE → MANAGER → ADMIN có quan hệ kế thừa (generalization): vai trò cấp trên kế thừa mọi use case của vai trò cấp dưới.
+Sơ đồ tổng thể gồm 17 use case chia thành 5 nhóm chức năng (Xác thực, Nhân viên & Dự án, Công việc & Chấm công, AI Gợi ý, Quản trị). Ba actor là EMPLOYEE → MANAGER → ADMIN có quan hệ kế thừa (generalization): vai trò cấp trên kế thừa mọi use case của vai trò cấp dưới.
+
+> Cập nhật 8/2026 (đồ án chuyên ngành): bổ sung UC-15, UC-16, UC-17 cho module nhận diện khuôn mặt.
 
 ```mermaid
 flowchart LR
@@ -27,6 +29,8 @@ flowchart LR
       UC06(["UC-06 Xem công việc của tôi"])
       UC07(["UC-07 Cập nhật trạng thái"])
       UC09(["UC-09 Chấm công vào/ra"])
+      UC15(["UC-15 Đăng ký khuôn mặt"])
+      UC16(["UC-16 Chấm công bằng khuôn mặt"])
     end
     subgraph P2["Nghiệp vụ Quản lý & Quản trị"]
       UC04(["UC-04 Quản lý nhân viên"])
@@ -37,11 +41,14 @@ flowchart LR
       UC12(["UC-12 Phân quyền tài khoản"])
       UC13(["UC-13 Xem logs hệ thống"])
       UC14(["UC-14 Quản lý cấu hình"])
+      UC17(["UC-17 Đối chiếu ảnh chấm công nghi vấn"])
     end
   end
-  User --> UC01 & UC02 & UC03 & UC06 & UC07 & UC09
-  Manager --> UC04 & UC05 & UC08 & UC10 & UC11
+  User --> UC01 & UC02 & UC03 & UC06 & UC07 & UC09 & UC15 & UC16
+  Manager --> UC04 & UC05 & UC08 & UC10 & UC11 & UC17
   Admin --> UC12 & UC13 & UC14
+  UC16 -. «extend» .-> UC09
+  UC16 -. «include» .-> UC15
 ```
 
 ### 1.2. Use Case — Xác thực
@@ -85,6 +92,38 @@ flowchart LR
   Mgr --> UC_Rep & UC_Exp & UC_My
   UC_Rep -. «extend» .-> UC_Exp
 ```
+
+### 1.3.b. Use Case — Nhận diện khuôn mặt (đồ án chuyên ngành)
+
+Module bổ sung 8/2026. Nhân viên tự đăng ký khuôn mặt của **chính mình** (không ai đăng ký hộ được, tránh dựng sẵn khuôn mặt giả cho tài khoản người khác), sau đó check-in kèm ảnh. Hệ thống kiểm tra **chống giả mạo trước**, chỉ khi qua mới so khớp danh tính — nếu là ảnh in hoặc ảnh trên điện thoại thì dừng ngay, không tốn bước so khớp.
+
+Ảnh **chỉ được lưu khi lần check-in bị nghi vấn**, để quản lý đối chiếu bằng mắt rồi quyết định duyệt hay từ chối. Check-in hợp lệ không lưu ảnh.
+
+```mermaid
+flowchart LR
+  Emp["Nhân viên"]
+  Mgr["Quản lý"]
+  Mgr -. kế thừa .-> Emp
+  subgraph SYS["Module Nhận diện khuôn mặt"]
+    UC_Enroll(["UC-15 Đăng ký khuôn mặt<br/>(3-5 ảnh)"])
+    UC_FaceIn(["UC-16 Chấm công bằng khuôn mặt"])
+    UC_Live(["Kiểm tra chống giả mạo<br/>(phát hiện chớp mắt)"])
+    UC_Match(["So khớp 1:1<br/>(cosine similarity)"])
+    UC_Del(["Xoá dữ liệu khuôn mặt của tôi"])
+    UC_Review(["UC-17 Đối chiếu ảnh nghi vấn"])
+  end
+  Emp --> UC_Enroll & UC_FaceIn & UC_Del
+  Mgr --> UC_Review
+  UC_FaceIn -. «include» .-> UC_Live
+  UC_FaceIn -. «include» .-> UC_Match
+  UC_Review -. «extend» .-> UC_FaceIn
+```
+
+| Use case | Điều kiện tiên quyết | Kết quả |
+|---|---|---|
+| UC-15 Đăng ký khuôn mặt | Đã đăng nhập; service AI đang chạy | Lưu embedding trung bình đã mã hoá vào `employee_faces` |
+| UC-16 Chấm công bằng khuôn mặt | Đã đăng ký khuôn mặt | Khớp + qua liveness → `APPROVED`; ngược lại → `PENDING_REVIEW` |
+| UC-17 Đối chiếu ảnh nghi vấn | Có bản ghi bị nghi vấn, chưa quá hạn lưu | Quản lý xem ảnh rồi duyệt / từ chối |
 
 ### 1.4. Use Case — Quản lý Dự án & Công việc
 
@@ -139,7 +178,9 @@ flowchart LR
 
 ### 2.1. Sơ đồ lớp Entity (Domain Model)
 
-6 entity chính: `User`, `Employee`, `Project`, `Task`, `Attendance`, `Suggestion`. `User` 1:0..1 `Employee`. `Employee` quản lý nhiều `Project`, được gán nhiều `Task`, có nhiều bản ghi `Attendance`.
+8 entity: `User`, `Employee`, `Project`, `Task`, `Attendance`, `Suggestion`, cùng 2 entity của module nhận diện khuôn mặt là `EmployeeFace` và `AttendanceFaceCapture`. `User` 1:0..1 `Employee`. `Employee` quản lý nhiều `Project`, được gán nhiều `Task`, có nhiều bản ghi `Attendance`, và tối đa **một** bản ghi `EmployeeFace` (đăng ký lại thì ghi đè).
+
+> Lưu ý thiết kế: dữ liệu sinh trắc học tách riêng khỏi `Employee` chứ không nhét thêm cột. Lý do: dễ áp quyền truy cập riêng, dễ xoá độc lập khi nhân viên rút lại đồng ý, và không làm mọi truy vấn nhân viên thông thường kéo theo dữ liệu nhạy cảm.
 
 ```mermaid
 classDiagram
@@ -195,13 +236,40 @@ classDiagram
     -String taskTitle
     -LocalDateTime createdAt
   }
+  class EmployeeFace {
+    -Long employeeFaceId
+    -String embeddingEncrypted
+    -int sampleCount
+    -LocalDateTime enrolledAt
+    -LocalDateTime updatedAt
+  }
+  class AttendanceFaceCapture {
+    -Long captureId
+    -String imageEncrypted
+    -String reason
+    -LocalDateTime capturedAt
+    -LocalDateTime expiresAt
+  }
   User "1" -- "0..1" Employee : owns
   Employee "1" -- "0..*" Task : assignedTo
   Employee "1" -- "0..*" Attendance : has
   Employee "1" -- "0..*" Project : manages
   Project "1" -- "0..*" Task : contains
   User "1" -- "0..*" Suggestion : creates
+  Employee "1" -- "0..1" EmployeeFace : enrolls
+  Attendance "1" -- "0..1" AttendanceFaceCapture : evidence
 ```
+
+**Ghi chú về 2 entity sinh trắc học:**
+
+| | `EmployeeFace` | `AttendanceFaceCapture` |
+|---|---|---|
+| Lưu gì | Vector 512 chiều (embedding), **không lưu ảnh** | Ảnh JPEG lúc check-in |
+| Khi nào tạo | Khi nhân viên đăng ký khuôn mặt | **Chỉ khi** check-in bị nghi vấn |
+| Mã hoá | AES-256-GCM | AES-256-GCM (cùng khoá) |
+| Vòng đời | Đến khi nhân viên xoá hoặc nghỉ việc | Tự xoá sau hạn lưu (mặc định 30 ngày) |
+
+Vì sao embedding **mã hoá hai chiều** chứ không **hash một chiều** như mật khẩu: xác thực khuôn mặt phải tính khoảng cách cosine giữa hai vector, nên bắt buộc đọc lại được giá trị gốc. Đây là khác biệt căn bản giữa bảo vệ mật khẩu và bảo vệ dữ liệu sinh trắc học — và cũng là lý do dữ liệu sinh trắc học nguy hiểm hơn khi rò rỉ: mật khẩu đổi được, khuôn mặt thì không.
 
 ### 2.2. Sơ đồ lớp Kiến trúc (Controller / Service / Repository)
 
@@ -411,6 +479,66 @@ sequenceDiagram
     AC-->>Emp: 200 OK {attendance}
   end
 ```
+
+### 3.2.b. Chấm công bằng khuôn mặt (đồ án chuyên ngành)
+
+Luồng đầy đủ khi nhân viên check-in kèm ảnh. Ba điểm đáng chú ý trong thiết kế:
+
+1. **Chống giả mạo chạy trước so khớp** — ảnh in / video phát lại bị chặn sớm, không tốn bước so khớp danh tính.
+2. **So khớp làm ở Java, không ở Python** — service Python stateless chỉ trả vector; embedding đã đăng ký không rời khỏi backend, nên dữ liệu sinh trắc học chỉ nằm một nơi.
+3. **Không bao giờ chặn cứng nhân viên** — mọi trường hợp sai đều thành `PENDING_REVIEW` để quản lý duyệt, vì nhận diện còn sai do ánh sáng/khẩu trang/camera kém.
+
+```mermaid
+sequenceDiagram
+  actor Emp as Nhân viên
+  participant FE as Web (FaceCapture)
+  participant AC as AttendanceController
+  participant AS as AttendanceService
+  participant FS as FaceRecognitionService
+  participant PY as Python AI Service
+  participant BC as BiometricCrypto
+  participant DB as PostgreSQL
+
+  Emp->>FE: Bấm "Chụp & vào ca"
+  FE->>FE: Lấy 1 ảnh + 8 khung hình liên tiếp
+  FE->>AC: POST /me/checkin {lat, lng, faceImage, livenessFrames}
+  AC->>AS: checkInSelf(auth, req)
+  AS->>AS: applyLocation() — tính khoảng cách geofence
+
+  AS->>FS: checkLiveness(frames)
+  FS->>PY: POST /liveness
+  PY-->>FS: {live: true/false}
+  alt không phát hiện chớp mắt
+    FS-->>AS: false
+    AS->>DB: INSERT (PENDING_REVIEW, livenessPassed=false)
+    AS->>FS: saveSuspiciousCapture(LIVENESS_FAILED)
+    FS->>BC: encryptBytes(ảnh)
+    FS->>DB: INSERT attendance_face_captures (hết hạn sau 30 ngày)
+    AS-->>Emp: 201 PENDING_REVIEW "nghi dùng ảnh/video"
+  else có chớp mắt
+    FS-->>AS: true
+    AS->>FS: verify(employee, faceImage)
+    FS->>PY: POST /embed
+    PY-->>FS: embedding[512]
+    FS->>DB: SELECT employee_faces WHERE employee_id=?
+    FS->>BC: decrypt(embedding đã đăng ký)
+    FS->>FS: cosineSimilarity(mới, đã đăng ký)
+    alt similarity >= ngưỡng (0.65)
+      FS-->>AS: {matched: true, similarity}
+      AS->>DB: INSERT (APPROVED, faceVerified=true)
+      Note over AS,DB: KHÔNG lưu ảnh — lần hợp lệ không cần bằng chứng
+      AS-->>Emp: 201 APPROVED
+    else similarity < ngưỡng
+      FS-->>AS: {matched: false, similarity}
+      AS->>DB: INSERT (PENDING_REVIEW, faceVerified=false)
+      AS->>FS: saveSuspiciousCapture(FACE_MISMATCH)
+      FS->>DB: INSERT ảnh đã mã hoá
+      AS-->>Emp: 201 PENDING_REVIEW "khuôn mặt không khớp"
+    end
+  end
+```
+
+> Trường hợp service Python không chạy: `FaceRecognitionService` ném `BusinessException`, `AttendanceService` bắt lại và vẫn ghi nhận chấm công ở trạng thái `PENDING_REVIEW` — sự cố hạ tầng không được phép khiến nhân viên mất công chấm.
 
 ### 3.3. AI Gợi ý Nhân viên
 
