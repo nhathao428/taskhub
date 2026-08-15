@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,8 +23,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
+/**
+ * @EnableMethodSecurity: bật để các annotation @PreAuthorize trên controller thực sự có
+ * hiệu lực. Trước đây dự án chỉ phân quyền theo URL ở đây, nên @PreAuthorize viết trong
+ * FaceController bị Spring bỏ qua ÂM THẦM — test phát hiện nhân viên thường vẫn gọi được
+ * endpoint dành cho quản lý. Giờ có 2 lớp: rule theo URL bên dưới (lớp chính) và
+ * annotation ở controller (lớp thứ hai, phòng khi ai đó thêm endpoint mà quên khai báo URL).
+ */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -97,6 +106,18 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/attendance/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkin").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/attendance/me/checkout").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+
+                // Nhận diện khuôn mặt. THỨ TỰ QUAN TRỌNG: các rule /me và /capture phải đứng
+                // TRƯỚC "/api/face/**", vì Spring Security khớp theo thứ tự khai báo — đặt sau
+                // thì rule rộng hơn sẽ nuốt mất.
+                // Nhân viên chỉ thao tác trên khuôn mặt của CHÍNH MÌNH (/me).
+                .requestMatchers(HttpMethod.GET, "/api/face/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/face/me/enroll").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/face/me").hasAnyRole("EMPLOYEE", "MANAGER", "ADMIN")
+                // Ảnh check-in nghi vấn là dữ liệu sinh trắc học của NGƯỜI KHÁC -> chỉ quản lý.
+                .requestMatchers(HttpMethod.GET, "/api/face/capture/**").hasAnyRole("MANAGER", "ADMIN")
+                // Xoá đăng ký của nhân viên bất kỳ -> chỉ quản lý.
+                .requestMatchers(HttpMethod.DELETE, "/api/face/**").hasAnyRole("MANAGER", "ADMIN")
 
                 // Office locations: mọi user xem được (cần để hiển thị bản đồ check-in);
                 // chỉ MANAGER/ADMIN sửa.

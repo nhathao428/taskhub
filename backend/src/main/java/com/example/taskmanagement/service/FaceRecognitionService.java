@@ -1,8 +1,11 @@
 package com.example.taskmanagement.service;
 
+import com.example.taskmanagement.entity.Attendance;
+import com.example.taskmanagement.entity.AttendanceFaceCapture;
 import com.example.taskmanagement.entity.Employee;
 import com.example.taskmanagement.entity.EmployeeFace;
 import com.example.taskmanagement.exception.BusinessException;
+import com.example.taskmanagement.repository.AttendanceFaceCaptureRepository;
 import com.example.taskmanagement.repository.EmployeeFaceRepository;
 import com.example.taskmanagement.security.BiometricCrypto;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +44,7 @@ public class FaceRecognitionService {
     private static final Logger log = LoggerFactory.getLogger(FaceRecognitionService.class);
 
     private final EmployeeFaceRepository faceRepository;
+    private final AttendanceFaceCaptureRepository captureRepository;
     private final BiometricCrypto crypto;
     private final RestClient restClient;
 
@@ -60,8 +65,18 @@ public class FaceRecognitionService {
     @Value("${app.face.require-liveness:true}")
     private boolean requireLiveness;
 
-    public FaceRecognitionService(EmployeeFaceRepository faceRepository, BiometricCrypto crypto) {
+    /**
+     * Số ngày giữ ảnh check-in bị nghi vấn trước khi job dọn dẹp xoá.
+     * Đặt 0 = KHÔNG lưu ảnh nào cả (chỉ giữ kết quả true/false + độ tương đồng).
+     */
+    @Value("${app.face.capture-retention-days:30}")
+    private int captureRetentionDays;
+
+    public FaceRecognitionService(EmployeeFaceRepository faceRepository,
+                                  AttendanceFaceCaptureRepository captureRepository,
+                                  BiometricCrypto crypto) {
         this.faceRepository = faceRepository;
+        this.captureRepository = captureRepository;
         this.crypto = crypto;
         this.restClient = RestClient.create();
     }
@@ -198,6 +213,74 @@ public class FaceRecognitionService {
 
     public boolean isLivenessRequired() {
         return requireLiveness;
+    }
+
+    public int getCaptureRetentionDays() {
+        return captureRetentionDays;
+    }
+
+    // ------------------------------------------------------------------
+    // Lưu ảnh của lần check-in bị nghi vấn (để quản lý đối chiếu bằng mắt)
+    // ------------------------------------------------------------------
+
+    /** Lý do một ảnh được giữ lại. */
+    public enum CaptureReason { FACE_MISMATCH, LIVENESS_FAILED }
+
+    /**
+     * Lưu ảnh check-in kèm mã hoá — CHỈ gọi khi lần check-in đó bị nghi vấn.
+     * Check-in hợp lệ không gọi hàm này, nên không tích luỹ ảnh của người dùng bình thường.
+     * Hết hạn lưu (app.face.capture-retention-days) sẽ bị FaceCaptureCleanupJob xoá.
+     */
+    @Transactional
+    public void saveSuspiciousCapture(Attendance attendance, String imageBase64, CaptureReason reason) {
+        if (captureRetentionDays <= 0) {
+            return; // chính sách: không lưu ảnh
+        }
+        if (imageBase64 == null || imageBase64.isBlank() || !crypto.isConfigured()) {
+            return;
+        }
+        try {
+            byte[] imageBytes = decodeImage(imageBase64);
+            AttendanceFaceCapture capture = captureRepository
+                    .findByAttendanceAttendanceId(attendance.getAttendanceId())
+                    .orElseGet(AttendanceFaceCapture::new);
+            capture.setAttendance(attendance);
+            capture.setImageEncrypted(crypto.encryptBytes(imageBytes));
+            capture.setReason(reason.name());
+            capture.setCapturedAt(LocalDateTime.now());
+            capture.setExpiresAt(LocalDateTime.now().plusDays(captureRetentionDays));
+            captureRepository.save(capture);
+            log.info("Đã lưu ảnh check-in nghi vấn (attendanceId={}, lý do={}, xoá sau {} ngày)",
+                    attendance.getAttendanceId(), reason, captureRetentionDays);
+        } catch (Exception e) {
+            // Không để việc lưu ảnh làm hỏng luồng chấm công.
+            log.warn("Không lưu được ảnh check-in nghi vấn (attendanceId={}): {}",
+                    attendance.getAttendanceId(), e.getMessage());
+        }
+    }
+
+    /** Ảnh đã giải mã để quản lý xem — chỉ gọi từ endpoint có kiểm tra quyền. */
+    @Transactional(readOnly = true)
+    public byte[] getCaptureImage(Long attendanceId) {
+        requireEnabled();
+        AttendanceFaceCapture capture = captureRepository.findByAttendanceAttendanceId(attendanceId)
+                .orElseThrow(() -> new BusinessException(
+                        "Không có ảnh lưu cho lần chấm công này. Chỉ những lần bị nghi vấn mới lưu ảnh, "
+                                + "và ảnh sẽ tự xoá sau " + captureRetentionDays + " ngày."));
+        if (capture.getExpiresAt() != null && capture.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("Ảnh đã quá hạn lưu trữ và sẽ được xoá trong đợt dọn dẹp tới.");
+        }
+        return crypto.decryptBytes(capture.getImageEncrypted());
+    }
+
+    /** Bỏ tiền tố data URI nếu có rồi decode base64 về bytes. */
+    private static byte[] decodeImage(String imageBase64) {
+        String raw = imageBase64.trim();
+        int comma = raw.indexOf(',');
+        if (raw.startsWith("data:") && comma > 0) {
+            raw = raw.substring(comma + 1);
+        }
+        return Base64.getDecoder().decode(raw);
     }
 
     public double getThreshold() {

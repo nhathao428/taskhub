@@ -128,8 +128,15 @@ public class AttendanceService {
         a.setDate(LocalDate.now());
         a.setCheckIn(java.time.LocalTime.now());
         applyLocation(a, loc);
-        applyFaceRecognition(a, me, loc);
-        return attendanceRepository.save(a);
+        FaceRecognitionService.CaptureReason suspicious = applyFaceRecognition(a, me, loc);
+
+        Attendance saved = attendanceRepository.save(a);
+
+        // Lưu ảnh SAU khi đã persist để có attendanceId, và CHỈ khi lần này bị nghi vấn.
+        if (suspicious != null) {
+            faceRecognitionService.saveSuspiciousCapture(saved, loc.faceImageBase64(), suspicious);
+        }
+        return saved;
     }
 
     /**
@@ -149,13 +156,14 @@ public class AttendanceService {
      * Đẩy sang cho quản lý duyệt vừa giữ được bằng chứng nghi vấn, vừa không khoá người dùng.
      * Cách này cũng đồng nhất với cách hệ thống đang xử lý check-in ngoài bán kính văn phòng.
      */
-    private void applyFaceRecognition(Attendance a, Employee me, CheckInLocationRequest loc) {
+    private FaceRecognitionService.CaptureReason applyFaceRecognition(
+            Attendance a, Employee me, CheckInLocationRequest loc) {
         if (loc == null || loc.faceImageBase64() == null || loc.faceImageBase64().isBlank()) {
-            return; // không dùng nhận diện khuôn mặt cho lần check-in này
+            return null; // không dùng nhận diện khuôn mặt cho lần check-in này
         }
         if (!faceRecognitionService.isEnabled()) {
             log.warn("Client gửi ảnh khuôn mặt nhưng tính năng chưa bật (thiếu BIOMETRIC_KEY) — bỏ qua.");
-            return;
+            return null;
         }
 
         try {
@@ -166,7 +174,7 @@ public class AttendanceService {
                 if (!live) {
                     a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
                     log.warn("Check-in của employeeId={} không qua kiểm tra chống giả mạo", me.getEmployeeId());
-                    return;
+                    return FaceRecognitionService.CaptureReason.LIVENESS_FAILED;
                 }
             } else if (faceRecognitionService.isLivenessRequired()) {
                 // Bắt buộc liveness nhưng client không gửi đủ khung hình.
@@ -174,7 +182,7 @@ public class AttendanceService {
                 a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
                 log.warn("Check-in của employeeId={} thiếu khung hình cho kiểm tra chống giả mạo",
                         me.getEmployeeId());
-                return;
+                return FaceRecognitionService.CaptureReason.LIVENESS_FAILED;
             }
 
             // 2. So khớp khuôn mặt với embedding đã đăng ký của chính nhân viên này.
@@ -187,7 +195,9 @@ public class AttendanceService {
                 a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
                 log.warn("Check-in của employeeId={} không khớp khuôn mặt (similarity={})",
                         me.getEmployeeId(), String.format("%.3f", result.similarity()));
+                return FaceRecognitionService.CaptureReason.FACE_MISMATCH;
             }
+            return null; // khớp mặt + qua liveness -> không lưu ảnh
         } catch (BusinessException e) {
             // Service Python chưa chạy, chưa đăng ký khuôn mặt, ảnh hỏng... — không chặn
             // nhân viên chấm công, chỉ đánh dấu để quản lý xem lại.
@@ -195,6 +205,8 @@ public class AttendanceService {
             a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
             log.warn("Không xác thực được khuôn mặt cho employeeId={}: {}",
                     me.getEmployeeId(), e.getMessage());
+            // Không lưu ảnh khi lỗi hệ thống — lỗi hạ tầng không phải bằng chứng gian lận.
+            return null;
         }
     }
 

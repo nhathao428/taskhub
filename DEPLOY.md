@@ -140,6 +140,8 @@ Nên set (không bắt buộc nhưng cần cho production thật):
 | `FACE_SERVICE_URL` | `http://127.0.0.1:8000` | URL service Python (`ml/face-recognition/api_service.py`). Xem cảnh báo RAM bên dưới |
 | `FACE_THRESHOLD` | `0.65` | Ngưỡng cosine similarity coi là cùng người. Chỉnh sau khi chạy `evaluate.py` trên dữ liệu thật |
 | `FACE_REQUIRE_LIVENESS` | `true` | Bắt buộc phát hiện chớp mắt mới cho check-in; thiếu khung hình sẽ bị đẩy sang PENDING_REVIEW |
+| `FACE_CAPTURE_RETENTION_DAYS` | `30` | Số ngày giữ ảnh của lần check-in **bị nghi vấn** để quản lý đối chiếu. Check-in hợp lệ không lưu ảnh. Ảnh mã hoá, tự xoá khi hết hạn. Đặt `0` = không lưu ảnh nào |
+| `FACE_CLEANUP_CRON` | `0 0 3 * * *` | Lịch chạy job xoá ảnh quá hạn (mặc định 03:00 hằng ngày) |
 
 > **Nhận diện khuôn mặt KHÔNG deploy được trên free tier.** Service Python cần PyTorch +
 > model FaceNet, chiếm khoảng **1–2GB RAM**, trong khi Render free chỉ có 512MB. Trên bản

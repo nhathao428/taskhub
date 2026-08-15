@@ -8,7 +8,9 @@ import com.example.taskmanagement.entity.EmployeeFace;
 import com.example.taskmanagement.service.CurrentUserService;
 import com.example.taskmanagement.service.FaceRecognitionService;
 import jakarta.validation.Valid;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -76,5 +78,24 @@ public class FaceController {
     public ResponseEntity<ApiResponse<String>> deleteEmployeeFace(@PathVariable Long employeeId) {
         faceService.deleteEnrollment(employeeId);
         return ResponseEntity.ok(ApiResponse.ok("Đã xoá dữ liệu khuôn mặt của nhân viên " + employeeId));
+    }
+
+    /**
+     * Ảnh của lần check-in BỊ NGHI VẤN, để quản lý nhìn và tự phán đoán đúng/sai người.
+     *
+     * Chỉ ADMIN/MANAGER xem được. Chỉ tồn tại với lần check-in không khớp mặt hoặc trượt
+     * liveness — lần hợp lệ không lưu ảnh. Ảnh tự xoá sau app.face.capture-retention-days.
+     *
+     * Trả về ảnh nhị phân trực tiếp (không phải JSON) để frontend gắn thẳng vào thẻ img.
+     */
+    @GetMapping("/capture/{attendanceId}")
+    @PreAuthorize("hasAnyRole('ADMIN','MANAGER')")
+    public ResponseEntity<byte[]> getCapture(@PathVariable Long attendanceId) {
+        byte[] image = faceService.getCaptureImage(attendanceId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                // Ảnh sinh trắc học: cấm cache ở trình duyệt/proxy trung gian.
+                .cacheControl(CacheControl.noStore())
+                .body(image);
     }
 }

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import api from '../api/axios'
-import { MdLogin, MdLogout, MdMyLocation, MdWarning, MdCheckCircle } from 'react-icons/md'
+import { MdLogin, MdLogout, MdMyLocation, MdWarning, MdCheckCircle, MdFace, MdDelete } from 'react-icons/md'
 import OfficeMap from '../components/OfficeMap'
+import FaceCapture from '../components/FaceCapture'
 import { useTranslation } from '../context/LanguageContext'
 import { EmptyState } from '../components/Illustrations'
 
@@ -37,6 +38,35 @@ function reviewBadge(status, t) {
   return <span className="text-slate-400 text-xs">-</span>
 }
 
+/** Hiển thị kết quả nhận diện khuôn mặt của một lần chấm công. */
+function faceBadge(record, t) {
+  const { faceVerified, faceSimilarity, livenessPassed } = record
+  // Lần check-in không dùng khuôn mặt -> cả 3 trường đều null
+  if (faceVerified == null && livenessPassed == null) {
+    return <span className="text-slate-400 text-xs">-</span>
+  }
+  if (livenessPassed === false) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-rose-100 text-rose-700">
+        <MdWarning /> {t('Nghi giả mạo')}
+      </span>
+    )
+  }
+  if (faceVerified === true) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-emerald-100 text-emerald-700">
+        <MdCheckCircle /> {faceSimilarity != null ? faceSimilarity.toFixed(2) : t('Khớp')}
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-100 text-amber-700">
+      <MdWarning /> {t('Không khớp')}
+      {faceSimilarity != null && ` (${faceSimilarity.toFixed(2)})`}
+    </span>
+  )
+}
+
 export default function MyAttendance() {
   const { t, lang } = useTranslation()
   const [records, setRecords] = useState([])
@@ -48,6 +78,25 @@ export default function MyAttendance() {
   const [position, setPosition] = useState(null) // [lat, lng]
   const [posError, setPosError] = useState('')
   const [posLoading, setPosLoading] = useState(false)
+
+  // --- Nhận diện khuôn mặt ---
+  // faceStatus.featureEnabled = backend có bật tính năng không (phụ thuộc BIOMETRIC_KEY).
+  // Nếu tắt, toàn bộ phần khuôn mặt bị ẩn và check-in chạy bằng GPS như cũ.
+  const [faceStatus, setFaceStatus] = useState(null)
+  const [showEnroll, setShowEnroll] = useState(false)
+  const [enrollShots, setEnrollShots] = useState([])
+  const [faceMessage, setFaceMessage] = useState('')
+  const [useFaceForCheckIn, setUseFaceForCheckIn] = useState(true)
+
+  const loadFaceStatus = async () => {
+    try {
+      const res = await api.get('/api/face/me')
+      setFaceStatus(res.data?.data || null)
+    } catch {
+      // Backend cũ chưa có endpoint này -> coi như tắt tính năng, không báo lỗi ồn ào.
+      setFaceStatus(null)
+    }
+  }
 
   const load = async () => {
     try {
@@ -66,7 +115,7 @@ export default function MyAttendance() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load(); loadFaceStatus() }, [])
 
   const requestLocation = () => {
     setPosError(''); setPosLoading(true)
@@ -113,16 +162,36 @@ export default function MyAttendance() {
     return { ...best, within: best.distance <= (best.office.radiusMeters || 100) }
   }, [position, offices])
 
-  const sendCheckIn = async (path, label) => {
+  /**
+   * Gửi check-in / check-out.
+   * face = { image, frames } nếu có dùng nhận diện khuôn mặt, ngược lại null.
+   */
+  const sendCheckIn = async (path, label, face = null) => {
     setBusy(true); setMessage('')
     try {
-      const body = position
-        ? { latitude: position[0], longitude: position[1], isMocked: false }
-        : null
-      const res = await api.post(path, body)
-      const reviewStatus = res.data?.data?.reviewStatus
+      const body = {}
+      if (position) {
+        body.latitude = position[0]
+        body.longitude = position[1]
+        body.isMocked = false
+      }
+      if (face?.image) {
+        body.faceImageBase64 = face.image
+        if (face.frames?.length) body.livenessFramesBase64 = face.frames
+      }
+      const res = await api.post(path, Object.keys(body).length ? body : null)
+      const data = res.data?.data
+      const reviewStatus = data?.reviewStatus
+
       if (reviewStatus === 'PENDING_REVIEW') {
-        setMessage(t('{label} thành công nhưng vị trí ngoài vùng cho phép – đã chuyển sang chờ duyệt.', { label }))
+        // Nói rõ LÝ DO bị chuyển chờ duyệt thay vì thông báo chung chung.
+        let reason = t('vị trí ngoài vùng cho phép')
+        if (data?.livenessPassed === false) {
+          reason = t('không phát hiện được chớp mắt (nghi dùng ảnh/video)')
+        } else if (data?.faceVerified === false) {
+          reason = t('khuôn mặt không khớp với người đã đăng ký')
+        }
+        setMessage(t('{label} đã ghi nhận nhưng chuyển sang chờ duyệt: ', { label }) + reason + '.')
       } else {
         setMessage(t('{label} thành công.', { label }))
       }
@@ -132,8 +201,47 @@ export default function MyAttendance() {
     } finally { setBusy(false) }
   }
 
-  const checkIn = () => sendCheckIn('/api/attendance/me/checkin', t('Chấm công vào'))
+  const faceEnabled = !!faceStatus?.featureEnabled
+  const faceEnrolled = !!faceStatus?.enrolled
+  // Chỉ dùng khuôn mặt khi backend bật + đã đăng ký + người dùng không tắt đi.
+  const faceActive = faceEnabled && faceEnrolled && useFaceForCheckIn
+
+  const checkIn = (face = null) => sendCheckIn('/api/attendance/me/checkin', t('Chấm công vào'), face)
   const checkOut = () => sendCheckIn('/api/attendance/me/checkout', t('Chấm công ra'))
+
+  /** Chụp xong ở chế độ check-in -> gửi luôn kèm ảnh. */
+  const handleCheckInCapture = (image, frames) => checkIn({ image, frames })
+
+  /** Chụp xong ở chế độ đăng ký -> gom lại, đủ số ảnh thì bấm gửi. */
+  const handleEnrollCapture = (image) => {
+    setEnrollShots((prev) => (prev.length >= 5 ? prev : [...prev, image]))
+    setFaceMessage('')
+  }
+
+  const submitEnroll = async () => {
+    if (enrollShots.length === 0) return
+    setBusy(true); setFaceMessage('')
+    try {
+      const res = await api.post('/api/face/me/enroll', { imagesBase64: enrollShots })
+      setFaceMessage(res.data?.data?.message || t('Đăng ký khuôn mặt thành công.'))
+      setEnrollShots([])
+      setShowEnroll(false)
+      await loadFaceStatus()
+    } catch (err) {
+      setFaceMessage(err.response?.data?.message || t('Đăng ký khuôn mặt thất bại.'))
+    } finally { setBusy(false) }
+  }
+
+  const deleteMyFace = async () => {
+    setBusy(true); setFaceMessage('')
+    try {
+      await api.delete('/api/face/me')
+      setFaceMessage(t('Đã xoá dữ liệu khuôn mặt của bạn.'))
+      await loadFaceStatus()
+    } catch (err) {
+      setFaceMessage(err.response?.data?.message || t('Xoá thất bại.'))
+    } finally { setBusy(false) }
+  }
 
   return (
     <div>
@@ -188,14 +296,121 @@ export default function MyAttendance() {
             )}
           </div>
 
-          <button
-            onClick={checkIn}
-            disabled={busy}
-            className="flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-soft-md hover:shadow-soft-lg transition-shadow disabled:opacity-60"
-          >
-            <MdLogin className="text-2xl" />
-            <span>{t('Vào ca (Check-in)')}</span>
-          </button>
+          {/* Khối nhận diện khuôn mặt — chỉ hiện khi backend bật tính năng */}
+          {faceEnabled && (
+            <div className="bg-white rounded-2xl p-4 ring-1 ring-slate-200/70 shadow-soft">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-semibold text-slate-700 inline-flex items-center gap-1">
+                  <MdFace className="text-lg" /> {t('Khuôn mặt')}
+                </p>
+                {faceEnrolled ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-emerald-100 text-emerald-700">
+                    <MdCheckCircle /> {t('Đã đăng ký')}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-600">
+                    {t('Chưa đăng ký')}
+                  </span>
+                )}
+              </div>
+
+              {!faceEnrolled && (
+                <p className="text-xs text-slate-500 mb-2">
+                  {t('Đăng ký khuôn mặt để check-in an toàn hơn, tránh bị chấm công hộ.')}
+                </p>
+              )}
+
+              {faceEnrolled && (
+                <label className="flex items-center gap-2 text-xs text-slate-600 mb-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useFaceForCheckIn}
+                    onChange={(e) => setUseFaceForCheckIn(e.target.checked)}
+                    className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  {t('Dùng khuôn mặt khi check-in')}
+                </label>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setShowEnroll((v) => !v); setEnrollShots([]); setFaceMessage('') }}
+                  className="flex-1 text-xs px-2 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700"
+                >
+                  {showEnroll ? t('Đóng') : (faceEnrolled ? t('Đăng ký lại') : t('Đăng ký ngay'))}
+                </button>
+                {faceEnrolled && (
+                  <button
+                    type="button"
+                    onClick={deleteMyFace}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-600 disabled:opacity-50"
+                    title={t('Xoá dữ liệu khuôn mặt của bạn')}
+                  >
+                    <MdDelete /> {t('Xoá')}
+                  </button>
+                )}
+              </div>
+
+              {faceMessage && (
+                <p className="mt-2 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-md p-2">
+                  {faceMessage}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Đăng ký khuôn mặt: chụp 3-5 ảnh rồi gửi */}
+          {faceEnabled && showEnroll && (
+            <div className="bg-white rounded-2xl p-3 ring-1 ring-slate-200/70 shadow-soft">
+              <p className="text-xs text-slate-500 mb-2">
+                {t('Chụp 3-5 ảnh, mỗi ảnh đổi góc mặt hoặc ánh sáng một chút để nhận diện ổn định hơn.')}
+              </p>
+              <FaceCapture
+                onCapture={handleEnrollCapture}
+                busy={busy}
+                label={t('Chụp ảnh {n}/5', { n: enrollShots.length + 1 })}
+              />
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-xs text-slate-500">
+                  {t('Đã chụp: {n} ảnh', { n: enrollShots.length })}
+                </span>
+                <button
+                  type="button"
+                  onClick={submitEnroll}
+                  disabled={busy || enrollShots.length === 0}
+                  className="text-xs px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                >
+                  {t('Lưu đăng ký')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Check-in bằng khuôn mặt thay cho nút thường */}
+          {faceActive ? (
+            <div className="bg-white rounded-2xl p-3 ring-1 ring-slate-200/70 shadow-soft">
+              <p className="text-sm font-semibold text-slate-700 mb-2 inline-flex items-center gap-1">
+                <MdLogin /> {t('Vào ca bằng khuôn mặt')}
+              </p>
+              <FaceCapture
+                onCapture={handleCheckInCapture}
+                captureFrames={faceStatus?.livenessRequired ? 8 : 0}
+                busy={busy}
+                label={t('Chụp & vào ca')}
+              />
+            </div>
+          ) : (
+            <button
+              onClick={() => checkIn()}
+              disabled={busy}
+              className="flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-soft-md hover:shadow-soft-lg transition-shadow disabled:opacity-60"
+            >
+              <MdLogin className="text-2xl" />
+              <span>{t('Vào ca (Check-in)')}</span>
+            </button>
+          )}
           <button
             onClick={checkOut}
             disabled={busy}
@@ -228,13 +443,16 @@ export default function MyAttendance() {
                 <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Giờ ra')}</th>
                 <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Văn phòng')}</th>
                 <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Khoảng cách')}</th>
+                {faceEnabled && (
+                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Khuôn mặt')}</th>
+                )}
                 <th className="px-6 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-[0.12em]">{t('Trạng thái')}</th>
               </tr>
             </thead>
             <tbody>
               {records.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-4"><EmptyState text={t('Chưa có bản ghi chấm công nào.')} /></td>
+                  <td colSpan={faceEnabled ? 7 : 6} className="py-4"><EmptyState text={t('Chưa có bản ghi chấm công nào.')} /></td>
                 </tr>
               ) : (
                 records.map((r, idx) => (
@@ -246,6 +464,9 @@ export default function MyAttendance() {
                     <td className="px-6 py-4 text-slate-600">
                       {r.checkInDistanceMeters != null ? `${r.checkInDistanceMeters}m` : '-'}
                     </td>
+                    {faceEnabled && (
+                      <td className="px-6 py-4">{faceBadge(r, t)}</td>
+                    )}
                     <td className="px-6 py-4">{reviewBadge(r.reviewStatus, t)}</td>
                   </tr>
                 ))

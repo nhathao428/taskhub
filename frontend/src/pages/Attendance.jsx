@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { MdAdd, MdCheck, MdClose, MdWarning } from 'react-icons/md'
+import { useEffect, useState } from 'react'
+import { MdAdd, MdCheck, MdClose, MdWarning, MdImage } from 'react-icons/md'
 import Modal from '../components/Modal'
 import api from '../api/axios'
 import { useAttendance } from '../hooks/useAttendance'
@@ -31,6 +31,41 @@ export default function Attendance() {
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // --- Xem ảnh check-in bị nghi vấn (đối chiếu bằng mắt) ---
+  // Ảnh chỉ tồn tại với lần không khớp mặt / trượt liveness, và tự xoá sau hạn lưu trữ.
+  const [captureView, setCaptureView] = useState(null)   // attendanceId đang xem
+  const [captureUrl, setCaptureUrl] = useState('')
+  const [captureError, setCaptureError] = useState('')
+
+  useEffect(() => {
+    if (!captureView) {
+      // Thu hồi blob URL để không giữ ảnh sinh trắc học trong bộ nhớ trình duyệt.
+      if (captureUrl) URL.revokeObjectURL(captureUrl)
+      setCaptureUrl(''); setCaptureError('')
+      return
+    }
+    let revoked = false
+    let url = ''
+    ;(async () => {
+      try {
+        setCaptureError('')
+        const res = await api.get(`/api/face/capture/${captureView}`, { responseType: 'blob' })
+        url = URL.createObjectURL(res.data)
+        if (!revoked) setCaptureUrl(url)
+      } catch (err) {
+        // Backend trả 401 cho cả trường hợp thiếu quyền (hành vi chung của dự án), nên
+        // gộp 401/403 vào cùng một thông báo.
+        const status = err.response?.status
+        setCaptureError(
+          status === 403 || status === 401
+            ? t('Bạn không có quyền xem ảnh này (chỉ quản lý xem được).')
+            : t('Không có ảnh cho lần chấm công này (chỉ lần bị nghi vấn mới lưu, và ảnh sẽ tự xoá sau hạn lưu trữ).')
+        )
+      }
+    })()
+    return () => { revoked = true; if (url) URL.revokeObjectURL(url) }
+  }, [captureView])
 
   const handleFilterChange = (e) => {
     const id = e.target.value
@@ -137,8 +172,38 @@ export default function Attendance() {
                     <td className="px-6 py-4 text-slate-600">
                       {rec.checkInDistanceMeters != null ? `${rec.checkInDistanceMeters}m` : '-'}
                     </td>
-                    <td className="px-6 py-4">{reviewBadge(rec.reviewStatus, t)}</td>
                     <td className="px-6 py-4">
+                      {reviewBadge(rec.reviewStatus, t)}
+                      {/* Kết quả nhận diện khuôn mặt, chỉ hiện với bản ghi có dùng */}
+                      {(rec.faceVerified != null || rec.livenessPassed != null) && (
+                        <div className="mt-1 text-[11px]">
+                          {rec.livenessPassed === false ? (
+                            <span className="text-rose-600">{t('Nghi giả mạo (không chớp mắt)')}</span>
+                          ) : rec.faceVerified === false ? (
+                            <span className="text-amber-600">
+                              {t('Mặt không khớp')}
+                              {rec.faceSimilarity != null && ` (${rec.faceSimilarity.toFixed(2)})`}
+                            </span>
+                          ) : (
+                            <span className="text-emerald-600">
+                              {t('Mặt khớp')}
+                              {rec.faceSimilarity != null && ` (${rec.faceSimilarity.toFixed(2)})`}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {/* Xem ảnh đối chiếu — chỉ tồn tại với lần bị nghi vấn */}
+                      {(rec.faceVerified === false || rec.livenessPassed === false) && (
+                        <button
+                          onClick={() => setCaptureView(rec.attendanceId)}
+                          title={t('Xem ảnh lúc check-in để đối chiếu')}
+                          className="mb-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px]"
+                        >
+                          <MdImage /> {t('Xem ảnh')}
+                        </button>
+                      )}
                       {rec.reviewStatus === 'PENDING_REVIEW' ? (
                         <div className="flex gap-1">
                           <button
@@ -167,6 +232,34 @@ export default function Attendance() {
           </table>
         )}
       </div>
+
+      {/* Ảnh lúc check-in để quản lý tự đối chiếu đúng/sai người */}
+      <Modal
+        isOpen={!!captureView}
+        onClose={() => setCaptureView(null)}
+        title={t('Ảnh lúc chấm công')}
+      >
+        <div className="space-y-3">
+          {captureError && (
+            <div className="p-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-sm">
+              {captureError}
+            </div>
+          )}
+          {!captureError && !captureUrl && (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+            </div>
+          )}
+          {captureUrl && (
+            <>
+              <img src={captureUrl} alt={t('Ảnh chấm công')} className="w-full rounded-lg" />
+              <p className="text-xs text-slate-500">
+                {t('Ảnh này chỉ được lưu vì lần chấm công bị nghi vấn, đã mã hoá trong cơ sở dữ liệu và sẽ tự động xoá sau thời hạn lưu trữ. So với ảnh nhân viên đã đăng ký để quyết định duyệt hay từ chối.')}
+              </p>
+            </>
+          )}
+        </div>
+      </Modal>
 
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={t('Ghi nhận chấm công')}>
         <form onSubmit={handleSave} className="space-y-4">

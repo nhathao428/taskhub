@@ -81,8 +81,20 @@ public class BiometricCrypto {
      * Định dạng sau khi decode base64: [IV 12 byte][ciphertext + tag].
      */
     public String encrypt(float[] embedding) {
+        return encryptBytes(floatsToBytes(embedding));
+    }
+
+    /** Giải mã chuỗi base64 trong DB về vector embedding. */
+    public float[] decrypt(String base64Payload) {
+        return bytesToFloats(decryptBytes(base64Payload));
+    }
+
+    /**
+     * Mã hoá dữ liệu nhị phân bất kỳ (dùng cho ảnh khuôn mặt lúc check-in bị nghi vấn).
+     * Cùng định dạng với encrypt(float[]): [IV 12 byte][ciphertext + tag], encode base64.
+     */
+    public String encryptBytes(byte[] plaintext) {
         requireConfigured();
-        byte[] plaintext = floatsToBytes(embedding);
         try {
             byte[] iv = new byte[IV_LENGTH_BYTES];
             SECURE_RANDOM.nextBytes(iv);
@@ -101,8 +113,8 @@ public class BiometricCrypto {
         }
     }
 
-    /** Giải mã chuỗi base64 trong DB về vector embedding. */
-    public float[] decrypt(String base64Payload) {
+    /** Giải mã dữ liệu nhị phân đã mã hoá bằng encryptBytes(). */
+    public byte[] decryptBytes(String base64Payload) {
         requireConfigured();
         try {
             byte[] combined = Base64.getDecoder().decode(base64Payload);
@@ -116,7 +128,7 @@ public class BiometricCrypto {
 
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BITS, iv));
-            return bytesToFloats(cipher.doFinal(ciphertext));
+            return cipher.doFinal(ciphertext);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
