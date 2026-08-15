@@ -22,3 +22,9 @@ joblib==1.4.2
 # Pillow PHAI trong khoang [10.2.0, 10.3.0) - facenet-pytorch==2.6.0 ghim cung: "Pillow<10.3.0,>=10.2.0".
 # Ban 10.3.0+ (vd 10.4.0) se bao loi xung dot dependency luc pip install.
 Pillow==10.2.0
+
+# --- Chi can khi chay api_service.py (service HTTP cho backend Java goi sang) ---
+# Neu chi chay script rieng le (capture/enroll/verify/liveness) thi khong bat buoc.
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.10.4

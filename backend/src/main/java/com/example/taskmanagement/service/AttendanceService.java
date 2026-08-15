@@ -8,6 +8,8 @@ import com.example.taskmanagement.exception.BusinessException;
 import com.example.taskmanagement.exception.ResourceNotFoundException;
 import com.example.taskmanagement.repository.AttendanceRepository;
 import com.example.taskmanagement.repository.EmployeeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
@@ -21,19 +23,24 @@ import java.util.Optional;
 @Service
 public class AttendanceService {
 
+    private static final Logger log = LoggerFactory.getLogger(AttendanceService.class);
+
     private final AttendanceRepository attendanceRepository;
     private final EmployeeRepository employeeRepository;
     private final CurrentUserService currentUserService;
     private final GeofenceService geofenceService;
+    private final FaceRecognitionService faceRecognitionService;
 
     public AttendanceService(AttendanceRepository attendanceRepository,
                              EmployeeRepository employeeRepository,
                              CurrentUserService currentUserService,
-                             GeofenceService geofenceService) {
+                             GeofenceService geofenceService,
+                             FaceRecognitionService faceRecognitionService) {
         this.attendanceRepository = attendanceRepository;
         this.employeeRepository = employeeRepository;
         this.currentUserService = currentUserService;
         this.geofenceService = geofenceService;
+        this.faceRecognitionService = faceRecognitionService;
     }
 
     @Cacheable("attendance")
@@ -121,7 +128,74 @@ public class AttendanceService {
         a.setDate(LocalDate.now());
         a.setCheckIn(java.time.LocalTime.now());
         applyLocation(a, loc);
+        applyFaceRecognition(a, me, loc);
         return attendanceRepository.save(a);
+    }
+
+    /**
+     * Xác thực khuôn mặt cho lần check-in (đồ án chuyên ngành 8/2026).
+     *
+     * TÙY CHỌN, KHÔNG BẮT BUỘC: client không gửi ảnh thì bỏ qua hoàn toàn, check-in bằng
+     * GPS chạy y như trước. Nhờ vậy app cũ và bản deploy chưa có service AI vẫn hoạt động.
+     *
+     * Quy tắc xử lý khi có gửi ảnh:
+     *   - Khuôn mặt KHỚP + qua liveness  -> giữ nguyên kết quả GPS đã tính (thường APPROVED).
+     *   - Khuôn mặt KHÔNG khớp           -> PENDING_REVIEW (nghi chấm công hộ, quản lý xem lại).
+     *   - Không qua liveness             -> PENDING_REVIEW (nghi dùng ảnh/video giả mạo).
+     *   - Service AI lỗi/không chạy      -> PENDING_REVIEW, KHÔNG chặn nhân viên chấm công.
+     *
+     * Vì sao chọn PENDING_REVIEW thay vì từ chối thẳng: nhận diện khuôn mặt còn sai do ánh
+     * sáng, khẩu trang, camera kém — chặn cứng sẽ khiến nhân viên thật không chấm công được.
+     * Đẩy sang cho quản lý duyệt vừa giữ được bằng chứng nghi vấn, vừa không khoá người dùng.
+     * Cách này cũng đồng nhất với cách hệ thống đang xử lý check-in ngoài bán kính văn phòng.
+     */
+    private void applyFaceRecognition(Attendance a, Employee me, CheckInLocationRequest loc) {
+        if (loc == null || loc.faceImageBase64() == null || loc.faceImageBase64().isBlank()) {
+            return; // không dùng nhận diện khuôn mặt cho lần check-in này
+        }
+        if (!faceRecognitionService.isEnabled()) {
+            log.warn("Client gửi ảnh khuôn mặt nhưng tính năng chưa bật (thiếu BIOMETRIC_KEY) — bỏ qua.");
+            return;
+        }
+
+        try {
+            // 1. Chống giả mạo trước: nếu là ảnh in/video phát lại thì không cần so khớp tiếp.
+            if (loc.livenessFramesBase64() != null && loc.livenessFramesBase64().size() >= 3) {
+                boolean live = faceRecognitionService.checkLiveness(loc.livenessFramesBase64());
+                a.setLivenessPassed(live);
+                if (!live) {
+                    a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+                    log.warn("Check-in của employeeId={} không qua kiểm tra chống giả mạo", me.getEmployeeId());
+                    return;
+                }
+            } else if (faceRecognitionService.isLivenessRequired()) {
+                // Bắt buộc liveness nhưng client không gửi đủ khung hình.
+                a.setLivenessPassed(false);
+                a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+                log.warn("Check-in của employeeId={} thiếu khung hình cho kiểm tra chống giả mạo",
+                        me.getEmployeeId());
+                return;
+            }
+
+            // 2. So khớp khuôn mặt với embedding đã đăng ký của chính nhân viên này.
+            FaceRecognitionService.VerifyResult result =
+                    faceRecognitionService.verify(me, loc.faceImageBase64());
+            a.setFaceVerified(result.matched());
+            a.setFaceSimilarity((float) result.similarity());
+
+            if (!result.matched()) {
+                a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+                log.warn("Check-in của employeeId={} không khớp khuôn mặt (similarity={})",
+                        me.getEmployeeId(), String.format("%.3f", result.similarity()));
+            }
+        } catch (BusinessException e) {
+            // Service Python chưa chạy, chưa đăng ký khuôn mặt, ảnh hỏng... — không chặn
+            // nhân viên chấm công, chỉ đánh dấu để quản lý xem lại.
+            a.setFaceVerified(false);
+            a.setReviewStatus(Attendance.ReviewStatus.PENDING_REVIEW);
+            log.warn("Không xác thực được khuôn mặt cho employeeId={}: {}",
+                    me.getEmployeeId(), e.getMessage());
+        }
     }
 
     /** Self check-out: closes today's open check-in for the authenticated employee. */

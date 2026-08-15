@@ -83,4 +83,24 @@ public class Attendance implements Serializable {
     /** Cờ cho biết client báo GPS mock (mobile thường set true nếu phát hiện fake location). */
     @Column(name = "is_mocked")
     private Boolean isMocked = false;
+
+    /*
+     * ----------- Nhận diện khuôn mặt (đồ án chuyên ngành 8/2026) -----------
+     * Chỉ lưu KẾT QUẢ xác thực, không lưu ảnh cũng không lưu embedding của lần check-in
+     * này — ảnh bị huỷ ngay sau khi so khớp xong. Embedding đăng ký của nhân viên nằm ở
+     * bảng riêng employee_faces, đã mã hoá (xem EmployeeFace + BiometricCrypto).
+     * null = lần check-in đó không dùng nhận diện khuôn mặt (chỉ GPS như trước).
+     */
+
+    /** true nếu khuôn mặt khớp với người đang đăng nhập, false nếu không khớp. */
+    @Column(name = "face_verified")
+    private Boolean faceVerified;
+
+    /** Độ tương đồng cosine với embedding đã đăng ký (0-1). Dùng để đối chiếu khi review. */
+    @Column(name = "face_similarity")
+    private Float faceSimilarity;
+
+    /** true nếu qua được kiểm tra chống giả mạo (phát hiện chớp mắt). */
+    @Column(name = "liveness_passed")
+    private Boolean livenessPassed;
 }

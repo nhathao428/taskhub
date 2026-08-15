@@ -136,6 +136,16 @@ Nên set (không bắt buộc nhưng cần cho production thật):
 | `RESEND_API_KEY` | trống — không gửi email, chỉ log | Free tại resend.com/api-keys (3.000 email/tháng). Bật gửi email thật cho luồng quên mật khẩu, độc lập với `PWD_RESET_EXPOSE_TOKEN` bên dưới |
 | `RESEND_FROM` | `TaskHub <onboarding@resend.dev>` | Free tier chưa verify domain: bắt buộc dùng `onboarding@resend.dev`, và Resend chỉ gửi được tới đúng email đăng ký tài khoản Resend. Verify domain riêng tại resend.com/domains để gửi tới bất kỳ ai |
 | `RATELIMIT_EMPLOYEES` | `40` | Giới hạn request/phút/IP cho `/api/employees/**` và `/api/attendance/**` — chặn kéo dữ liệu hàng loạt nếu tài khoản manager bị lộ. Audit bảo mật 8/2026 phát hiện 2 nhóm endpoint này trước đó không có rate limit |
+| `BIOMETRIC_KEY` | trống — **tắt** nhận diện khuôn mặt | Khoá AES-256 mã hoá embedding khuôn mặt trong DB. Tạo bằng `openssl rand -base64 32`. Để trống thì check-in bằng GPS vẫn chạy bình thường. **Mất khoá = mất toàn bộ khuôn mặt đã đăng ký** |
+| `FACE_SERVICE_URL` | `http://127.0.0.1:8000` | URL service Python (`ml/face-recognition/api_service.py`). Xem cảnh báo RAM bên dưới |
+| `FACE_THRESHOLD` | `0.65` | Ngưỡng cosine similarity coi là cùng người. Chỉnh sau khi chạy `evaluate.py` trên dữ liệu thật |
+| `FACE_REQUIRE_LIVENESS` | `true` | Bắt buộc phát hiện chớp mắt mới cho check-in; thiếu khung hình sẽ bị đẩy sang PENDING_REVIEW |
+
+> **Nhận diện khuôn mặt KHÔNG deploy được trên free tier.** Service Python cần PyTorch +
+> model FaceNet, chiếm khoảng **1–2GB RAM**, trong khi Render free chỉ có 512MB. Trên bản
+> deploy công khai, để trống `BIOMETRIC_KEY` — hệ thống tự chạy chế độ chỉ GPS như cũ.
+> Tính năng khuôn mặt chạy ở máy local là đủ cho demo đồ án. Muốn deploy thật thì phải
+> export model sang ONNX (nhẹ hơn nhiều) hoặc dùng gói trả phí ≥2GB RAM.
 
 > Xem đầy đủ toàn bộ biến (kèm giải thích chi tiết bằng tiếng Việt) tại [`.env.example`](./.env.example).
 

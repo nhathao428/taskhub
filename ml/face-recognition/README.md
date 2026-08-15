@@ -300,6 +300,41 @@ python liveness.py --timeout 10
 
 ---
 
+## Bước 9 (tuỳ chọn): Chạy service cho backend TaskHub gọi sang
+
+Sau khi các bước trên chạy ngon, có thể bật service HTTP để backend Java dùng nhận diện
+khuôn mặt trong luồng check-in thật.
+
+```bash
+uvicorn api_service:app --host 127.0.0.1 --port 8000
+```
+
+Kiểm tra service sống chưa:
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Service này **stateless** — chỉ nhận ảnh và trả về vector 512 chiều, không lưu gì cả.
+Toàn bộ embedding của nhân viên do backend Java giữ trong PostgreSQL và đã mã hoá
+AES-256-GCM, để dữ liệu sinh trắc học chỉ nằm ở một nơi duy nhất.
+
+Hai endpoint:
+
+| Endpoint | Nhận | Trả về |
+|---|---|---|
+| `POST /embed` | `{"image_base64": "..."}` | `{"face_detected": true, "embedding": [512 số]}` |
+| `POST /liveness` | `{"frames_base64": ["...", "...", "..."]}` | `{"live": true/false, "min_ear": ..., "max_ear": ...}` |
+
+Phía TaskHub cần set trong `.env`:
+```
+BIOMETRIC_KEY=<openssl rand -base64 32>
+FACE_SERVICE_URL=http://127.0.0.1:8000
+```
+
+Nếu không set `BIOMETRIC_KEY`, backend tự chạy chế độ chỉ GPS như cũ — không cần service này.
+
+---
+
 ## Troubleshoot
 
 | Triệu chứng | Nguyên nhân thường gặp |
