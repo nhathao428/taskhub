@@ -1,0 +1,45 @@
+version: 2
+
+updates:
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'deps'
+    labels:
+      - dependencies
+      - backend
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'deps'
+    labels:
+      - dependencies
+      - frontend
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: 'ci'
+    labels:
+      - dependencies
+
+  - package-ecosystem: docker
+    directories:
+      - /backend
+      - /frontend
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'deps'
+    labels:
+      - dependencies
+      - docker
