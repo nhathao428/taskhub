@@ -43,6 +43,9 @@ public class BiometricCrypto {
     private static final int TAG_LENGTH_BITS = 128;
     private static final int KEY_LENGTH_BYTES = 32;     // AES-256
 
+    /** Trần kích thước plaintext. Ảnh khuôn mặt thực tế nhỏ hơn nhiều. */
+    private static final int MAX_PLAINTEXT_BYTES = 8 * 1024 * 1024;
+
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Value("${app.biometric.key:}")
@@ -95,6 +98,9 @@ public class BiometricCrypto {
      */
     public String encryptBytes(byte[] plaintext) {
         requireConfigured();
+        if (plaintext.length > MAX_PLAINTEXT_BYTES) {
+            throw new BusinessException("Dữ liệu khuôn mặt quá lớn để mã hoá");
+        }
         try {
             byte[] iv = new byte[IV_LENGTH_BYTES];
             SECURE_RANDOM.nextBytes(iv);
@@ -103,7 +109,9 @@ public class BiometricCrypto {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, new GCMParameterSpec(TAG_LENGTH_BITS, iv));
             byte[] ciphertext = cipher.doFinal(plaintext);
 
-            byte[] combined = new byte[iv.length + ciphertext.length];
+            // Math.addExact ném ArithmeticException nếu tràn int, thay vì âm thầm
+            // wrap thành số âm rồi ném NegativeArraySizeException khó truy.
+            byte[] combined = new byte[Math.addExact(iv.length, ciphertext.length)];
             System.arraycopy(iv, 0, combined, 0, iv.length);
             System.arraycopy(ciphertext, 0, combined, iv.length, ciphertext.length);
             return Base64.getEncoder().encodeToString(combined);

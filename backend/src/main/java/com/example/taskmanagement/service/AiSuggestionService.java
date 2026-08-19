@@ -108,7 +108,10 @@ public class AiSuggestionService {
     private static final java.util.regex.Pattern EMAIL = java.util.regex.Pattern.compile(
             "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
     private static final java.util.regex.Pattern CREDIT_CARD = java.util.regex.Pattern.compile(
-            "\\b(?:\\d[ -]?){13,19}\\b");
+            // Mỗi vòng lặp buộc phải ăn đúng một chữ số. Bản cũ "(?:\\d[ -]?){13,19}"
+            // có phần tử optional bên trong repetition có cận, nên engine phải thử
+            // rất nhiều cách chia — backtracking bùng nổ với input gần khớp.
+            "\\b\\d(?:[ -]?\\d){12,18}\\b");
     private static final java.util.regex.Pattern VN_PHONE = java.util.regex.Pattern.compile(
             "(?:\\+84|0)(?:3|5|7|8|9)\\d{8}");
     private static final java.util.regex.Pattern VN_CCCD = java.util.regex.Pattern.compile(
@@ -168,9 +171,16 @@ public class AiSuggestionService {
      */
     static String sanitizePromptInput(String raw) {
         if (raw == null) return null;
+        // Cắt độ dài TRƯỚC khi chạy bất kỳ regex nào. Trước đây bước cắt nằm ở
+        // cuối hàm, nên mọi regex bên dưới — kể cả CREDIT_CARD — nhận input dài
+        // không giới hạn. Đó mới là thứ biến một regex chậm thành DoS thật:
+        // giới hạn input là biện pháp chắc chắn hơn là chỉ vá pattern.
+        String stripped = raw.length() > MAX_FIELD_LENGTH
+                ? raw.substring(0, MAX_FIELD_LENGTH)
+                : raw;
         // Newline/tab/CR → space; xoá control chars khác
-        String stripped = raw.replaceAll("[\\r\\n\\t]+", " ")
-                             .replaceAll("\\p{Cntrl}", "");
+        stripped = stripped.replaceAll("[\\r\\n\\t]+", " ")
+                           .replaceAll("\\p{Cntrl}", "");
         // Block các marker dễ bị abuse để giả lập section của prompt
         stripped = stripped.replace("===", "≡≡≡")
                            .replace("```", "ʼʼʼ");

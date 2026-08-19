@@ -37,6 +37,23 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
     private static final long WINDOW_MS = 60_000;
 
+    /**
+     * Hình dạng hợp lệ của một IP (v4 hoặc v6). Chỉ dùng để sàng giá trị lấy từ
+     * header X-Forwarded-For — header do client gửi nên hoàn toàn có thể bị giả.
+     *
+     * Không validate thì có hai hậu quả, cái thứ hai nặng hơn nhiều:
+     *   1. Nhét CR/LF vào header là giả được dòng log (log injection).
+     *   2. Giá trị đó được dùng làm KEY của map {@code windows}. Mỗi giá trị giả
+     *      khác nhau tạo một bucket mới đếm lại từ 0, tức là bypass sạch rate
+     *      limit — vô hiệu hoá luôn cơ chế chống brute-force đăng nhập. Đồng thời
+     *      map phình ra không giới hạn cho tới khi hết bộ nhớ.
+     */
+    private static final java.util.regex.Pattern IP_SHAPE =
+            java.util.regex.Pattern.compile("^[0-9A-Fa-f.:]{3,45}$");
+
+    /** Trần số bucket theo dõi đồng thời, chặn map phình vô hạn. */
+    private static final int MAX_TRACKED_KEYS = 100_000;
+
     @Value("${app.ratelimit.auth:20}")
     private int authLimit;
 
@@ -114,6 +131,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private boolean allow(String key, int limit) {
         long now = System.currentTimeMillis();
+        // Dọn bucket đã hết hạn khi map quá lớn. Không có bước này thì entry của
+        // mọi IP từng ghé qua nằm lại mãi trong bộ nhớ.
+        if (windows.size() > MAX_TRACKED_KEYS) {
+            windows.entrySet().removeIf(e -> now - e.getValue().windowStart >= WINDOW_MS);
+        }
         Window window = windows.compute(key, (k, current) ->
                 (current == null || now - current.windowStart >= WINDOW_MS)
                         ? new Window(now)
@@ -129,7 +151,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (trustForwardedHeader) {
             String forwarded = request.getHeader("X-Forwarded-For");
             if (forwarded != null && !forwarded.isBlank()) {
-                return forwarded.split(",")[0].trim();
+                String first = forwarded.split(",")[0].trim();
+                // Chỉ tin khi đúng hình dạng IP. Sai thì rơi về remoteAddr chứ
+                // không dùng giá trị tuỳ ý — xem javadoc của IP_SHAPE.
+                if (IP_SHAPE.matcher(first).matches()) {
+                    return first;
+                }
+                log.debug("Bỏ qua X-Forwarded-For không hợp lệ, dùng remoteAddr");
             }
         }
         return request.getRemoteAddr();

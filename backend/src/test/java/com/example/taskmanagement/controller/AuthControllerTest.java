@@ -116,7 +116,7 @@ class AuthControllerTest {
     @Test
     void forgotPassword_returns200_withGenericMessage() throws Exception {
         when(passwordResetService.requestReset(any()))
-                .thenReturn(new ForgotPasswordResponse("Nếu email tồn tại...", null, null));
+                .thenReturn(new ForgotPasswordResponse("Nếu email tồn tại...", null));
 
         String body = """
                 {"email": "hao@example.com"}
@@ -145,7 +145,7 @@ class AuthControllerTest {
     @Test
     void resetPassword_returns200_whenValidPayload() throws Exception {
         String body = """
-                {"token": "some-token", "newPassword": "Password1!"}
+                {"email": "hao@example.com", "otp": "123456", "newPassword": "Password1!"}
                 """;
 
         mockMvc.perform(post("/api/auth/reset-password")
@@ -159,7 +159,7 @@ class AuthControllerTest {
     void resetPassword_returns400_whenPasswordWeak() throws Exception {
         // Thiếu số + ký tự đặc biệt → vi phạm @Pattern.
         String body = """
-                {"token": "some-token", "newPassword": "onlyletters"}
+                {"email": "hao@example.com", "otp": "123456", "newPassword": "onlyletters"}
                 """;
 
         mockMvc.perform(post("/api/auth/reset-password")
