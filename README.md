@@ -1,182 +1,182 @@
-# 🗂️ TaskHub — Hệ thống Quản lý Công việc cho Doanh nghiệp Nhỏ Đa ngành
+# 🗂️ TaskHub — Work Management System for Small Multi-Industry Businesses
 
-Hệ thống quản lý toàn diện giúp doanh nghiệp nhỏ quản lý nhân sự, chấm công, dự án, tiến độ công việc và nhận gợi ý phân công nhân viên thông minh từ AI (Google Gemini).
+A complete management system that helps small businesses handle staff, attendance, projects and task progress, with AI-assisted staff assignment suggestions (Google Gemini).
 
-Chấm công xác thực hai lớp: **GPS geofence** (kiểm tra vị trí trong bán kính văn phòng) kết hợp **nhận diện khuôn mặt** có chống giả mạo — nhằm giải quyết bài toán chấm công hộ.
+Attendance uses two independent checks: **GPS geofencing** (verifying the user is inside the office radius) combined with **face recognition** with anti-spoofing — the goal is to stop people clocking in on someone else's behalf.
 
-## 🚀 Deploy demo (free)
+## 🚀 Demo deployment (free)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/nhathao428/taskhub)
 
-Render Blueprint (`render.yaml`) tự tạo backend (Docker) + frontend (static) + Postgres free. Cold start ~30s sau 15ph idle. Sau khi deploy, set `GEMINI_API_KEY` ở Dashboard nếu muốn bật AI suggestion.
+The Render Blueprint (`render.yaml`) provisions the backend (Docker), the frontend (static) and a free Postgres instance. Cold start is around 30s after 15 minutes idle. After deploying, set `GEMINI_API_KEY` in the Dashboard if you want AI suggestions enabled.
 
-> ⚠️ Postgres free của Render **tự xoá sau 30 ngày** (không phải bản lưu trữ lâu dài) — phù hợp demo, không phù hợp lưu dữ liệu thật lâu dài. Xem hướng dẫn dùng DB free không hết hạn (Neon/Supabase) và deploy thủ công từng phần (Render/Vercel/Netlify/Cloudflare Pages — toàn bộ free) tại [`DEPLOY.md`](./DEPLOY.md).
+> ⚠️ Render's free Postgres is **deleted automatically after 30 days** — it is not durable storage. Fine for a demo, not for real data. For a free database that does not expire (Neon/Supabase) and for deploying each part manually (Render/Vercel/Netlify/Cloudflare Pages — all free tiers), see [`DEPLOY.md`](./DEPLOY.md).
 
 ---
 
-## 🏗️ Kiến trúc tổng quan
+## 🏗️ Architecture overview
 
 ```mermaid
 flowchart LR
-  User["Người dùng"]
-  subgraph CLIENT["TẦNG CLIENT"]
-    Web["Web App<br/>React 18 + Vite<br/>Song ngữ Việt/Anh (i18n)"]
+  User["User"]
+  subgraph CLIENT["CLIENT TIER"]
+    Web["Web App<br/>React 18 + Vite<br/>Bilingual Vietnamese/English (i18n)"]
     Mobile["Mobile App<br/>Flutter 3.x"]
   end
-  subgraph APP["TẦNG ỨNG DỤNG"]
-    Backend["Spring Boot REST API · cổng 5000<br/>Controller → Service → Repository<br/>Bảo mật JWT · Spring Cache"]
+  subgraph APP["APPLICATION TIER"]
+    Backend["Spring Boot REST API · port 5000<br/>Controller → Service → Repository<br/>JWT security · Spring Cache"]
   end
-  subgraph DATA["TẦNG DỮ LIỆU"]
+  subgraph DATA["DATA TIER"]
     PG[("PostgreSQL 16")]
-    Redis[("Redis 7<br/>bộ nhớ đệm")]
+    Redis[("Redis 7<br/>cache")]
   end
   Gemini["Google Gemini API<br/>(gemini-2.5-flash)"]
-  FaceSvc["Face Recognition Service<br/>Python + FastAPI · cổng 8000<br/>MTCNN + FaceNet · KHÔNG lưu dữ liệu"]
+  FaceSvc["Face Recognition Service<br/>Python + FastAPI · port 8000<br/>MTCNN + FaceNet · stores NOTHING"]
   User --> Web & Mobile
   Web -->|REST / JWT| Backend
   Mobile -->|REST / JWT| Backend
   Backend -->|JDBC| PG
   Backend -->|cache| Redis
   Backend -->|HTTPS| Gemini
-  Backend -->|HTTP nội bộ<br/>ảnh → vector 512| FaceSvc
+  Backend -->|internal HTTP<br/>image → 512-d vector| FaceSvc
 ```
 
-Hệ thống chia 3 tầng: **Client** (Web React + Mobile Flutter) → **Application** (Spring Boot REST API, port 5000, bảo mật JWT) → **Data** (PostgreSQL 16, Redis 7). Module AI gọi Google Gemini để gợi ý nhân viên.
+The system is split into three tiers: **Client** (React web + Flutter mobile) → **Application** (Spring Boot REST API, port 5000, JWT-secured) → **Data** (PostgreSQL 16, Redis 7). The AI module calls Google Gemini to suggest employees.
 
-**Vì sao tách service Python riêng:** JVM không chạy trực tiếp được PyTorch, nên phần AI thị giác đặt ở tiến trình Python độc lập. Service này **stateless** — chỉ nhận ảnh và trả về vector đặc trưng, không lưu bất cứ thứ gì. Toàn bộ embedding của nhân viên do backend Java giữ trong PostgreSQL ở dạng đã mã hoá, và việc so khớp cũng làm ở Java. Nhờ vậy dữ liệu sinh trắc học chỉ nằm ở **một nơi duy nhất**, dễ kiểm soát và sao lưu.
+**Why the Python service is separate:** the JVM cannot run PyTorch directly, so the computer-vision part lives in its own Python process. That service is **stateless** — it receives an image and returns a feature vector, and stores nothing. Every employee embedding is held by the Java backend in PostgreSQL in encrypted form, and matching is done in Java as well. As a result the biometric data lives in **exactly one place**, which makes it easier to control and to back up.
 
 ---
 
-## ✨ Tính năng chính
+## ✨ Key features
 
-| Tính năng | Mô tả |
+| Feature | Description |
 |---|---|
-| 🔐 Xác thực JWT | Đăng ký, đăng nhập, phân quyền 3 vai trò (Admin / Manager / Employee) |
-| 👥 Quản lý nhân viên | CRUD nhân viên, hồ sơ phòng ban / chức vụ / nhóm |
-| 👤 Self-service nhân viên | Xem task được giao, cập nhật trạng thái, tự check-in/out, xem lịch sử chấm công |
-| 📋 Quản lý dự án | Tạo, cập nhật, xóa dự án; liên kết với công việc |
-| ✅ Quản lý công việc | Tạo công việc, phân công nhân viên, theo dõi trạng thái |
-| 🕐 Chấm công | Ghi nhận giờ vào/ra theo ngày, xem lịch sử chấm công |
-| 📍 Geofence GPS | Xác minh vị trí check-in trong bán kính văn phòng; ngoài vùng → chờ quản lý duyệt |
-| 🙂 Nhận diện khuôn mặt | Check-in bằng khuôn mặt, chống chấm công hộ. Embedding mã hoá AES-256, có kiểm tra chống giả mạo |
-| 🤖 AI Gợi ý nhân viên | Tích hợp Google Gemini để đề xuất top 5 nhân viên phù hợp nhất |
-| 🔑 Quên mật khẩu | Gửi OTP 6 số qua email (Resend), hết hạn 10 phút, khoá sau 5 lần nhập sai |
-| 📊 Dashboard | Biểu đồ thống kê tổng quan (Chart.js) |
+| 🔐 JWT authentication | Register, login, three roles (Admin / Manager / Employee) |
+| 👥 Employee management | Employee CRUD, department / position / team records |
+| 👤 Employee self-service | View assigned tasks, update their status, check in/out, view own attendance history |
+| 📋 Project management | Create, update and delete projects; link them to tasks |
+| ✅ Task management | Create tasks, assign employees, track status |
+| 🕐 Attendance | Record daily clock-in/clock-out times, view attendance history |
+| 📍 GPS geofencing | Verify the check-in location is inside the office radius; outside the zone → waits for manager approval |
+| 🙂 Face recognition | Check in by face to prevent proxy attendance. Embeddings encrypted with AES-256, with anti-spoofing checks |
+| 🤖 AI employee suggestions | Google Gemini integration proposing the top 5 best-fit employees |
+| 🔑 Forgot password | 6-digit OTP by email (Resend), expires in 10 minutes, locks after 5 wrong attempts |
+| 📊 Dashboard | Overview statistics charts (Chart.js) |
 
 ---
 
-## 🛠️ Công nghệ sử dụng
+## 🛠️ Tech stack
 
-| Tầng | Công nghệ | Phiên bản |
+| Layer | Technology | Version |
 |---|---|---|
 | **Backend** | Java, Spring Boot, Maven | Java 17+, Spring Boot 3.5.0 |
-| **Xác thực** | Spring Security + JWT (jjwt) | 0.12.x |
+| **Authentication** | Spring Security + JWT (jjwt) | 0.12.x |
 | **ORM** | Spring Data JPA / Hibernate | - |
 | **Frontend** | React, Vite, Tailwind CSS | React 18, Vite 5 |
-| **HTTP Client** | Axios + JWT interceptor | - |
-| **Biểu đồ** | Chart.js + react-chartjs-2 | - |
+| **HTTP client** | Axios + JWT interceptor | - |
+| **Charts** | Chart.js + react-chartjs-2 | - |
 | **Routing** | React Router DOM | v6 |
 | **Mobile** | Flutter, Dart | Flutter 3.x, Dart ≥ 3.0 |
-| **Cơ sở dữ liệu** | PostgreSQL | 16 |
+| **Database** | PostgreSQL | 16 |
 | **Cache** | Redis + Spring Cache | 7 |
-| **Container** | Docker, Docker Compose | - |
-| **AI gợi ý** | Google Gemini API (fallback Groq) | gemini-2.5-flash |
-| **AI thị giác** | Python, FastAPI, PyTorch, facenet-pytorch | Python 3.10/3.11, torch 2.2.2 |
-| **Nhận diện khuôn mặt** | MTCNN (detect+align) + InceptionResnetV1 (VGGFace2) | facenet-pytorch 2.6.0 |
-| **Chống giả mạo** | MediaPipe Face Mesh — Eye Aspect Ratio | mediapipe 0.10.14 |
+| **Containers** | Docker, Docker Compose | - |
+| **AI suggestions** | Google Gemini API (Groq fallback) | gemini-2.5-flash |
+| **Computer vision** | Python, FastAPI, PyTorch, facenet-pytorch | Python 3.10/3.11, torch 2.2.2 |
+| **Face recognition** | MTCNN (detect+align) + InceptionResnetV1 (VGGFace2) | facenet-pytorch 2.6.0 |
+| **Anti-spoofing** | MediaPipe Face Mesh — Eye Aspect Ratio | mediapipe 0.10.14 |
 
 ---
 
-## 📋 Yêu cầu hệ thống
+## 📋 Requirements
 
-- **Java** 17 trở lên
-- **Node.js** 18 trở lên và **npm**
-- **Docker** & **Docker Compose** (để chạy PostgreSQL và Redis)
-- **Flutter SDK** 3.x trở lên (nếu phát triển mobile)
-- **Android Studio** hoặc **Xcode** (để chạy emulator / simulator)
+- **Java** 17 or later
+- **Node.js** 18 or later and **npm**
+- **Docker** & **Docker Compose** (to run PostgreSQL and Redis)
+- **Flutter SDK** 3.x or later (only for mobile development)
+- **Android Studio** or **Xcode** (to run an emulator / simulator)
 
 ---
 
-## 🚀 Khởi động nhanh với Docker Compose
+## 🚀 Quick start with Docker Compose
 
 ```bash
-# 1. Clone repository
+# 1. Clone the repository
 git clone https://github.com/nhathao428/taskhub.git
 cd taskhub
 
-# 2. Tạo file biến môi trường (tuỳ chọn)
-cp .env.example .env   # chỉnh JWT_SECRET nếu cần
+# 2. Create the environment file (optional)
+cp .env.example .env   # adjust JWT_SECRET if needed
 
-# 3. Khởi động PostgreSQL, Redis và Backend
+# 3. Start PostgreSQL, Redis and the backend
 docker-compose up --build -d
 
-# 4. Cài đặt và chạy Frontend riêng
+# 4. Install and run the frontend separately
 cd frontend
 npm install
 npm run dev
 ```
 
-- **API Backend**: `http://localhost:5000`
-- **Giao diện Frontend**: `http://localhost:5173`
+- **Backend API**: `http://localhost:5000`
+- **Frontend UI**: `http://localhost:5173`
 
 ---
 
-## 🔧 Cài đặt thủ công
+## 🔧 Manual setup
 
 ### Backend (Spring Boot)
 
 ```bash
 cd backend
 
-# Cấu hình database trong src/main/resources/application.properties
-# Xem mục "Cấu hình Backend" bên dưới
+# Configure the database in src/main/resources/application.properties
+# See "Backend configuration" below
 
 mvn spring-boot:run
 ```
 
-API sẽ khởi động tại: `http://localhost:5000`
+The API starts at: `http://localhost:5000`
 
-#### Cấu hình Backend (biến môi trường)
+#### Backend configuration (environment variables)
 
-Mặc định backend chạy H2 in-memory (không cần set gì cũng chạy được cho dev). Để dùng PostgreSQL thật, set `SPRING_PROFILES_ACTIVE=postgres` + các biến dưới đây:
+By default the backend runs on in-memory H2, so it starts for development without setting anything. To use a real PostgreSQL, set `SPRING_PROFILES_ACTIVE=postgres` plus the variables below:
 
 ```bash
-# Kết nối PostgreSQL (chỉ áp dụng khi SPRING_PROFILES_ACTIVE=postgres)
+# PostgreSQL connection (only applies when SPRING_PROFILES_ACTIVE=postgres)
 DB_URL=jdbc:postgresql://localhost:5432/task_management_db
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 
-# JWT — bắt buộc, không có default value. Tạo bằng: openssl rand -base64 48
+# JWT — required, no default value. Generate with: openssl rand -base64 48
 JWT_SECRET=your_jwt_secret_key_that_is_at_least_256_bits_long
-JWT_EXPIRATION_MS=7200000          # mặc định 2h
+JWT_EXPIRATION_MS=7200000          # default 2h
 
-# Admin seed — bắt buộc, app throw exception nếu thiếu
+# Admin seed — required, the app throws on startup if missing
 ADMIN_PASSWORD=Admin@12345
 
-# Manager / Employee seed — tuỳ chọn, để trống thì không seed tài khoản demo
+# Manager / Employee seed — optional, leave empty to skip seeding demo accounts
 MANAGER_PASSWORD=
 EMPLOYEE_PASSWORD=
 
-# Redis Cache (set CACHE_TYPE=redis khi có Redis server, mặc định 'none')
+# Redis cache (set CACHE_TYPE=redis when a Redis server is available, default 'none')
 REDIS_HOST=localhost
 REDIS_PORT=6379
 CACHE_TYPE=none
 
-# Gemini (cho tính năng AI gợi ý — không có key thì endpoint trả 422)
+# Gemini (for AI suggestions — without a key the endpoint returns 422)
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-2.5-flash
 
-# CORS — domain frontend được phép gọi API
+# CORS — frontend origins allowed to call the API
 CORS_ORIGINS=http://localhost:3000,http://localhost:5173
 
-# Rate limit (request/phút/IP) và Swagger — nên giữ mặc định, tắt Swagger ở prod
+# Rate limits (requests/minute/IP) and Swagger — keep the defaults, disable Swagger in production
 RATELIMIT_AUTH=20
 RATELIMIT_AI=10
 RATELIMIT_EMPLOYEES=40
 SWAGGER_ENABLED=false
 
-# Nhận diện khuôn mặt — để TRỐNG BIOMETRIC_KEY là TẮT hẳn tính năng,
-# check-in bằng GPS vẫn chạy bình thường. Tạo khoá: openssl rand -base64 32
+# Face recognition — leaving BIOMETRIC_KEY EMPTY DISABLES the feature entirely,
+# GPS check-in keeps working normally. Generate a key: openssl rand -base64 32
 BIOMETRIC_KEY=
 FACE_SERVICE_URL=http://127.0.0.1:8000
 FACE_THRESHOLD=0.65
@@ -187,19 +187,19 @@ FACE_CAPTURE_RETENTION_DAYS=30
 server.port=5000
 ```
 
-> Danh sách đầy đủ tất cả biến môi trường (kèm giải thích) xem tại [`.env.example`](./.env.example). Hướng dẫn deploy production chi tiết xem [`DEPLOY.md`](./DEPLOY.md).
+> The complete list of environment variables with explanations is in [`.env.example`](./.env.example) (written in Vietnamese). Detailed production deployment instructions are in [`DEPLOY.md`](./DEPLOY.md).
 
 ### Frontend (React + Vite)
 
 ```bash
 cd frontend
 npm install
-npm run dev          # Môi trường phát triển: http://localhost:5173
-npm run build        # Build production → dist/
-npm run preview      # Xem trước bản build production
+npm run dev          # Development: http://localhost:5173
+npm run build        # Production build → dist/
+npm run preview      # Preview the production build
 ```
 
-#### Biến môi trường Frontend (`.env`)
+#### Frontend environment variables (`.env`)
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000
@@ -210,90 +210,90 @@ VITE_API_BASE_URL=http://localhost:5000
 ```bash
 cd mobile
 flutter pub get
-flutter run           # Chạy trên emulator / thiết bị thật
-flutter build apk     # Build Android APK
-flutter build ios     # Build iOS (cần macOS + Xcode)
+flutter run           # Run on an emulator / real device
+flutter build apk     # Build the Android APK
+flutter build ios     # Build for iOS (requires macOS + Xcode)
 ```
 
-### Service Nhận diện Khuôn mặt (Python — tuỳ chọn)
+### Face recognition service (Python — optional)
 
-Chỉ cần khi muốn bật check-in bằng khuôn mặt. Không chạy service này thì hệ thống tự động dùng chế độ chỉ GPS.
+Only needed if you want face check-in. Without this service running, the system automatically falls back to GPS-only mode.
 
 ```bash
 cd ml/face-recognition
 python -m venv venv
 # Windows: venv\Scripts\activate | macOS/Linux: source venv/bin/activate
 
-# Cài torch TRƯỚC (bắt buộc ghim version — facenet-pytorch yêu cầu torch 2.2.x)
+# Install torch FIRST (the version must be pinned — facenet-pytorch requires torch 2.2.x)
 pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 
 uvicorn api_service:app --host 127.0.0.1 --port 8000
 ```
 
-Sau đó set `BIOMETRIC_KEY` cho backend (tạo bằng `openssl rand -base64 32`) rồi khởi động lại.
+Then set `BIOMETRIC_KEY` for the backend (generate it with `openssl rand -base64 32`) and restart.
 
-> ⚠️ **Không deploy được trên free tier.** Service này cần PyTorch + model FaceNet, chiếm khoảng **1–2GB RAM**, trong khi Render free chỉ có 512MB. Trên bản deploy công khai nên để trống `BIOMETRIC_KEY`. Tính năng khuôn mặt chạy ở máy local là đủ cho demo. Muốn deploy thật cần export model sang ONNX hoặc dùng gói ≥2GB RAM.
+> ⚠️ **This cannot be deployed on a free tier.** The service needs PyTorch plus the FaceNet model, which takes roughly **1–2 GB of RAM**, while Render's free plan gives you 512 MB. On a public deployment, leave `BIOMETRIC_KEY` empty. Running the face feature locally is enough for a demo. A real deployment would require exporting the model to ONNX or paying for a plan with ≥2 GB RAM.
 
-Chi tiết cách chụp ảnh, huấn luyện, đánh giá Accuracy/FAR/FRR: xem [`ml/face-recognition/README.md`](ml/face-recognition/README.md).
+For details on capturing images, enrolling, and measuring Accuracy/FAR/FRR, see [`ml/face-recognition/README.md`](ml/face-recognition/README.md).
 
 ---
 
-## 📡 Tổng quan API Endpoints
+## 📡 API endpoint overview
 
-| Phương thức | Đường dẫn | Mô tả | Yêu cầu Auth |
+| Method | Path | Description | Auth required |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Đăng ký tài khoản | Không |
-| `POST` | `/api/auth/login` | Đăng nhập, nhận JWT | Không |
-| `GET` | `/api/employees` | Danh sách nhân viên | Manager / Admin |
-| `GET` | `/api/employees/me` | Profile của nhân viên đang đăng nhập | Mọi role |
-| `POST` | `/api/employees` | Thêm nhân viên | Manager / Admin |
-| `PUT` | `/api/employees/{id}` | Cập nhật nhân viên | Manager / Admin |
-| `DELETE` | `/api/employees/{id}` | Xóa nhân viên | Manager / Admin |
-| `GET` | `/api/projects` | Danh sách dự án | Mọi role |
-| `POST` | `/api/projects` | Tạo dự án mới | Manager / Admin |
-| `PUT` | `/api/projects/{id}` | Cập nhật dự án | Manager / Admin |
-| `DELETE` | `/api/projects/{id}` | Xóa dự án | Manager / Admin |
-| `GET` | `/api/tasks` | Danh sách tất cả công việc | Mọi role |
-| `GET` | `/api/tasks/me` | Task được giao cho nhân viên hiện tại | Mọi role |
-| `POST` | `/api/tasks` | Tạo công việc mới | Manager / Admin |
-| `PUT` | `/api/tasks/{id}` | Cập nhật toàn bộ công việc | Manager / Admin |
-| `PATCH` | `/api/tasks/{id}/status` | Đổi status task của chính mình | Mọi role |
-| `DELETE` | `/api/tasks/{id}` | Xóa công việc | Manager / Admin |
-| `GET` | `/api/attendance` | Lịch sử chấm công toàn bộ | Manager / Admin |
-| `GET` | `/api/attendance/me` | Lịch sử chấm công của bản thân | Mọi role |
-| `POST` | `/api/attendance/me/checkin` | Tự check-in (lấy ID từ JWT) | Mọi role |
-| `POST` | `/api/attendance/me/checkout` | Tự check-out (đóng bản ghi mở hôm nay) | Mọi role |
-| `POST` | `/api/attendance/checkin` | Check-in cho nhân viên bất kỳ | Manager / Admin |
-| `POST` | `/api/attendance/checkout` | Đóng bản ghi chấm công cụ thể | Manager / Admin |
-| `PATCH` | `/api/attendance/{id}/review` | Duyệt / từ chối bản ghi chờ duyệt | Manager / Admin |
-| `POST` | `/api/suggestions/recommend` | AI gợi ý nhân viên cho task | Manager / Admin |
-| `GET` | `/api/suggestions/recommend/{taskId}` | AI gợi ý theo task ID có sẵn | Manager / Admin |
-| `POST` | `/api/auth/forgot-password` | Gửi OTP 6 số qua email | Không |
-| `POST` | `/api/auth/reset-password` | Đặt lại mật khẩu bằng email + OTP | Không |
-| `GET` | `/api/face/me` | Trạng thái tính năng + đã đăng ký khuôn mặt chưa | Mọi role |
-| `POST` | `/api/face/me/enroll` | Đăng ký khuôn mặt của chính mình (3–5 ảnh) | Mọi role |
-| `DELETE` | `/api/face/me` | Tự xoá dữ liệu khuôn mặt của mình | Mọi role |
-| `DELETE` | `/api/face/{employeeId}` | Xoá đăng ký của nhân viên bất kỳ | Manager / Admin |
-| `GET` | `/api/face/capture/{attendanceId}` | Xem ảnh lần chấm công nghi vấn để đối chiếu | Manager / Admin |
+| `POST` | `/api/auth/register` | Register an account | None |
+| `POST` | `/api/auth/login` | Log in, receive a JWT | None |
+| `GET` | `/api/employees` | List employees | Manager / Admin |
+| `GET` | `/api/employees/me` | Profile of the logged-in employee | Any role |
+| `POST` | `/api/employees` | Add an employee | Manager / Admin |
+| `PUT` | `/api/employees/{id}` | Update an employee | Manager / Admin |
+| `DELETE` | `/api/employees/{id}` | Delete an employee | Manager / Admin |
+| `GET` | `/api/projects` | List projects | Any role |
+| `POST` | `/api/projects` | Create a project | Manager / Admin |
+| `PUT` | `/api/projects/{id}` | Update a project | Manager / Admin |
+| `DELETE` | `/api/projects/{id}` | Delete a project | Manager / Admin |
+| `GET` | `/api/tasks` | List all tasks | Any role |
+| `POST` | `/api/tasks` | Create a task | Manager / Admin |
+| `GET` | `/api/tasks/me` | Tasks assigned to the current employee | Any role |
+| `PUT` | `/api/tasks/{id}` | Update an entire task | Manager / Admin |
+| `PATCH` | `/api/tasks/{id}/status` | Change the status of your own task | Any role |
+| `DELETE` | `/api/tasks/{id}` | Delete a task | Manager / Admin |
+| `GET` | `/api/attendance` | Full attendance history | Manager / Admin |
+| `GET` | `/api/attendance/me` | Your own attendance history | Any role |
+| `POST` | `/api/attendance/me/checkin` | Check yourself in (ID taken from the JWT) | Any role |
+| `POST` | `/api/attendance/me/checkout` | Check yourself out (closes today's open record) | Any role |
+| `POST` | `/api/attendance/checkin` | Check in on behalf of any employee | Manager / Admin |
+| `POST` | `/api/attendance/checkout` | Close a specific attendance record | Manager / Admin |
+| `PATCH` | `/api/attendance/{id}/review` | Approve / reject a pending record | Manager / Admin |
+| `POST` | `/api/suggestions/recommend` | AI employee suggestions for a task | Manager / Admin |
+| `GET` | `/api/suggestions/recommend/{taskId}` | AI suggestions for an existing task ID | Manager / Admin |
+| `POST` | `/api/auth/forgot-password` | Send a 6-digit OTP by email | None |
+| `POST` | `/api/auth/reset-password` | Reset the password using email + OTP | None |
+| `GET` | `/api/face/me` | Feature status + whether a face is enrolled | Any role |
+| `POST` | `/api/face/me/enroll` | Enrol your own face (3–5 images) | Any role |
+| `DELETE` | `/api/face/me` | Delete your own face data | Any role |
+| `DELETE` | `/api/face/{employeeId}` | Delete any employee's enrolment | Manager / Admin |
+| `GET` | `/api/face/capture/{attendanceId}` | View the captured image of a suspicious check-in for comparison | Manager / Admin |
 
-> Bật `SWAGGER_ENABLED=true` khi chạy dev để xem đặc tả tương tác đầy đủ tại `http://localhost:5000/swagger-ui.html` (mặc định tắt ở production để không lộ API surface).
+> Set `SWAGGER_ENABLED=true` in development to browse the full interactive specification at `http://localhost:5000/swagger-ui.html` (disabled by default in production so the API surface is not exposed).
 
 ---
 
-## 📁 Cấu trúc dự án
+## 📁 Project structure
 
 ```
 taskhub/
 ├── backend/                        # Spring Boot REST API
 │   ├── src/main/java/com/example/taskmanagement/
 │   │   ├── config/                 # Security, CORS, Redis, OpenAPI
-│   │   ├── controller/             # REST Controllers
-│   │   ├── dto/                    # Data Transfer Objects
-│   │   ├── entity/                 # JPA Entities (User, Employee, Task…)
-│   │   ├── repository/             # Spring Data JPA Repositories
-│   │   ├── security/               # JWT Filter & Utility
-│   │   └── service/                # Business Logic + AI Service
+│   │   ├── controller/             # REST controllers
+│   │   ├── dto/                    # Data transfer objects
+│   │   ├── entity/                 # JPA entities (User, Employee, Task…)
+│   │   ├── repository/             # Spring Data JPA repositories
+│   │   ├── security/               # JWT filter & utilities
+│   │   └── service/                # Business logic + AI service
 │   ├── src/main/resources/
 │   │   └── application.properties
 │   └── pom.xml
@@ -301,50 +301,50 @@ taskhub/
 │   ├── src/
 │   │   ├── api/axios.js            # Axios instance + JWT interceptor
 │   │   ├── components/             # Layout, Sidebar, Modal, ProtectedRoute
-│   │   ├── context/AuthContext.jsx # Auth state toàn cục
+│   │   ├── context/AuthContext.jsx # Global auth state
 │   │   └── pages/                  # Login, Dashboard, Employees, …
 │   └── package.json
 ├── mobile/                         # Flutter mobile app
 │   └── pubspec.yaml
-├── ml/face-recognition/            # Module nhận diện khuôn mặt (Python)
-│   ├── api_service.py              # FastAPI: /embed, /liveness — stateless, không lưu dữ liệu
+├── ml/face-recognition/            # Face recognition module (Python)
+│   ├── api_service.py              # FastAPI: /embed, /liveness — stateless, stores nothing
 │   ├── face_pipeline.py            # MTCNN detect+align + FaceNet embedding
-│   ├── capture_faces.py            # Chụp ảnh từ webcam vào dataset/
-│   ├── enroll.py                   # Tính embedding trung bình mỗi người
-│   ├── verify.py                   # Nhận diện qua webcam (1:N cosine similarity)
-│   ├── evaluate.py                 # Đo Accuracy / FAR / FRR / EER
-│   ├── liveness.py                 # Chống giả mạo bằng phát hiện chớp mắt (EAR)
-│   └── README.md                   # Hướng dẫn chạy từng bước trên máy có GPU
-├── docs/                           # Tài liệu kỹ thuật + báo cáo đồ án
+│   ├── capture_faces.py            # Capture webcam images into dataset/
+│   ├── enroll.py                   # Compute the mean embedding per person
+│   ├── verify.py                   # Recognise via webcam (1:N cosine similarity)
+│   ├── evaluate.py                 # Measure Accuracy / FAR / FRR / EER
+│   ├── liveness.py                 # Anti-spoofing via blink detection (EAR)
+│   └── README.md                   # Step-by-step guide for a machine with a GPU
+├── docs/                           # Technical documentation + project report
 │   ├── UML_DIAGRAMS.md
 │   └── DATABASE_SCHEMA.md
-├── .env.example                    # Toàn bộ biến môi trường + giải thích
-├── render.yaml                     # Render Blueprint (one-click deploy free)
-├── DEPLOY.md                       # Hướng dẫn deploy free (Render/Vercel/Netlify/Cloudflare)
-├── DEPLOY-AWS.md                   # Hướng dẫn deploy lên AWS EC2 (có phí sau free-tier 12 tháng)
+├── .env.example                    # Every environment variable, with explanations
+├── render.yaml                     # Render Blueprint (one-click free deploy)
+├── DEPLOY.md                       # Free deployment guide (Render/Vercel/Netlify/Cloudflare)
+├── DEPLOY-AWS.md                   # AWS EC2 deployment guide (paid after the 12-month free tier)
 └── README.md
 ```
 
-> Lưu ý: `docker-compose.yml`, `docker-compose.prod.yml`, `Caddyfile` **không còn trong repo** (đã bị xoá ở một commit trước) — nếu cần tự host bằng Docker Compose + Caddy, phải tự viết lại hoặc khôi phục từ lịch sử git.
+> Note: `docker-compose.yml`, `docker-compose.prod.yml` and `Caddyfile` are **no longer in the repository** (removed in an earlier commit). If you want to self-host with Docker Compose + Caddy, you will need to write them again or restore them from the git history.
 
 ---
 
-## 🤖 Tính năng AI Gợi ý Nhân viên
+## 🤖 AI employee suggestions
 
-Hệ thống tích hợp **Google Gemini** để phân tích và đề xuất nhân viên phù hợp nhất cho từng công việc. AI ra quyết định hoàn toàn — backend không tự tính điểm.
+The system integrates **Google Gemini** to analyse and propose the best-fit employee for a given task. The AI makes the decision entirely — the backend does not compute a score of its own.
 
-### Cách hoạt động
+### How it works
 
-1. Manager gửi thông tin công việc (`tiêu đề`, `mô tả tùy chọn`) đến backend.
-2. Backend thu thập **dữ liệu thô** của tất cả nhân viên:
-   - **Tiến độ task trước**: tổng task được giao, số đã hoàn thành, số đang xử lý
-   - **Thời gian hoàn thành**: số task đúng hạn / tổng task có due date, trung bình số ngày trễ
-   - **Chấm công**: số ngày làm việc trong 30 ngày gần nhất
-3. Backend đẩy raw data + 3 tiêu chí ưu tiên cho Google Gemini (`gemini-2.5-flash`) qua prompt tiếng Việt.
-4. AI **tự xếp hạng** top 5 nhân viên kèm reasoning bằng tiếng Việt — không có tính điểm bằng code.
-5. Nếu `GEMINI_API_KEY` chưa được set, endpoint trả về **HTTP 422** (`AI suggestion is unavailable`).
+1. A manager sends the task details (`title`, `optional description`) to the backend.
+2. The backend gathers **raw data** for every employee:
+   - **Past task progress**: total tasks assigned, how many completed, how many in progress
+   - **Delivery timing**: tasks delivered on time / total tasks with a due date, average days late
+   - **Attendance**: days worked in the last 30 days
+3. The backend passes the raw data plus three priority criteria to Google Gemini (`gemini-2.5-flash`) through a Vietnamese-language prompt.
+4. The AI **ranks** the top 5 employees itself and returns its reasoning in Vietnamese — there is no scoring logic in the code.
+5. If `GEMINI_API_KEY` is not set, the endpoint returns **HTTP 422** (`AI suggestion is unavailable`).
 
-### Ví dụ Request
+### Example request
 
 ```json
 POST /api/suggestions/recommend
@@ -354,7 +354,9 @@ POST /api/suggestions/recommend
 }
 ```
 
-### Ví dụ Response
+### Example response
+
+The `reasoning` field comes back in Vietnamese because the prompt is in Vietnamese:
 
 ```json
 [
@@ -379,23 +381,23 @@ POST /api/suggestions/recommend
 
 ---
 
-## 📖 Tài liệu
+## 📖 Documentation
 
-| Tài liệu | Mô tả |
+| Document | Description |
 |---|---|
-| [Sơ đồ UML](docs/UML_DIAGRAMS.md) | Use Case, Class, Sequence, Activity diagrams (Mermaid — GitHub render trực tiếp) |
-| [Lược đồ Cơ sở dữ liệu](docs/DATABASE_SCHEMA.md) | ERD, mô tả bảng, và lý do đằng sau các quyết định về dữ liệu nhạy cảm |
-| [Module Nhận diện Khuôn mặt](ml/face-recognition/README.md) | Hướng dẫn từng bước: chụp ảnh, đăng ký, đánh giá FAR/FRR, chạy service |
-| [Hướng dẫn Deploy](DEPLOY.md) | Deploy free (Render Blueprint, hoặc Render/Vercel/Netlify/Cloudflare Pages thủ công) |
-| [Biến môi trường](.env.example) | Toàn bộ biến kèm giải thích chi tiết bằng tiếng Việt |
-| [Backend](backend/README.md) | Tài liệu chi tiết về phần backend |
-| [Frontend](frontend/README.md) | Tài liệu chi tiết về phần frontend |
-| [Mobile](mobile/README.md) | Tài liệu chi tiết về ứng dụng di động |
+| [UML diagrams](docs/UML_DIAGRAMS.md) | Use case, class, sequence and activity diagrams (Mermaid — rendered directly by GitHub) |
+| [Database schema](docs/DATABASE_SCHEMA.md) | ERD, table descriptions, and the reasoning behind the decisions on sensitive data |
+| [Face recognition module](ml/face-recognition/README.md) | Step-by-step: capturing images, enrolling, measuring FAR/FRR, running the service |
+| [Deployment guide](DEPLOY.md) | Free deployment (Render Blueprint, or Render/Vercel/Netlify/Cloudflare Pages manually) |
+| [Environment variables](.env.example) | Every variable with a detailed explanation (in Vietnamese) |
+| [Backend](backend/README.md) | Detailed backend documentation |
+| [Frontend](frontend/README.md) | Detailed frontend documentation |
+| [Mobile](mobile/README.md) | Detailed mobile app documentation |
 
-> Đặc tả API tương tác: bật `SWAGGER_ENABLED=true` rồi mở `http://localhost:5000/swagger-ui.html`.
+> Interactive API specification: set `SWAGGER_ENABLED=true` and open `http://localhost:5000/swagger-ui.html`.
 
 ---
 
-## 📄 Giấy phép
+## 📄 Licence
 
-Dự án được phát triển cho mục đích học thuật. Mọi đóng góp và phản hồi đều được hoan nghênh.
+This project was built for academic purposes. Contributions and feedback are welcome.
