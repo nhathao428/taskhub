@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { MdVideocam, MdVideocamOff, MdCameraAlt, MdRefresh } from 'react-icons/md'
+import { MdVideocam, MdVideocamOff, MdCameraAlt } from 'react-icons/md'
 import { useTranslation } from '../context/LanguageContext'
 
 /**
@@ -104,7 +104,8 @@ export default function FaceCapture({
         setCountdown(captureFrames - i)
         const f = grabFrame()
         if (f) frames.push(f)
-        // eslint-disable-next-line no-await-in-loop
+        // Sequential on purpose: the frames must be spaced in time, so
+        // awaiting inside the loop is the intended behaviour here.
         await sleep(frameIntervalMs)
       }
       setCountdown(0)
